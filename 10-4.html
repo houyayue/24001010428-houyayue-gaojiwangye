@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>侯雅月的媒体查询网格布局</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            min-width: 320px;
+            min-height: 100%;
+        }
+        body {
+            margin: 0;
+            padding: 28px 16px;
+            color: #203b36;
+            background: #f0f3ed;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .page {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+        }
+        .heading {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: start;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .eyebrow {
+            margin: 0 0 10px;
+            color: #d65d45;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(28px, 5vw, 48px);
+            line-height: 1.15;
+        }
+        .author {
+            margin: 0 0 4px;
+            color: #52635d;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .tile {
+            min-width: 0;
+            aspect-ratio: 1;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            border-radius: 6px;
+        }
+        .tile:nth-child(1) { background: #df654d; }
+        .tile:nth-child(2) { background: #197f78; }
+        .tile:nth-child(3) { background: #386da0; }
+        .tile:nth-child(4) { background: #d8a83c; color: #243b36; }
+        .tile:nth-child(5) { background: #875a82; }
+        .tile:nth-child(6) { background: #4d7656; }
+        .tile:nth-child(7) { background: #bd604d; }
+        .tile:nth-child(8) { background: #426d70; }
+        .tile-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .tile-number {
+            font-size: clamp(32px, 6vw, 64px);
+            font-weight: 700;
+            line-height: 1;
+        }
+        .layout-info {
+            margin: 20px 0 0;
+            color: #52635d;
+            font-size: 14px;
+        }
+        .layout-info span::after {
+            content: "当前每行 1 个盒子";
+            color: #d65d45;
+            font-weight: 700;
+        }
+        @media (min-width: 480px) {
+            body {
+                padding: 36px 20px;
+            }
+            .heading {
+                margin-bottom: 32px;
+                align-items: end;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 20px;
+            }
+            .gallery {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
+            }
+            .tile {
+                padding: 16px;
+            }
+            .layout-info span::after {
+                content: "当前每行 2 个盒子";
+            }
+        }
+        @media (min-width: 600px) {
+            body {
+                padding: 48px 32px;
+            }
+            .gallery {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 18px;
+            }
+            .tile {
+                padding: 18px;
+            }
+            .layout-info span::after {
+                content: "当前每行 4 个盒子";
+            }
+        }
+        @media (min-width: 1024px) {
+            .gallery {
+                grid-template-columns: repeat(8, minmax(0, 1fr));
+                gap: 12px;
+            }
+            .tile {
+                padding: 12px;
+            }
+            .tile-label {
+                font-size: 10px;
+            }
+            .layout-info span::after {
+                content: "当前每行 8 个盒子";
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <header class="heading">
+            <div>
+                <p class="eyebrow">CSS MEDIA QUERY / 10-4</p>
+                <h1>响应式盒子布局</h1>
+            </div>
+            <p class="author">侯雅月 · 网页设计练习</p>
+        </header>
+        <section class="gallery" aria-label="八个响应式排列的盒子">
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">01</span></article>
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">02</span></article>
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">03</span></article>
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">04</span></article>
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">05</span></article>
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">06</span></article>
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">07</span></article>
+            <article class="tile"><span class="tile-label">GRID ITEM</span><span class="tile-number">08</span></article>
+        </section>
+        <p class="layout-info">视口宽度变化时，<span></span>。</p>
+    </main>
+</body>
+</html>

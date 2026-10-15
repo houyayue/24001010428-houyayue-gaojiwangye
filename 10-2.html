@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>侯雅月的 CSS Animation 幻灯片</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 48px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            color: #fff;
+            background: #000;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .page-heading {
+            width: min(900px, 100%);
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .eyebrow {
+            margin: 0 0 8px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(26px, 5vw, 42px);
+            line-height: 1.2;
+        }
+        .author {
+            margin: 0 0 4px;
+            color: #fff;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+        .carousel {
+            width: min(900px, 100%);
+            overflow: hidden;
+            background: #000;
+        }
+        .track {
+            display: flex;
+            width: 500%;
+            animation: slide-show 25s linear infinite;
+        }
+        .carousel:hover .track {
+            animation-play-state: paused;
+        }
+        .slide {
+            position: relative;
+            flex: 0 0 20%;
+            min-width: 0;
+            height: clamp(260px, 55vh, 500px);
+        }
+        .slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+        .caption {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            padding: 18px 24px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            color: #fff;
+            background: transparent;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95), 0 1px 2px #000;
+        }
+        .caption h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .caption p {
+            margin: 5px 0 0;
+            color: #fff;
+            font-size: 13px;
+        }
+        .slide-number {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        @keyframes slide-show {
+            0% { transform: translateX(0); animation-timing-function: steps(1, end); }
+            20% { transform: translateX(-20%); animation-timing-function: steps(1, end); }
+            40% { transform: translateX(-40%); animation-timing-function: steps(1, end); }
+            60% { transform: translateX(-60%); animation-timing-function: steps(1, end); }
+            80% { transform: translateX(-80%); animation-timing-function: steps(1, end); }
+            100% { transform: translateX(0); }
+        }
+        @media (max-width: 560px) {
+            body {
+                padding: 28px 16px;
+                gap: 18px;
+            }
+            .page-heading {
+                align-items: start;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .slide {
+                height: 52vh;
+                min-height: 240px;
+            }
+            .caption {
+                padding: 14px 16px;
+            }
+            .caption h2 {
+                font-size: 17px;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .track {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-heading">
+        <div>
+            <p class="eyebrow">CSS ANIMATION / 10-2</p>
+            <h1>影像轮播</h1>
+        </div>
+        <p class="author">侯雅月 · 网页设计练习</p>
+    </header>
+
+    <main class="carousel" aria-label="自动播放的图片幻灯片">
+        <div class="track">
+            <article class="slide">
+                <img src="image/2.jpeg" alt="海岛阳光与旅行汽车插画">
+                <div class="caption">
+                    <div><h2>把旅程装进行囊</h2><p>阳光、海岛与一场轻松的出发</p></div>
+                    <span class="slide-number">01 / 05</span>
+                </div>
+            </article>
+            <article class="slide">
+                <img src="image/3.jpeg" alt="粉色爱心主题插画">
+                <div class="caption">
+                    <div><h2>心意与可爱</h2><p>用柔和的颜色记录生活里的小惊喜</p></div>
+                    <span class="slide-number">02 / 05</span>
+                </div>
+            </article>
+            <article class="slide">
+                <img src="image/18.jpg" alt="中华人民共和国国徽主题海报">
+                <div class="caption">
+                    <div><h2>家国记忆</h2><p>鲜明的红色画面，传递庄重与热忱</p></div>
+                    <span class="slide-number">03 / 05</span>
+                </div>
+            </article>
+            <article class="slide">
+                <img src="image/19.jpg" alt="中国人民解放军主题海报">
+                <div class="caption">
+                    <div><h2>守护与担当</h2><p>以坚定的视觉表达守护与责任</p></div>
+                    <span class="slide-number">04 / 05</span>
+                </div>
+            </article>
+            <article class="slide">
+                <img src="image/20.jpg" alt="信仰主题红色海报">
+                <div class="caption">
+                    <div><h2>信念与初心</h2><p>让每一帧画面都留下清晰印象</p></div>
+                    <span class="slide-number">05 / 05</span>
+                </div>
+            </article>
+        </div>
+    </main>
+</body>
+</html>

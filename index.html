@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>袁磊的《高级网页设计》课堂实践</title>
+    <style>
+        :root {
+            --bg1: #eef6ff;
+            --bg2: #fffaf0;
+            --card: rgba(255, 255, 255, 0.82);
+            --line: #d8e6f5;
+            --primary: #1d5fa6;
+            --primary-dark: #153f73;
+            --accent: #ff9d2f;
+            --text: #213244;
+            --muted: #5d6d7e;
+            --shadow: 0 18px 40px rgba(29, 95, 166, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            color: var(--text);
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(29,95,166,0.94), rgba(21,63,115,0.95));
+            border-radius: 24px;
+            padding: 42px 36px;
+            color: #fff;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hero::before {
+            top: -50px;
+            right: -40px;
+        }
+
+        .hero::after {
+            bottom: -70px;
+            left: -30px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            line-height: 1.2;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.82);
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        .summary {
+            margin-top: 26px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .summary-item {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 16px 18px;
+            backdrop-filter: blur(4px);
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .summary-item span {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.95rem;
+        }
+
+        .section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            margin: 0 0 18px;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            display: block;
+            text-decoration: none;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 20px 18px;
+            box-shadow: 0 10px 25px rgba(17, 24, 39, 0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            color: var(--text);
+            min-height: 150px;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 30px rgba(13, 54, 101, 0.12);
+            border-color: rgba(29,95,166,0.38);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #dff0ff, #edf7ff);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .card-badge {
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .prompt-box {
+            margin-top: 32px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-left: 6px solid var(--accent);
+            border-radius: 18px;
+            padding: 22px 20px;
+            box-shadow: 0 12px 30px rgba(17, 24, 39, 0.04);
+        }
+
+        .prompt-box h3 {
+            margin: 0 0 12px;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+        }
+
+        .prompt-box blockquote {
+            margin: 0;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #fff7f0, #fffaf6);
+            border: 1px solid #fbe4c5;
+            border-radius: 12px;
+            color: #4b4b4b;
+            line-height: 1.9;
+            font-size: 0.96rem;
+        }
+
+        @media (max-width: 700px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 28px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="hero">
+            <div class="hero-content">
+                <div class="tag">课堂实践导航</div>
+                <h1>侯雅月的《高级网页设计》课堂实践</h1>
+                <p class="subtitle">
+                    这是本课程的网页作品集汇总页，汇总了本目录下的所有 HTML 实践页面，展示学习过程中的基础知识、表单设计、图片链接、CSS 进阶等内容。
+                </p>
+
+                <div class="summary">
+                    <div class="summary-item">
+                        <strong>19</strong>
+                        <span>实践页面</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>HTML</strong>
+                        <span>原生构建</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>CSS</strong>
+                        <span>样式美化</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="section">
+            <h2 class="section-title">作品列表</h2>
+            <div class="grid">
+                <a class="card" href="1.html">
+                    <div class="card-header">
+                        <span class="card-index">1</span>
+                        <span class="card-badge">基础页面</span>
+                    </div>
+                    <h3>1.html</h3>
+                    <p>HTML 基础元素、段落、列表与颜色文字展示的入门训练页面。</p>
+                </a>
+
+                <a class="card" href="2-1.html">
+                    <div class="card-header">
+                        <span class="card-index">2-1</span>
+                        <span class="card-badge">超链接</span>
+                    </div>
+                    <h3>2-1.html</h3>
+                    <p>网页链接、相对路径与页面跳转的练习，展示了常见超链接使用方式。</p>
+                </a>
+
+                <a class="card" href="2.2.html">
+                    <div class="card-header">
+                        <span class="card-index">2.2</span>
+                        <span class="card-badge">图片与表格</span>
+                    </div>
+                    <h3>2.2.html</h3>
+                    <p>图片展示、图片超链接以及大国重器表格设计的综合实战页面。</p>
+                </a>
+
+                <a class="card" href="3-1.html">
+                    <div class="card-header">
+                        <span class="card-index">3-1</span>
+                        <span class="card-badge">表单</span>
+                    </div>
+                    <h3>3-1.html</h3>
+                    <p>HTML 表单元素训练，包括文本框、密码框、单选、多选和下拉菜单。</p>
+                </a>
+
+                <a class="card" href="3-2.html">
+                    <div class="card-header">
+                        <span class="card-index">3-2</span>
+                        <span class="card-badge">表单应用</span>
+                    </div>
+                    <h3>3-2.html</h3>
+                    <p>表单提交与表单控件组合示例，进一步巩固表单开发技能。</p>
+                </a>
+
+                <a class="card" href="4-1.css2.html">
+                    <div class="card-header">
+                        <span class="card-index">4-1</span>
+                        <span class="card-badge">CSS 进阶</span>
+                    </div>
+                    <h3>4-1.css2.html</h3>
+                    <p>层叠样式表进阶应用，涉及群组选择器、后代选择器与继承等知识点。</p>
+                </a>
+
+                <a class="card" href="5-1.html">
+                    <div class="card-header">
+                        <span class="card-index">5-1</span>
+                        <span class="card-badge">选择器</span>
+                    </div>
+                    <h3>5-1.html</h3>
+                    <p>CSS 选择器与优先级练习，展示标签、类、ID 和后代选择器的组合使用。</p>
+                </a>
+
+                <a class="card" href="5-2.html">
+                    <div class="card-header">
+                        <span class="card-index">5-2</span>
+                        <span class="card-badge">盒子模型</span>
+                    </div>
+                    <h3>5-2.html</h3>
+                    <p>围绕盒子模型进行布局实践，体验尺寸、边框、内边距与外边距的作用。</p>
+                </a>
+
+                <a class="card" href="6-1.html">
+                    <div class="card-header">
+                        <span class="card-index">6-1</span>
+                        <span class="card-badge">Flex 布局</span>
+                    </div>
+                    <h3>6-1.html</h3>
+                    <p>使用 Flex 实现弹性布局，练习元素排列、换行和间距控制。</p>
+                </a>
+
+                <a class="card" href="6-2.html">
+                    <div class="card-header">
+                        <span class="card-index">6-2</span>
+                        <span class="card-badge">综合布局</span>
+                    </div>
+                    <h3>6-2.html</h3>
+                    <p>综合运用 CSS 布局知识，完成页面模块化排列与视觉样式设计。</p>
+                </a>
+
+                <a class="card" href="7-1%20%E4%B8%8A%E5%9B%BE%E4%B8%8B%E6%96%87.html">
+                    <div class="card-header">
+                        <span class="card-index">7-1</span>
+                        <span class="card-badge">图文布局</span>
+                    </div>
+                    <h3>7-1 上图下文.html</h3>
+                    <p>图片在上、文字在下的卡片布局练习，展示图文内容的整齐组织方式。</p>
+                </a>
+
+                <a class="card" href="7-2%20%E5%B7%A6%E5%9B%BE%E5%8F%B3%E6%96%87.html">
+                    <div class="card-header">
+                        <span class="card-index">7-2</span>
+                        <span class="card-badge">图文布局</span>
+                    </div>
+                    <h3>7-2 左图右文.html</h3>
+                    <p>图片在左、文字在右的横向图文布局练习，巩固 Flex 排版方法。</p>
+                </a>
+
+                <a class="card" href="8-1%20css3%E9%80%89%E6%8B%A9%E5%99%A8.html">
+                    <div class="card-header">
+                        <span class="card-index">8-1</span>
+                        <span class="card-badge">CSS3 选择器</span>
+                    </div>
+                    <h3>8-1 css3选择器.html</h3>
+                    <p>CSS3 选择器效果练习，展示不同选择器对页面元素样式的控制。</p>
+                </a>
+
+                <a class="card" href="9-1transiton.html">
+                    <div class="card-header">
+                        <span class="card-index">9-1</span>
+                        <span class="card-badge">过渡动画</span>
+                    </div>
+                    <h3>9-1transiton.html</h3>
+                    <p>使用 CSS transition 为图片和文字效果添加平滑过渡动画。</p>
+                </a>
+
+                <a class="card" href="10-1-animation.html">
+                    <div class="card-header">
+                        <span class="card-index">10-1</span>
+                        <span class="card-badge">CSS 动画</span>
+                    </div>
+                    <h3>10-1-animation.html</h3>
+                    <p>背景颜色循环切换，线条小人随颜色变化同步变换舞姿。</p>
+                </a>
+
+                <a class="card" href="10-2.html">
+                    <div class="card-header">
+                        <span class="card-index">10-2</span>
+                        <span class="card-badge">CSS 幻灯片</span>
+                    </div>
+                    <h3>10-2.html</h3>
+                    <p>使用 CSS Animation 实现图片自动轮播与图上文字说明。</p>
+                </a>
+
+                <a class="card" href="10-3.html">
+                    <div class="card-header">
+                        <span class="card-index">10-3</span>
+                        <span class="card-badge">媒体查询</span>
+                    </div>
+                    <h3>10-3.html</h3>
+                    <p>根据视口宽度切换全屏背景颜色与文字尺寸。</p>
+                </a>
+
+                <a class="card" href="10-4.html">
+                    <div class="card-header">
+                        <span class="card-index">10-4</span>
+                        <span class="card-badge">响应式布局</span>
+                    </div>
+                    <h3>10-4.html</h3>
+                    <p>通过媒体查询调整八个盒子的网格列数，适配不同视口。</p>
+                </a>
+
+                <a class="card" href="11-1.html">
+                    <div class="card-header">
+                        <span class="card-index">11-1</span>
+                        <span class="card-badge">长度单位</span>
+                    </div>
+                    <h3>11-1.html</h3>
+                    <p>Web 前端常用 CSS 长度单位：px、em、rem、%、vw、vh 的说明与示例。</p>
+                </a>
+
+                <a class="card" href="11-2.html">
+                    <div class="card-header">
+                        <span class="card-index">11-2</span>
+                        <span class="card-badge">CSS3 3D 动画</span>
+                    </div>
+                    <h3>11-2.html</h3>
+                    <p>使用 CSS3 transform 与 animation 实现立方体旋转、卡片翻转、圆环、金字塔、开门及 3D 轮播等动画效果。</p>
+                </a>
+            </div>
+        </main>
+
+        <section class="prompt-box">
+            <h3>本提示词</h3>
+            <blockquote>
+                创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为侯雅月的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。
+            </blockquote>
+        </section>
+    </div>
+</body>
+</html>

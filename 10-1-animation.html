@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>盒子背景颜色动画</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			min-height: 100vh;
+			margin: 0;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 20px;
+			font-family: "Microsoft YaHei", sans-serif;
+			background-color: #f3f5f7;
+		}
+		h1 {
+			margin: 0;
+			color: #263238;
+			font-size: 24px;
+		}
+		.box {
+			position: relative;
+			width: min(280px, 75vw);
+			aspect-ratio: 1;
+			overflow: hidden;
+			border-radius: 12px;
+			animation: change-color 8s linear infinite;
+		}
+		.dancer {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 140px;
+			height: 190px;
+			margin: -95px 0 0 -70px;
+			animation: dance-body 8s linear infinite;
+		}
+		.dancer span {
+			position: absolute;
+			display: block;
+			background: #172a32;
+			border-radius: 4px;
+			filter: drop-shadow(0 0 1px #fff);
+		}
+		.dancer .head {
+			top: 2px;
+			left: 53px;
+			width: 34px;
+			height: 34px;
+			border: 5px solid #172a32;
+			border-radius: 50%;
+			background: transparent;
+		}
+		.dancer .torso {
+			top: 38px;
+			left: 67px;
+			width: 6px;
+			height: 60px;
+		}
+		.dancer .arm,
+		.dancer .leg {
+			left: 70px;
+			width: 52px;
+			height: 5px;
+			transform-origin: 4px center;
+		}
+		.dancer .arm {
+			top: 52px;
+			animation: dance-arms 8s linear infinite;
+		}
+		.dancer .arm-left {
+			animation-name: dance-arm-left;
+		}
+		.dancer .arm-right {
+			animation-name: dance-arm-right;
+		}
+		.dancer .leg {
+			top: 94px;
+			animation: dance-legs 8s linear infinite;
+		}
+		.dancer .leg-left {
+			animation-name: dance-leg-left;
+		}
+		.dancer .leg-right {
+			animation-name: dance-leg-right;
+		}
+		.box:hover,
+		.box:hover .dancer,
+		.box:hover .arm,
+		.box:hover .leg {
+			animation-play-state: paused;
+		}
+		@keyframes change-color {
+			0% { background-color: #ef476f; animation-timing-function: steps(1, end); }
+			12.5% { background-color: #ff7f11; animation-timing-function: steps(1, end); }
+			25% { background-color: #ffd166; animation-timing-function: steps(1, end); }
+			37.5% { background-color: #06d6a0; animation-timing-function: steps(1, end); }
+			50% { background-color: #118ab2; animation-timing-function: steps(1, end); }
+			62.5% { background-color: #4361ee; animation-timing-function: steps(1, end); }
+			75% { background-color: #8338ec; animation-timing-function: steps(1, end); }
+			87.5% { background-color: #f72585; animation-timing-function: steps(1, end); }
+			100% { background-color: #ef476f; }
+		}
+		@keyframes dance-body {
+			0% { transform: translateY(0) rotate(0); animation-timing-function: steps(1, end); }
+			12.5% { transform: translateY(-7px) rotate(-8deg); animation-timing-function: steps(1, end); }
+			25% { transform: translateY(0) rotate(5deg); animation-timing-function: steps(1, end); }
+			37.5% { transform: translateY(-10px) rotate(0); animation-timing-function: steps(1, end); }
+			50% { transform: translateY(0) rotate(8deg); animation-timing-function: steps(1, end); }
+			62.5% { transform: translateY(-6px) rotate(-4deg); animation-timing-function: steps(1, end); }
+			75% { transform: translateY(0) rotate(-9deg); animation-timing-function: steps(1, end); }
+			87.5% { transform: translateY(-12px) rotate(5deg); animation-timing-function: steps(1, end); }
+			100% { transform: translateY(0) rotate(0); }
+		}
+		@keyframes dance-arm-left {
+			0% { transform: rotate(220deg); animation-timing-function: steps(1, end); }
+			12.5% { transform: rotate(155deg); animation-timing-function: steps(1, end); }
+			25% { transform: rotate(250deg); animation-timing-function: steps(1, end); }
+			37.5% { transform: rotate(110deg); animation-timing-function: steps(1, end); }
+			50% { transform: rotate(200deg); animation-timing-function: steps(1, end); }
+			62.5% { transform: rotate(140deg); animation-timing-function: steps(1, end); }
+			75% { transform: rotate(280deg); animation-timing-function: steps(1, end); }
+			87.5% { transform: rotate(180deg); animation-timing-function: steps(1, end); }
+			100% { transform: rotate(220deg); }
+		}
+		@keyframes dance-arm-right {
+			0% { transform: rotate(320deg); animation-timing-function: steps(1, end); }
+			12.5% { transform: rotate(25deg); animation-timing-function: steps(1, end); }
+			25% { transform: rotate(290deg); animation-timing-function: steps(1, end); }
+			37.5% { transform: rotate(70deg); animation-timing-function: steps(1, end); }
+			50% { transform: rotate(340deg); animation-timing-function: steps(1, end); }
+			62.5% { transform: rotate(40deg); animation-timing-function: steps(1, end); }
+			75% { transform: rotate(80deg); animation-timing-function: steps(1, end); }
+			87.5% { transform: rotate(0deg); animation-timing-function: steps(1, end); }
+			100% { transform: rotate(320deg); }
+		}
+		@keyframes dance-leg-left {
+			0% { transform: rotate(135deg); animation-timing-function: steps(1, end); }
+			12.5% { transform: rotate(160deg); animation-timing-function: steps(1, end); }
+			25% { transform: rotate(115deg); animation-timing-function: steps(1, end); }
+			37.5% { transform: rotate(145deg); animation-timing-function: steps(1, end); }
+			50% { transform: rotate(155deg); animation-timing-function: steps(1, end); }
+			62.5% { transform: rotate(110deg); animation-timing-function: steps(1, end); }
+			75% { transform: rotate(130deg); animation-timing-function: steps(1, end); }
+			87.5% { transform: rotate(165deg); animation-timing-function: steps(1, end); }
+			100% { transform: rotate(135deg); }
+		}
+		@keyframes dance-leg-right {
+			0% { transform: rotate(45deg); animation-timing-function: steps(1, end); }
+			12.5% { transform: rotate(30deg); animation-timing-function: steps(1, end); }
+			25% { transform: rotate(70deg); animation-timing-function: steps(1, end); }
+			37.5% { transform: rotate(10deg); animation-timing-function: steps(1, end); }
+			50% { transform: rotate(40deg); animation-timing-function: steps(1, end); }
+			62.5% { transform: rotate(65deg); animation-timing-function: steps(1, end); }
+			75% { transform: rotate(20deg); animation-timing-function: steps(1, end); }
+			87.5% { transform: rotate(50deg); animation-timing-function: steps(1, end); }
+			100% { transform: rotate(45deg); }
+		}
+	</style>
+</head>
+<body>
+	<h1>盒子背景颜色变化</h1>
+	<div class="box">
+		<div class="dancer" role="img" aria-label="随着背景颜色变化而跳舞的线条小人">
+			<span class="head"></span>
+			<span class="torso"></span>
+			<span class="arm arm-left"></span>
+			<span class="arm arm-right"></span>
+			<span class="leg leg-left"></span>
+			<span class="leg leg-right"></span>
+		</div>
+	</div>
+</body>
+</html>

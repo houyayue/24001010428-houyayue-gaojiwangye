@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>CSS3 3D 动画</title>
+<style>
+body {
+    margin: 0;
+    padding: 40px;
+    background: #1a1a2e;
+    font-family: "Microsoft YaHei", sans-serif;
+    color: #eee;
+}
+h1 {
+    text-align: center;
+    color: #e94560;
+    margin-bottom: 40px;
+}
+.hou_ya_yue_container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 60px;
+}
+.hou_ya_yue_box_wrapper {
+    perspective: 800px;
+    text-align: center;
+}
+.hou_ya_yue_box_wrapper p {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #aaa;
+}
+
+.hou_ya_yue_cube {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: hou_ya_yue_rotateCube 6s linear infinite;
+    margin: 0 auto;
+}
+.hou_ya_yue_face {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 2px solid #e94560;
+    background: rgba(233, 69, 96, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #e94560;
+}
+.hou_ya_yue_front  { transform: translateZ(50px); }
+.hou_ya_yue_back   { transform: rotateY(180deg) translateZ(50px); }
+.hou_ya_yue_right  { transform: rotateY(90deg) translateZ(50px); }
+.hou_ya_yue_left   { transform: rotateY(-90deg) translateZ(50px); }
+.hou_ya_yue_top    { transform: rotateX(90deg) translateZ(50px); }
+.hou_ya_yue_bottom { transform: rotateX(-90deg) translateZ(50px); }
+@keyframes hou_ya_yue_rotateCube {
+    from { transform: rotateX(0) rotateY(0); }
+    to   { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+.hou_ya_yue_card {
+    width: 120px;
+    height: 160px;
+    background: linear-gradient(135deg, #0f3460, #16213e);
+    border: 2px solid #e94560;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transform-style: preserve-3d;
+    animation: hou_ya_yue_flipCard 4s ease-in-out infinite;
+    margin: 0 auto;
+}
+@keyframes hou_ya_yue_flipCard {
+    0%, 100% { transform: rotateY(0deg); }
+    50%      { transform: rotateY(180deg); }
+}
+
+.hou_ya_yue_ring {
+    width: 120px;
+    height: 120px;
+    border: 6px solid transparent;
+    border-top-color: #e94560;
+    border-right-color: #0f3460;
+    border-radius: 50%;
+    animation: hou_ya_yue_spinRing 2s linear infinite;
+    margin: 0 auto;
+}
+@keyframes hou_ya_yue_spinRing {
+    from { transform: rotateX(70deg) rotateZ(0deg); }
+    to   { transform: rotateX(70deg) rotateZ(360deg); }
+}
+
+.hou_ya_yue_pyramid {
+    width: 0;
+    height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-bottom: 100px solid rgba(233, 69, 96, 0.6);
+    transform-style: preserve-3d;
+    animation: hou_ya_yue_rotatePyramid 5s linear infinite;
+    margin: 0 auto;
+    position: relative;
+}
+@keyframes hou_ya_yue_rotatePyramid {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+}
+
+.hou_ya_yue_door {
+    width: 100px;
+    height: 160px;
+    background: linear-gradient(180deg, #533483, #0f3460);
+    border: 3px solid #e94560;
+    border-radius: 6px;
+    transform-origin: left center;
+    animation: hou_ya_yue_openDoor 3s ease-in-out infinite alternate;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+@keyframes hou_ya_yue_openDoor {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(-100deg); }
+}
+
+.hou_ya_yue_carousel {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: hou_ya_yue_carouselSpin 8s linear infinite;
+    margin: 0 auto;
+}
+.hou_ya_yue_carousel .hou_ya_yue_panel {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(233, 69, 96, 0.2);
+    border: 2px solid #e94560;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    backface-visibility: visible;
+}
+.hou_ya_yue_panel:nth-child(1) { transform: rotateY(0deg) translateZ(140px); }
+.hou_ya_yue_panel:nth-child(2) { transform: rotateY(60deg) translateZ(140px); }
+.hou_ya_yue_panel:nth-child(3) { transform: rotateY(120deg) translateZ(140px); }
+.hou_ya_yue_panel:nth-child(4) { transform: rotateY(180deg) translateZ(140px); }
+.hou_ya_yue_panel:nth-child(5) { transform: rotateY(240deg) translateZ(140px); }
+.hou_ya_yue_panel:nth-child(6) { transform: rotateY(300deg) translateZ(140px); }
+@keyframes hou_ya_yue_carouselSpin {
+    from { transform: rotateX(-10deg) rotateY(0deg); }
+    to   { transform: rotateX(-10deg) rotateY(360deg); }
+}
+</style>
+</head>
+<body>
+<h1>CSS3 3D 动画效果</h1>
+<div class="hou_ya_yue_container">
+    <div class="hou_ya_yue_box_wrapper">
+        <div class="hou_ya_yue_cube">
+            <div class="hou_ya_yue_face hou_ya_yue_front">前</div>
+            <div class="hou_ya_yue_face hou_ya_yue_back">后</div>
+            <div class="hou_ya_yue_face hou_ya_yue_right">右</div>
+            <div class="hou_ya_yue_face hou_ya_yue_left">左</div>
+            <div class="hou_ya_yue_face hou_ya_yue_top">上</div>
+            <div class="hou_ya_yue_face hou_ya_yue_bottom">下</div>
+        </div>
+        <p>3D 立方体旋转</p>
+    </div>
+    <div class="hou_ya_yue_box_wrapper">
+        <div class="hou_ya_yue_card">翻转卡片</div>
+        <p>Y 轴翻转</p>
+    </div>
+    <div class="hou_ya_yue_box_wrapper">
+        <div class="hou_ya_yue_ring"></div>
+        <p>3D 圆环旋转</p>
+    </div>
+    <div class="hou_ya_yue_box_wrapper">
+        <div class="hou_ya_yue_pyramid"></div>
+        <p>金字塔旋转</p>
+    </div>
+    <div class="hou_ya_yue_box_wrapper">
+        <div class="hou_ya_yue_door">开门</div>
+        <p>3D 开门效果</p>
+    </div>
+    <div class="hou_ya_yue_box_wrapper">
+        <div class="hou_ya_yue_carousel">
+            <div class="hou_ya_yue_panel">1</div>
+            <div class="hou_ya_yue_panel">2</div>
+            <div class="hou_ya_yue_panel">3</div>
+            <div class="hou_ya_yue_panel">4</div>
+            <div class="hou_ya_yue_panel">5</div>
+            <div class="hou_ya_yue_panel">6</div>
+        </div>
+        <p>3D 图片 carousel</p>
+    </div>
+</div>
+</body>
+</html>

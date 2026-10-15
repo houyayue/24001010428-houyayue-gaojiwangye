@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>侯雅月的媒体查询练习</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html {
+            font-size: 14px;
+        }
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .viewport-box {
+            --background: #e9684f;
+            --foreground: #fffaf0;
+            --accent: #ffd277;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: clamp(24px, 7vw, 88px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: var(--foreground);
+            background-color: var(--background);
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 48px 48px;
+            transition: background-color 300ms ease, color 300ms ease;
+        }
+        .eyebrow {
+            margin: 0 0 1.125rem;
+            color: var(--accent);
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 0.125rem;
+        }
+        h1 {
+            max-width: 900px;
+            margin: 0;
+            font-size: 3rem;
+            line-height: 1.1;
+        }
+        .description {
+            max-width: 520px;
+            margin: 1.5rem 0 0;
+            font-size: 1.125rem;
+            line-height: 1.8;
+        }
+        .footer {
+            padding-top: 2rem;
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 1.5rem;
+            border-top: 1px solid currentColor;
+        }
+        .author {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .breakpoint {
+            margin: 0;
+            color: var(--accent);
+            font-size: 0.875rem;
+            text-align: right;
+        }
+        .breakpoint span::after {
+            content: "窄屏 · 0–599px";
+        }
+        @media (min-width: 600px) {
+            html {
+                font-size: 16px;
+            }
+            .viewport-box {
+                --background: #168277;
+                --foreground: #f5fff8;
+                --accent: #f5d36d;
+            }
+            h1 {
+                font-size: 3.5rem;
+            }
+            .breakpoint span::after {
+                content: "中屏 · 600–899px";
+            }
+        }
+        @media (min-width: 900px) {
+            html {
+                font-size: 18px;
+            }
+            .viewport-box {
+                --background: #e8bd58;
+                --foreground: #243b3b;
+                --accent: #a43e32;
+            }
+            h1 {
+                font-size: 5rem;
+            }
+            .breakpoint span::after {
+                content: "宽屏 · 900px 及以上";
+            }
+        }
+        @media (max-width: 420px) {
+            .footer {
+                align-items: start;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .breakpoint {
+                text-align: left;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .viewport-box {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="viewport-box">
+        <header>
+            <p class="eyebrow">CSS MEDIA QUERY / 10-3</p>
+            <h1>视口改变，<br>颜色随之改变。</h1>
+            <p class="description">调整浏览器窗口的宽度，背景颜色与文字尺寸会随媒体查询同步变化。</p>
+        </header>
+        <footer class="footer">
+            <p class="author">侯雅月 · 网页设计练习</p>
+            <p class="breakpoint">当前视口：<span></span></p>
+        </footer>
+    </main>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        h2,h3,p{
+            padding:0;
+            margin:0;
+        }
+        #box{
+            width: 480px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+            margin: 20px;
+        }
+        #box h3{
+            font-size: 16px;
+            /* 居中 */
+            text-align: center;
+            /* 行高33px */
+            line-height: 33px;
+            /* 字间距3px */
+            letter-spacing: 3px;
+            color: #036;
+        }
+        #box p{
+            /*行高150%*/
+            line-height: 150%;
+            /*首行缩进2em*/
+            text-indent: 2em;
+            color: #666;
+        }
+        #box a{
+            color: #f11;
+            text-decoration: none;
+            /*加粗*/
+            font-weight: bold;
+        }
+        .gname{
+            /* 深色加粗 */
+            color: #333;
+            font-weight: bold;
+        }
+        .sid{
+            /* 蓝色加粗 */
+            color: blue;
+            font-weight: bold;
+        }
+        .difficulty{
+            /* 红色加粗 */
+            color: red;
+            font-weight: bold;
+        }
+        .knowledge{
+            /* 紫色边框 */
+            border: 1px solid purple;
+            padding: 2px 4px;
+        }
+    </style>
+</head>
+<body>
+    <h2>css进阶</h2>
+    <div id="box">
+        <h3>CSS那些事</h3>
+        <p>
+            学号：<span class="sid">428</span>，姓名：<span class="gname">侯雅月</span>, 班级:计算机24004，对于《高级网页设计》课程的难度认知为：<span class="difficulty">难</span>，
+            这个例子对应的知识点是：<span class="knowledge">群组选择器、后代选择器、层叠与继承</span>。
+            <a href='#'>更多>></a>
+        </p>
+    </div>
+    <!-- 学号：蓝色加粗；姓名：深色加粗,难度的值：红色加粗，知识点，紫色边框，边框为额外内容，使用内部css-->
+</body>
+</html>

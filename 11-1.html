@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>侯雅月的CSS长度单位</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            color: #213244;
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef6ff 100%);
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            min-height: 100vh;
+        }
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .hero h1 {
+            margin: 0 0 12px;
+            font-size: clamp(28px, 5vw, 42px);
+            color: #1d5fa6;
+        }
+        .hero p {
+            margin: 0;
+            color: #5d6d7e;
+            font-size: 16px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #d8e6f5;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(29, 95, 166, 0.08);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(29, 95, 166, 0.15);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .unit-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #dff0ff, #edf7ff);
+            color: #1d5fa6;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .unit-type {
+            font-size: 12px;
+            color: #ff9d2f;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            color: #153f73;
+        }
+        .card p {
+            margin: 0 0 16px;
+            color: #5d6d7e;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .demo-box {
+            background: #f8fafd;
+            border: 1px dashed #b0c4de;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .demo-item {
+            margin: 6px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .demo-px {
+            width: 200px;
+            height: 40px;
+            line-height: 40px;
+            background: #4a90d9;
+            color: #fff;
+            border-radius: 6px;
+            margin: 8px auto;
+        }
+        .demo-em {
+            font-size: 20px;
+        }
+        .demo-em .em-child {
+            font-size: 1.5em;
+            color: #d65d45;
+        }
+        .demo-rem {
+            font-size: 20px;
+        }
+        .demo-rem .rem-child {
+            font-size: 1.5rem;
+            color: #2e8b57;
+        }
+        .demo-percent {
+            width: 100%;
+            background: #eee;
+            border-radius: 6px;
+            padding: 4px;
+        }
+        .demo-percent .percent-child {
+            width: 50%;
+            height: 36px;
+            line-height: 36px;
+            background: #e6a23c;
+            color: #fff;
+            border-radius: 4px;
+        }
+        .demo-vw {
+            width: 50vw;
+            max-width: 100%;
+            height: 40px;
+            line-height: 40px;
+            background: #875a82;
+            color: #fff;
+            border-radius: 6px;
+            margin: 8px auto;
+        }
+        .demo-vh {
+            height: 20vh;
+            min-height: 40px;
+            background: #4d7656;
+            color: #fff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 36px;
+            color: #8a9aab;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <header class="hero">
+            <h1>Web 前端长度单位</h1>
+            <p>CSS 中常用的长度单位及其使用场景</p>
+        </header>
+
+        <section class="grid">
+            <article class="card">
+                <div class="card-header">
+                    <span class="unit-badge">px</span>
+                    <span class="unit-type">绝对单位</span>
+                </div>
+                <h3>像素</h3>
+                <p>最常用的绝对单位，1px 等于屏幕上的一个物理像素点。适合精确控制元素尺寸。</p>
+                <div class="demo-box">
+                    <div class="demo-item">宽度: 200px</div>
+                    <div class="demo-px">200 × 40 px</div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-header">
+                    <span class="unit-badge">em</span>
+                    <span class="unit-type">相对单位</span>
+                </div>
+                <h3>相对父元素</h3>
+                <p>相对于父元素的字体大小。若父元素 font-size 为 20px，则 1.5em = 30px。常用于字体和间距。</p>
+                <div class="demo-box">
+                    <div class="demo-item">父元素: 20px</div>
+                    <div class="demo-em">父元素文字
+                        <span class="em-child">子元素 1.5em = 30px</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-header">
+                    <span class="unit-badge">rem</span>
+                    <span class="unit-type">相对单位</span>
+                </div>
+                <h3>相对根元素</h3>
+                <p>相对于根元素（html）的字体大小，不受父元素影响。适合全局统一的尺寸管理。</p>
+                <div class="demo-box">
+                    <div class="demo-item">根元素默认: 16px</div>
+                    <div class="demo-rem">根元素基准
+                        <span class="rem-child">1.5rem = 24px</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-header">
+                    <span class="unit-badge">%</span>
+                    <span class="unit-type">相对单位</span>
+                </div>
+                <h3>百分比</h3>
+                <p>相对于父元素的对应属性值。宽度百分比相对于父元素宽度，字体百分比相对于父元素字体大小。</p>
+                <div class="demo-box">
+                    <div class="demo-item">父容器宽度 100%</div>
+                    <div class="demo-percent">
+                        <div class="percent-child">子元素 50%</div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-header">
+                    <span class="unit-badge">vw</span>
+                    <span class="unit-type">视口单位</span>
+                </div>
+                <h3>视口宽度</h3>
+                <p>1vw 等于视口宽度的 1%。常用于响应式布局，使元素随窗口宽度缩放。</p>
+                <div class="demo-box">
+                    <div class="demo-item">宽度: 50vw</div>
+                    <div class="demo-vw">当前视口宽度的 50%</div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-header">
+                    <span class="unit-badge">vh</span>
+                    <span class="unit-type">视口单位</span>
+                </div>
+                <h3>视口高度</h3>
+                <p>1vh 等于视口高度的 1%。适合全屏布局或需要根据屏幕高度调整的场景。</p>
+                <div class="demo-box">
+                    <div class="demo-item">高度: 20vh</div>
+                    <div class="demo-vh">当前视口高度的 20%</div>
+                </div>
+            </article>
+        </section>
+
+        <footer class="footer">
+            侯雅月 · 《高级网页设计》课堂实践 · 11-1
+        </footer>
+    </main>
+</body>
+</html>

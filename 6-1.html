@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flex 布局示例</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
+            padding: 40px 3vw 56px;
+            background: #f4f5f8;
+            color: #222;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        h2 {
+            margin: 0 0 28px;
+            color: #163b72;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(24px, 3.5vw, 60px);
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .panel {
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            gap: 16px;
+            width: min(330px, 42vw);
+            height: 330px;
+            padding: 16px;
+            border: 1px solid #999;
+            background: #fff;
+        }
+
+        .box {
+            flex: 1 1 calc(50% - 8px);
+            min-width: 0;
+            height: 90px;
+            border: 1px solid #111;
+            background: #ddd;
+        }
+
+        .panel-one {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel-one .box {
+            flex: 0 0 90px;
+            height: 90px;
+        }
+
+        .panel-two {
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .panel-two .box {
+            flex: 0 0 75px;
+            width: 120px;
+        }
+
+        .panel-three .box {
+            flex-basis: calc(50% - 8px);
+        }
+
+        .panel-four .box:first-child {
+            flex-basis: 100%;
+        }
+
+        .panel-four .box {
+            flex-basis: calc(50% - 8px);
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 28px 16px 40px;
+            }
+
+            .panel {
+                width: min(330px, 90vw);
+            }
+        }
+
+        @media (min-width: 801px) and (max-width: 1100px) {
+            .panel {
+                width: 165px;
+                height: 165px;
+                gap: 8px;
+                padding: 8px;
+            }
+
+            .panel-one .box {
+                flex-basis: 45px;
+                height: 45px;
+            }
+
+            .box {
+                height: 45px;
+            }
+
+            .panel-two .box {
+                flex-basis: 45px;
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>侯雅月 flex</h2>
+    <ul class="flex">
+        <li class="panel panel-one">
+            <div class="box"></div>
+        </li>
+        <li class="panel panel-two">
+            <div class="box"></div>
+            <div class="box"></div>
+        </li>
+        <li class="panel panel-three">
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+        </li>
+        <li class="panel panel-four">
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+        </li>
+    </ul>
+</body>
+</html>
