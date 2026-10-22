@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-1 Font Awesome 字体图标</title>
+    <link rel="stylesheet" href="cdn/all.min.css">
+    <style>
+        :root {
+            --bg1: #eef6ff;
+            --bg2: #fffaf0;
+            --card: rgba(255, 255, 255, 0.82);
+            --line: #d8e6f5;
+            --primary: #1d5fa6;
+            --primary-dark: #153f73;
+            --accent: #ff9d2f;
+            --text: #213244;
+            --muted: #5d6d7e;
+            --shadow: 0 18px 40px rgba(29, 95, 166, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            color: var(--text);
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+        }
+
+        .hou_ya_yue_page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .hou_ya_yue_hero {
+            background: linear-gradient(135deg, rgba(29, 95, 166, 0.94), rgba(21, 63, 115, 0.95));
+            border-radius: 24px;
+            padding: 42px 36px;
+            color: #fff;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .hou_ya_yue_hero::before,
+        .hou_ya_yue_hero::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hou_ya_yue_hero::before {
+            top: -50px;
+            right: -40px;
+        }
+
+        .hou_ya_yue_hero::after {
+            bottom: -70px;
+            left: -30px;
+        }
+
+        .hou_ya_yue_hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hou_ya_yue_tag {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        .hou_ya_yue_hero h1 {
+            margin: 0 0 12px;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            line-height: 1.2;
+            letter-spacing: 1px;
+        }
+
+        .hou_ya_yue_subtitle {
+            margin: 0;
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.82);
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        .hou_ya_yue_section {
+            margin-top: 30px;
+        }
+
+        .hou_ya_yue_section-title {
+            margin: 0 0 18px;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+        }
+
+        .hou_ya_yue_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .hou_ya_yue_card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 24px 18px;
+            box-shadow: 0 10px 25px rgba(17, 24, 39, 0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            text-align: center;
+        }
+
+        .hou_ya_yue_card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 30px rgba(13, 54, 101, 0.12);
+            border-color: rgba(29, 95, 166, 0.38);
+        }
+
+        .hou_ya_yue_icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .hou_ya_yue_icon-name {
+            font-size: 0.9rem;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        .hou_ya_yue_back {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: background 0.25s ease;
+        }
+
+        .hou_ya_yue_back:hover {
+            background: var(--primary-dark);
+        }
+
+        .hou_ya_yue_divider {
+            margin: 40px 0;
+            border: none;
+            border-top: 2px dashed var(--line);
+        }
+
+        .hou_ya_yue_category {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin: 30px 0 16px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_page">
+        <header class="hou_ya_yue_hero">
+            <div class="hou_ya_yue_hero-content">
+                <div class="hou_ya_yue_tag">字体图标</div>
+                <h1>Font Awesome 图标</h1>
+                <p class="hou_ya_yue_subtitle">
+                    使用字体图标（Font Icon）方式显示图标。通过 CSS 类名引用字体文件中的字符，
+                    具有体积小、缩放不失真、可通过 CSS 控制颜色等优点。
+                </p>
+            </div>
+        </header>
+
+        <main class="hou_ya_yue_section">
+            <h2 class="hou_ya_yue_section-title">常用图标展示</h2>
+
+            <h3 class="hou_ya_yue_category">实心图标 (Solid)</h3>
+            <div class="hou_ya_yue_grid">
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-house"></i>
+                    <div class="hou_ya_yue_icon-name">fa-house</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-user"></i>
+                    <div class="hou_ya_yue_icon-name">fa-user</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-heart"></i>
+                    <div class="hou_ya_yue_icon-name">fa-heart</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-star"></i>
+                    <div class="hou_ya_yue_icon-name">fa-star</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-magnifying-glass"></i>
+                    <div class="hou_ya_yue_icon-name">fa-magnifying-glass</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-gear"></i>
+                    <div class="hou_ya_yue_icon-name">fa-gear</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-envelope"></i>
+                    <div class="hou_ya_yue_icon-name">fa-envelope</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-camera"></i>
+                    <div class="hou_ya_yue_icon-name">fa-camera</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-music"></i>
+                    <div class="hou_ya_yue_icon-name">fa-music</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-car"></i>
+                    <div class="hou_ya_yue_icon-name">fa-car</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-plane"></i>
+                    <div class="hou_ya_yue_icon-name">fa-plane</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-bicycle"></i>
+                    <div class="hou_ya_yue_icon-name">fa-bicycle</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-book"></i>
+                    <div class="hou_ya_yue_icon-name">fa-book</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-pen"></i>
+                    <div class="hou_ya_yue_icon-name">fa-pen</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-phone"></i>
+                    <div class="hou_ya_yue_icon-name">fa-phone</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-cloud"></i>
+                    <div class="hou_ya_yue_icon-name">fa-cloud</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-sun"></i>
+                    <div class="hou_ya_yue_icon-name">fa-sun</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-moon"></i>
+                    <div class="hou_ya_yue_icon-name">fa-moon</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-umbrella"></i>
+                    <div class="hou_ya_yue_icon-name">fa-umbrella</div>
+                </div>
+            </div>
+
+            <hr class="hou_ya_yue_divider">
+
+            <h3 class="hou_ya_yue_category">品牌图标 (Brands)</h3>
+            <div class="hou_ya_yue_grid">
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-github"></i>
+                    <div class="hou_ya_yue_icon-name">fa-github</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-weixin"></i>
+                    <div class="hou_ya_yue_icon-name">fa-weixin</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-weibo"></i>
+                    <div class="hou_ya_yue_icon-name">fa-weibo</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-qq"></i>
+                    <div class="hou_ya_yue_icon-name">fa-qq</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-bilibili"></i>
+                    <div class="hou_ya_yue_icon-name">fa-bilibili</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-android"></i>
+                    <div class="hou_ya_yue_icon-name">fa-android</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-apple"></i>
+                    <div class="hou_ya_yue_icon-name">fa-apple</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-brands fa-windows"></i>
+                    <div class="hou_ya_yue_icon-name">fa-windows</div>
+                </div>
+            </div>
+
+            <hr class="hou_ya_yue_divider">
+
+            <h3 class="hou_ya_yue_category">大小与颜色控制</h3>
+            <div class="hou_ya_yue_grid">
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-star" style="font-size: 1rem; color: #ff9d2f;"></i>
+                    <div class="hou_ya_yue_icon-name">小 (1rem)</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-star" style="font-size: 2rem; color: #1d5fa6;"></i>
+                    <div class="hou_ya_yue_icon-name">中 (2rem)</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-star" style="font-size: 3.5rem; color: #e74c3c;"></i>
+                    <div class="hou_ya_yue_icon-name">大 (3.5rem)</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-heart" style="font-size: 3rem; color: #e74c3c;"></i>
+                    <div class="hou_ya_yue_icon-name">红色</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-thumbs-up" style="font-size: 3rem; color: #27ae60;"></i>
+                    <div class="hou_ya_yue_icon-name">绿色</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon fa-solid fa-bell" style="font-size: 3rem; color: #f39c12;"></i>
+                    <div class="hou_ya_yue_icon-name">橙色</div>
+                </div>
+            </div>
+        </main>
+
+        <a class="hou_ya_yue_back" href="index.html">返回首页</a>
+    </div>
+</body>
+</html>

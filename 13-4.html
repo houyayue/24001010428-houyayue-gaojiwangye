@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>13-4 iconfont SVG 图标导航</title>
+    <script src="font/download/font_5244712_2tggcu3z7s/iconfont.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            padding-bottom: 60px;
+        }
+
+        .hou_ya_yue_header {
+            background: #fff;
+            padding: 16px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .hou_ya_yue_content {
+            padding: 20px;
+        }
+
+        .hou_ya_yue_card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .hou_ya_yue_card h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .hou_ya_yue_nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: #fff;
+            border-top: 1px solid #e8e8e8;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 100;
+        }
+
+        .hou_ya_yue_nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0 6px;
+            text-decoration: none;
+            color: #999;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .hou_ya_yue_nav-item.hou_ya_yue_active {
+            color: #1d5fa6;
+        }
+
+        .hou_ya_yue_icon-wrapper {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hou_ya_yue_icon-wrapper .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .hou_ya_yue_badge {
+            position: absolute;
+            top: -4px;
+            right: -12px;
+            background: #ff4d4f;
+            color: #fff;
+            font-size: 10px;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            font-style: normal;
+            line-height: 1;
+        }
+
+        .hou_ya_yue_dot {
+            position: absolute;
+            top: 0;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #ff4d4f;
+            border-radius: 50%;
+        }
+
+        .hou_ya_yue_label {
+            font-size: 10px;
+            margin-top: 4px;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_header">SVG Symbol 底部导航</div>
+
+    <div class="hou_ya_yue_content">
+        <div class="hou_ya_yue_card">
+            <h3>SVG 图标导航</h3>
+            <p>使用 iconfont SVG Symbol 方式实现的移动端底部固定导航，通过 SVG use 元素引用图标。</p>
+        </div>
+        <div class="hou_ya_yue_card">
+            <h3>自适应宽度</h3>
+            <p>五个导航项平均分配宽度，适配不同屏幕尺寸的移动端设备。</p>
+        </div>
+        <div class="hou_ya_yue_card">
+            <h3>交互状态</h3>
+            <p>当前激活项以主题色高亮显示，未读消息通过右上角徽章或小红点提醒。</p>
+        </div>
+    </div>
+
+    <nav class="hou_ya_yue_nav">
+        <a href="#" class="hou_ya_yue_nav-item hou_ya_yue_active">
+            <div class="hou_ya_yue_icon-wrapper">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-shouye"></use></svg>
+            </div>
+            <span class="hou_ya_yue_label">首页</span>
+        </a>
+        <a href="#" class="hou_ya_yue_nav-item">
+            <div class="hou_ya_yue_icon-wrapper">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-shequ"></use></svg>
+                <span class="hou_ya_yue_dot"></span>
+            </div>
+            <span class="hou_ya_yue_label">社区</span>
+        </a>
+        <a href="#" class="hou_ya_yue_nav-item">
+            <div class="hou_ya_yue_icon-wrapper">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-xuanche"></use></svg>
+                <span class="hou_ya_yue_badge">3</span>
+            </div>
+            <span class="hou_ya_yue_label">选车</span>
+        </a>
+        <a href="#" class="hou_ya_yue_nav-item">
+            <div class="hou_ya_yue_icon-wrapper">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-ershouche"></use></svg>
+                <span class="hou_ya_yue_badge">12</span>
+            </div>
+            <span class="hou_ya_yue_label">二手车</span>
+        </a>
+        <a href="#" class="hou_ya_yue_nav-item">
+            <div class="hou_ya_yue_icon-wrapper">
+                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-wode"></use></svg>
+            </div>
+            <span class="hou_ya_yue_label">我的</span>
+        </a>
+    </nav>
+</body>
+</html>

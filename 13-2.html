@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-2 Lucide SVG 图标</title>
+    <script src="cdn/lucide/lucide.min.js"></script>
+    <style>
+        :root {
+            --bg1: #eef6ff;
+            --bg2: #fffaf0;
+            --card: rgba(255, 255, 255, 0.82);
+            --line: #d8e6f5;
+            --primary: #1d5fa6;
+            --primary-dark: #153f73;
+            --accent: #ff9d2f;
+            --text: #213244;
+            --muted: #5d6d7e;
+            --shadow: 0 18px 40px rgba(29, 95, 166, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            color: var(--text);
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+        }
+
+        .hou_ya_yue_page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .hou_ya_yue_hero {
+            background: linear-gradient(135deg, rgba(29, 95, 166, 0.94), rgba(21, 63, 115, 0.95));
+            border-radius: 24px;
+            padding: 42px 36px;
+            color: #fff;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .hou_ya_yue_hero::before,
+        .hou_ya_yue_hero::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hou_ya_yue_hero::before {
+            top: -50px;
+            right: -40px;
+        }
+
+        .hou_ya_yue_hero::after {
+            bottom: -70px;
+            left: -30px;
+        }
+
+        .hou_ya_yue_hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hou_ya_yue_tag {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        .hou_ya_yue_hero h1 {
+            margin: 0 0 12px;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            line-height: 1.2;
+            letter-spacing: 1px;
+        }
+
+        .hou_ya_yue_subtitle {
+            margin: 0;
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.82);
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        .hou_ya_yue_section {
+            margin-top: 30px;
+        }
+
+        .hou_ya_yue_section-title {
+            margin: 0 0 18px;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+        }
+
+        .hou_ya_yue_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .hou_ya_yue_card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 24px 18px;
+            box-shadow: 0 10px 25px rgba(17, 24, 39, 0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            text-align: center;
+        }
+
+        .hou_ya_yue_card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 30px rgba(13, 54, 101, 0.12);
+            border-color: rgba(29, 95, 166, 0.38);
+        }
+
+        .hou_ya_yue_icon {
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .hou_ya_yue_icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .hou_ya_yue_icon-name {
+            font-size: 0.9rem;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        .hou_ya_yue_back {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: background 0.25s ease;
+        }
+
+        .hou_ya_yue_back:hover {
+            background: var(--primary-dark);
+        }
+
+        .hou_ya_yue_divider {
+            margin: 40px 0;
+            border: none;
+            border-top: 2px dashed var(--line);
+        }
+
+        .hou_ya_yue_category {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin: 30px 0 16px;
+            font-weight: 700;
+        }
+
+        .hou_ya_yue_demo-row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .hou_ya_yue_demo-item {
+            text-align: center;
+        }
+
+        .hou_ya_yue_demo-item svg {
+            display: block;
+            margin: 0 auto 8px;
+        }
+
+        .hou_ya_yue_demo-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_page">
+        <header class="hou_ya_yue_hero">
+            <div class="hou_ya_yue_hero-content">
+                <div class="hou_ya_yue_tag">SVG 图标</div>
+                <h1>Lucide 图标</h1>
+                <p class="hou_ya_yue_subtitle">
+                    使用 SVG（可缩放矢量图形）方式显示图标。Lucide 是一套开源图标库，
+                    通过 JavaScript 将标记替换为内联 SVG，支持自定义大小、颜色、描边宽度等属性。
+                </p>
+            </div>
+        </header>
+
+        <main class="hou_ya_yue_section">
+            <h2 class="hou_ya_yue_section-title">常用图标展示</h2>
+
+            <h3 class="hou_ya_yue_category">基础图标</h3>
+            <div class="hou_ya_yue_grid">
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="home"></i>
+                    <div class="hou_ya_yue_icon-name">home</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="user"></i>
+                    <div class="hou_ya_yue_icon-name">user</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="heart"></i>
+                    <div class="hou_ya_yue_icon-name">heart</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="star"></i>
+                    <div class="hou_ya_yue_icon-name">star</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="search"></i>
+                    <div class="hou_ya_yue_icon-name">search</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="settings"></i>
+                    <div class="hou_ya_yue_icon-name">settings</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="mail"></i>
+                    <div class="hou_ya_yue_icon-name">mail</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="camera"></i>
+                    <div class="hou_ya_yue_icon-name">camera</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="music"></i>
+                    <div class="hou_ya_yue_icon-name">music</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="car"></i>
+                    <div class="hou_ya_yue_icon-name">car</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="plane"></i>
+                    <div class="hou_ya_yue_icon-name">plane</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="book"></i>
+                    <div class="hou_ya_yue_icon-name">book</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="pen-tool"></i>
+                    <div class="hou_ya_yue_icon-name">pen-tool</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="phone"></i>
+                    <div class="hou_ya_yue_icon-name">phone</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="cloud"></i>
+                    <div class="hou_ya_yue_icon-name">cloud</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="sun"></i>
+                    <div class="hou_ya_yue_icon-name">sun</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="moon"></i>
+                    <div class="hou_ya_yue_icon-name">moon</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="smile"></i>
+                    <div class="hou_ya_yue_icon-name">smile</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="thumbs-up"></i>
+                    <div class="hou_ya_yue_icon-name">thumbs-up</div>
+                </div>
+            </div>
+
+            <hr class="hou_ya_yue_divider">
+
+            <h3 class="hou_ya_yue_category">SVG 属性控制演示</h3>
+            <div class="hou_ya_yue_demo-row">
+                <div class="hou_ya_yue_demo-item">
+                    <i data-lucide="star" data-size="24" data-color="#ff9d2f"></i>
+                    <div class="hou_ya_yue_demo-label">24px / 橙色</div>
+                </div>
+                <div class="hou_ya_yue_demo-item">
+                    <i data-lucide="star" data-size="40" data-color="#1d5fa6"></i>
+                    <div class="hou_ya_yue_demo-label">40px / 蓝色</div>
+                </div>
+                <div class="hou_ya_yue_demo-item">
+                    <i data-lucide="star" data-size="56" data-color="#e74c3c"></i>
+                    <div class="hou_ya_yue_demo-label">56px / 红色</div>
+                </div>
+                <div class="hou_ya_yue_demo-item">
+                    <i data-lucide="star" data-size="72" data-color="#27ae60"></i>
+                    <div class="hou_ya_yue_demo-label">72px / 绿色</div>
+                </div>
+                <div class="hou_ya_yue_demo-item">
+                    <i data-lucide="heart" data-size="48" data-color="#e74c3c" data-stroke-width="3"></i>
+                    <div class="hou_ya_yue_demo-label">描边 3px</div>
+                </div>
+                <div class="hou_ya_yue_demo-item">
+                    <i data-lucide="bell" data-size="48" data-color="#8e44ad" data-stroke-width="1.5"></i>
+                    <div class="hou_ya_yue_demo-label">描边 1.5px</div>
+                </div>
+            </div>
+
+            <hr class="hou_ya_yue_divider">
+
+            <h3 class="hou_ya_yue_category">界面功能图标</h3>
+            <div class="hou_ya_yue_grid">
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="bell"></i>
+                    <div class="hou_ya_yue_icon-name">bell</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="calendar"></i>
+                    <div class="hou_ya_yue_icon-name">calendar</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="clock"></i>
+                    <div class="hou_ya_yue_icon-name">clock</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="download"></i>
+                    <div class="hou_ya_yue_icon-name">download</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="upload"></i>
+                    <div class="hou_ya_yue_icon-name">upload</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="edit"></i>
+                    <div class="hou_ya_yue_icon-name">edit</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="trash-2"></i>
+                    <div class="hou_ya_yue_icon-name">trash-2</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="share-2"></i>
+                    <div class="hou_ya_yue_icon-name">share-2</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="bookmark"></i>
+                    <div class="hou_ya_yue_icon-name">bookmark</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="flag"></i>
+                    <div class="hou_ya_yue_icon-name">flag</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="tag"></i>
+                    <div class="hou_ya_yue_icon-name">tag</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="message-circle"></i>
+                    <div class="hou_ya_yue_icon-name">message-circle</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="map-pin"></i>
+                    <div class="hou_ya_yue_icon-name">map-pin</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="wifi"></i>
+                    <div class="hou_ya_yue_icon-name">wifi</div>
+                </div>
+                <div class="hou_ya_yue_card">
+                    <i class="hou_ya_yue_icon" data-lucide="battery"></i>
+                    <div class="hou_ya_yue_icon-name">battery</div>
+                </div>
+            </div>
+        </main>
+
+        <a class="hou_ya_yue_back" href="index.html">返回首页</a>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
