@@ -9,6 +9,18 @@ Static collection of HTML/CSS course practice pages (《高级网页设计》). 
 - `css.css` is a shared stylesheet but is only linked by `5-1.html`. All other pages use inline `<style>` — keep new page styles inline, don't introduce shared CSS.
 - Images live in `image/` and are referenced with relative paths (`image/1.jpg` or `./image/1.jpg`).
 
+## File Header Comment
+
+- **Rule: every newly created HTML file must include a header comment inside `<head>` (right after `<title>`).** The comment must contain, in Chinese: 作者「侯雅月」、建立时间（creation timestamp）、使用的大模型（model name）、功能名称（page feature name）. Example:
+  ```html
+  <!--
+    作者：侯雅月
+    建立时间：2026-10-26 13:53:33
+    使用的大模型：GLM-5.3-Flash
+    功能名称：数7游戏（逢七过）
+  -->
+  ```
+
 ## Naming Convention
 
 - All CSS class names, id names, and JS variables must start with `hou_ya_yue_`.

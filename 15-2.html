@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-2 JavaScript 程序结构：循环与条件</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-10-26 14:55:41
+      使用的大模型：GLM-5.3-Flash
+      功能名称：JavaScript 程序结构演示（循环与条件）
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 26px;
+            color: #1d5fa6;
+            margin-bottom: 6px;
+        }
+
+        .hou_ya_yue_sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .hou_ya_yue_demo {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .hou_ya_yue_demo h2 {
+            font-size: 18px;
+            color: #1d5fa6;
+            border-left: 4px solid #1d5fa6;
+            padding-left: 10px;
+            margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_demo p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        pre {
+            background: #282c34;
+            color: #98c379;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin-bottom: 12px;
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        .hou_ya_yue_row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hou_ya_yue_row input {
+            width: 120px;
+            padding: 8px 10px;
+            border: 1px solid #ccd6e0;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .hou_ya_yue_row input:focus {
+            border-color: #1d5fa6;
+        }
+
+        button {
+            background: #1d5fa6;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #164a82;
+        }
+
+        .hou_ya_yue_result {
+            background: #eef5fc;
+            border: 1px dashed #9ec3e8;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+            min-height: 44px;
+        }
+
+        .hou_ya_yue_result strong {
+            color: #d9534f;
+        }
+
+        .hou_ya_yue_table {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 6px;
+        }
+
+        .hou_ya_yue_cell {
+            background: #fff;
+            border: 1px solid #cfe0f0;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            padding: 6px 2px;
+            color: #1d5fa6;
+        }
+
+        footer {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>JavaScript 程序结构：循环与条件</h1>
+        <p class="hou_ya_yue_sub">《高级网页设计》第 15 章 · 15-2.html · 交互演示</p>
+
+        <!-- 演示一：if / else if / else -->
+        <section class="hou_ya_yue_demo">
+            <h2>一、条件结构 if / else if / else</h2>
+            <p>输入一个 0~100 的分数，程序自上而下逐个判断条件，命中即执行对应分支。</p>
+            <pre>if (score &gt;= 90)      { grade = '优秀'; }
+else if (score &gt;= 80) { grade = '良好'; }
+else if (score &gt;= 60) { grade = '及格'; }
+else                  { grade = '不及格'; }</pre>
+            <div class="hou_ya_yue_row">
+                <label for="hou_ya_yue_scoreInput">分数：</label>
+                <input id="hou_ya_yue_scoreInput" type="number" min="0" max="100" value="85">
+                <button onclick="hou_ya_yue_judgeScore()">判定等级</button>
+            </div>
+            <div class="hou_ya_yue_result" id="hou_ya_yue_scoreResult">点击"判定等级"查看结果</div>
+        </section>
+
+        <!-- 演示二：switch / case -->
+        <section class="hou_ya_yue_demo">
+            <h2>二、条件结构 switch / case</h2>
+            <p>输入 1~7 的数字，switch 把表达式与各 case 值精确匹配，break 防止贯穿。</p>
+            <pre>switch (day) {
+  case 1: name = '星期一'; break;
+  case 2: name = '星期二'; break;
+  /* … 中间略 … */
+  case 7: name = '星期日'; break;
+  default: name = '输入无效';
+}</pre>
+            <div class="hou_ya_yue_row">
+                <label for="hou_ya_yue_dayInput">数字：</label>
+                <input id="hou_ya_yue_dayInput" type="number" min="1" max="7" value="3">
+                <button onclick="hou_ya_yue_judgeDay()">switch 判断</button>
+            </div>
+            <div class="hou_ya_yue_result" id="hou_ya_yue_dayResult">点击"switch 判断"查看结果</div>
+        </section>
+
+        <!-- 演示三：for 循环 -->
+        <section class="hou_ya_yue_demo">
+            <h2>三、循环结构 for（累加求和）</h2>
+            <p>for 由"初始化；条件；更新"三部分组成，循环变量 i 从 1 走到 n，把每次的 i 累加进 sum。</p>
+            <pre>let sum = 0;
+for (let i = 1; i &lt;= n; i++) {
+  sum += i;
+}</pre>
+            <div class="hou_ya_yue_row">
+                <label for="hou_ya_yue_sumInput">n =</label>
+                <input id="hou_ya_yue_sumInput" type="number" min="1" max="1000" value="100">
+                <button onclick="hou_ya_yue_runSum()">for 求和</button>
+            </div>
+            <div class="hou_ya_yue_result" id="hou_ya_yue_sumResult">点击"for 求和"查看结果</div>
+        </section>
+
+        <!-- 演示四：while 循环 -->
+        <section class="hou_ya_yue_demo">
+            <h2>四、循环结构 while（条件循环）</h2>
+            <p>while 先判断条件再执行循环体，条件不满足即退出——这里用来列出不超过 1000 的 2 的幂。</p>
+            <pre>let p = 1;
+while (p &lt;= 1000) {
+  list.push(p);
+  p *= 2;   // 若忘记更新 p 会造成死循环
+}</pre>
+            <button onclick="hou_ya_yue_runWhile()">while 演示</button>
+            <div class="hou_ya_yue_result" id="hou_ya_yue_whileResult">点击"while 演示"查看结果</div>
+        </section>
+
+        <!-- 演示五：双重循环 -->
+        <section class="hou_ya_yue_demo">
+            <h2>五、双重 for 循环 + 条件判断（九九乘法表）</h2>
+            <p>外层循环 i 控制行、内层循环 j 控制列（j ≤ i），再配合条件判断过滤右上三角，形成阶梯状乘法表。</p>
+            <pre>for (let i = 1; i &lt;= 9; i++) {
+  for (let j = 1; j &lt;= i; j++) {
+    addCell(j + '×' + i + '=' + (i * j));
+  }
+}</pre>
+            <button onclick="hou_ya_yue_runTable()">生成乘法表</button>
+            <div class="hou_ya_yue_result hou_ya_yue_table" id="hou_ya_yue_tableResult" style="display:none;"></div>
+        </section>
+
+        <footer>《高级网页设计》课程练习 · 15-2.html · JavaScript 程序结构演示</footer>
+    </div>
+
+    <script>
+        // 演示一：if / else if / else 判断成绩等级
+        function hou_ya_yue_judgeScore() {
+            var hou_ya_yue_scoreEl = document.getElementById('hou_ya_yue_scoreInput');
+            var hou_ya_yue_outEl = document.getElementById('hou_ya_yue_scoreResult');
+            var hou_ya_yue_score = Number(hou_ya_yue_scoreEl.value);
+            var hou_ya_yue_grade;
+
+            if (isNaN(hou_ya_yue_score) || hou_ya_yue_score < 0 || hou_ya_yue_score > 100) {
+                hou_ya_yue_outEl.innerHTML = '请输入 <strong>0~100</strong> 之间的有效分数';
+                return;
+            }
+
+            if (hou_ya_yue_score >= 90) {
+                hou_ya_yue_grade = '优秀';
+            } else if (hou_ya_yue_score >= 80) {
+                hou_ya_yue_grade = '良好';
+            } else if (hou_ya_yue_score >= 60) {
+                hou_ya_yue_grade = '及格';
+            } else {
+                hou_ya_yue_grade = '不及格';
+            }
+
+            hou_ya_yue_outEl.innerHTML = '分数 ' + hou_ya_yue_score + ' 分，判定为：<strong>' + hou_ya_yue_grade + '</strong>';
+        }
+
+        // 演示二：switch / case 判断星期
+        function hou_ya_yue_judgeDay() {
+            var hou_ya_yue_dayEl = document.getElementById('hou_ya_yue_dayInput');
+            var hou_ya_yue_outEl = document.getElementById('hou_ya_yue_dayResult');
+            var hou_ya_yue_day = Number(hou_ya_yue_dayEl.value);
+            var hou_ya_yue_name;
+
+            switch (hou_ya_yue_day) {
+                case 1: hou_ya_yue_name = '星期一'; break;
+                case 2: hou_ya_yue_name = '星期二'; break;
+                case 3: hou_ya_yue_name = '星期三'; break;
+                case 4: hou_ya_yue_name = '星期四'; break;
+                case 5: hou_ya_yue_name = '星期五'; break;
+                case 6: hou_ya_yue_name = '星期六'; break;
+                case 7: hou_ya_yue_name = '星期日'; break;
+                default: hou_ya_yue_name = '';
+            }
+
+            if (hou_ya_yue_name === '') {
+                hou_ya_yue_outEl.innerHTML = '请输入 <strong>1~7</strong> 之间的有效数字';
+            } else {
+                hou_ya_yue_outEl.innerHTML = 'switch 匹配到 case ' + hou_ya_yue_day + '：今天是<strong>' + hou_ya_yue_name + '</strong>';
+            }
+        }
+
+        // 演示三：for 循环累加求和
+        function hou_ya_yue_runSum() {
+            var hou_ya_yue_nEl = document.getElementById('hou_ya_yue_sumInput');
+            var hou_ya_yue_outEl = document.getElementById('hou_ya_yue_sumResult');
+            var hou_ya_yue_n = Number(hou_ya_yue_nEl.value);
+            var hou_ya_yue_sum = 0;
+
+            if (isNaN(hou_ya_yue_n) || hou_ya_yue_n < 1 || hou_ya_yue_n > 1000) {
+                hou_ya_yue_outEl.innerHTML = '请输入 <strong>1~1000</strong> 之间的有效数字';
+                return;
+            }
+
+            for (var hou_ya_yue_i = 1; hou_ya_yue_i <= hou_ya_yue_n; hou_ya_yue_i++) {
+                hou_ya_yue_sum += hou_ya_yue_i;
+            }
+
+            hou_ya_yue_outEl.innerHTML = 'for 循环执行 ' + hou_ya_yue_n + ' 次：1 + 2 + … + ' + hou_ya_yue_n + ' = <strong>' + hou_ya_yue_sum + '</strong>';
+        }
+
+        // 演示四：while 循环列出 2 的幂
+        function hou_ya_yue_runWhile() {
+            var hou_ya_yue_outEl = document.getElementById('hou_ya_yue_whileResult');
+            var hou_ya_yue_list = [];
+            var hou_ya_yue_p = 1;
+            var hou_ya_yue_count = 0;
+
+            while (hou_ya_yue_p <= 1000) {
+                hou_ya_yue_list.push(hou_ya_yue_p);
+                hou_ya_yue_p *= 2;
+                hou_ya_yue_count++;
+            }
+
+            hou_ya_yue_outEl.innerHTML = 'while 循环共执行 ' + hou_ya_yue_count + ' 次，1000 以内的 2 的幂：<strong>' + hou_ya_yue_list.join('、') + '</strong>';
+        }
+
+        // 演示五：双重 for 循环生成九九乘法表
+        function hou_ya_yue_runTable() {
+            var hou_ya_yue_outEl = document.getElementById('hou_ya_yue_tableResult');
+            var hou_ya_yue_html = '';
+
+            for (var hou_ya_yue_i = 1; hou_ya_yue_i <= 9; hou_ya_yue_i++) {
+                for (var hou_ya_yue_j = 1; hou_ya_yue_j <= hou_ya_yue_i; hou_ya_yue_j++) {
+                    hou_ya_yue_html += '<div class="hou_ya_yue_cell">' + hou_ya_yue_j + '×' + hou_ya_yue_i + '=' + (hou_ya_yue_i * hou_ya_yue_j) + '</div>';
+                }
+                // 条件判断：补齐每行右侧的空位，形成阶梯效果
+                for (var hou_ya_yue_k = hou_ya_yue_i; hou_ya_yue_k < 9; hou_ya_yue_k++) {
+                    hou_ya_yue_html += '<div class="hou_ya_yue_cell" style="visibility:hidden;"></div>';
+                }
+            }
+
+            hou_ya_yue_outEl.style.display = 'grid';
+            hou_ya_yue_outEl.innerHTML = hou_ya_yue_html;
+        }
+    </script>
+</body>
+</html>
