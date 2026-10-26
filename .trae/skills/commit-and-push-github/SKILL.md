@@ -9,9 +9,9 @@ description: "将项目 commit 并 push 到 GitHub 远程仓库 houyayue/2400101
 
 ## 远程仓库
 
-- SSH 地址：`git@github.com:houyayue/24001010428-houyayue-gaojiwangye.git`
+- SSH 地址（443 端口通道，**本机 22 端口到 GitHub 被拒，必须用这个**）：`ssh://git@ssh.github.com:443/houyayue/24001010428-houyayue-gaojiwangye.git`
 - 网页地址：`https://github.com/houyayue/24001010428-houyayue-gaojiwangye`
-- 认证方式：SSH 公钥已设置，**必须使用 SSH 地址**（不要用 https 地址，否则会要求 token）
+- 认证方式：SSH 公钥已设置（id_ed25519），**必须使用 SSH 地址**（不要用 https 地址，否则会要求 token）
 
 ## 工作流程
 
@@ -27,9 +27,9 @@ description: "将项目 commit 并 push 到 GitHub 远程仓库 houyayue/2400101
 
 3. 确认名为 `github` 的远程是否已配置；若无则添加（`origin` 指向 Gitee，**不要覆盖 origin**）：
    ```
-   git remote add github git@github.com:houyayue/24001010428-houyayue-gaojiwangye.git
+   git remote add github ssh://git@ssh.github.com:443/houyayue/24001010428-houyayue-gaojiwangye.git
    ```
-   若 `github` 已存在但地址不对：`git remote set-url github git@github.com:houyayue/24001010428-houyayue-gaojiwangye.git`
+   若 `github` 已存在但地址不对：`git remote set-url github ssh://git@ssh.github.com:443/houyayue/24001010428-houyayue-gaojiwangye.git`
 
 4. 暂存文件（优先按名称逐个添加，避免误加敏感文件；确认无敏感文件时可 `git add .`）：
    ```
