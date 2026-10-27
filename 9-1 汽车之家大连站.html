@@ -1,0 +1,2473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汽车之家大连站_看车 买车 用车 换车,省时省心省钱!</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-10-27 10:20:00
+      使用的大模型：codebuddy/auto
+      功能名称：汽车之家大连站首页复刻（9-1 汽车之家）
+    -->
+    <style>
+        /* ===== 0. iconfont（本地字体） ===== */
+        @font-face {
+            font-family: "hou_ya_yue_iconfont";
+            src: url('font/download/font_5247138_vjeiggmyqu/iconfont.woff2?t=1792999424759') format('woff2'),
+                 url('font/download/font_5247138_vjeiggmyqu/iconfont.woff?t=1792999424759') format('woff'),
+                 url('font/download/font_5247138_vjeiggmyqu/iconfont.ttf?t=1792999424759') format('truetype');
+        }
+        .hou_ya_yue_if {
+            font-family: "hou_ya_yue_iconfont" !important;
+            font-size: 16px; font-style: normal;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+        }
+        .hou_ya_yue_i-shouye:before { content: "\e77e"; }
+        .hou_ya_yue_i-xuanche:before { content: "\e603"; }
+        .hou_ya_yue_i-tuku:before { content: "\e63e"; }
+        .hou_ya_yue_i-paihang:before { content: "\e602"; }
+        .hou_ya_yue_i-wenzhang:before { content: "\eb2e"; }
+        .hou_ya_yue_i-shipin:before { content: "\e656"; }
+        .hou_ya_yue_i-zhibo:before { content: "\e8c1"; }
+        .hou_ya_yue_i-chejiahao:before { content: "\e653"; }
+        .hou_ya_yue_i-luntan:before { content: "\e69c"; }
+        .hou_ya_yue_i-koubei:before { content: "\e600"; }
+        .hou_ya_yue_i-jingxiaoshang:before { content: "\e6c8"; }
+        .hou_ya_yue_i-ershouche:before { content: "\e64d"; }
+        .hou_ya_yue_i-butie:before { content: "\e74d"; }
+        .hou_ya_yue_i-jiangjia:before { content: "\e601"; }
+        .hou_ya_yue_i-pinpai:before { content: "\e605"; }
+        .hou_ya_yue_i-yongche:before { content: "\e776"; }
+        .hou_ya_yue_i-gongju:before { content: "\e6e7"; }
+        .hou_ya_yue_i-zuijin:before { content: "\e696"; }
+        .hou_ya_yue_i-store:before { content: "\e655"; }
+        .hou_ya_yue_i-dengpao:before { content: "\e739"; }
+        .hou_ya_yue_i-youxiang:before { content: "\e908"; }
+        .hou_ya_yue_i-quan:before { content: "\e70e"; }
+        .hou_ya_yue_i-14:before { content: "\e615"; }
+
+        /* ===== 1. 基础 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --hou_ya_yue_blue: #3d7eff;
+            --hou_ya_yue_blue_bg: #eaf2ff;
+            --hou_ya_yue_orange: #ff6600;
+            --hou_ya_yue_red: #ff2c00;
+        }
+        body {
+            font: 14px/1.6 "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            color: #222; background: #f5f6f7; min-width: 1360px;
+        }
+        ul, li { list-style: none; }
+        a { color: #222; text-decoration: none; }
+        a:hover { color: var(--hou_ya_yue_blue); }
+        img { display: block; border: 0; }
+        .hou_ya_yue_w { width: 1160px; margin: 0 auto; }
+
+        /* ===== 2. 左侧固定导航 ===== */
+        .hou_ya_yue_aside {
+            position: fixed; left: 0; top: 0; bottom: 0; width: 104px;
+            background: #fff; border-right: 1px solid #eef0f3; z-index: 900;
+            padding: 10px 0 20px; overflow-y: auto;
+        }
+        .hou_ya_yue_aside::-webkit-scrollbar { width: 0; }
+        .hou_ya_yue_aside a {
+            display: flex; align-items: center; height: 42px; padding: 0 8px 0 18px;
+            font-size: 14px; color: #333; position: relative; white-space: nowrap;
+        }
+        .hou_ya_yue_aside a .hou_ya_yue_if { font-size: 16px; margin-right: 9px; color: #555; width: 18px; }
+        .hou_ya_yue_aside a:hover { color: var(--hou_ya_yue_blue); background: #f5f8ff; }
+        .hou_ya_yue_aside a.hou_ya_yue_on {
+            color: var(--hou_ya_yue_blue); background: var(--hou_ya_yue_blue_bg); font-weight: bold;
+        }
+        .hou_ya_yue_aside a.hou_ya_yue_on .hou_ya_yue_if { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_aside a em {
+            position: absolute; right: 10px; top: 50%; margin-top: -4px;
+            border: 4px solid transparent; border-left-color: #c3c9d4;
+        }
+        .hou_ya_yue_aside a.hou_ya_yue_hot .hou_ya_yue_if { color: var(--hou_ya_yue_red); }
+        .hou_ya_yue_aside .hou_ya_yue_gap { height: 8px; }
+
+        /* ===== 3. 顶部通栏 ===== */
+        .hou_ya_yue_header {
+            position: sticky; top: 0; z-index: 800; background: #fff;
+            box-shadow: 0 2px 8px rgba(20, 40, 80, .06); margin-left: 104px;
+        }
+        .hou_ya_yue_header .hou_ya_yue_w { display: flex; align-items: center; height: 64px; }
+        .hou_ya_yue_logo img { height: 34px; }
+        .hou_ya_yue_hdr-city { margin-left: 16px; font-size: 15px; font-weight: bold; cursor: pointer; }
+        .hou_ya_yue_hdr-city:after {
+            content: ""; display: inline-block; margin-left: 3px;
+            border: 4px solid transparent; border-top-color: #999; vertical-align: 1px;
+        }
+        .hou_ya_yue_hdr-weather { margin-left: 14px; font-size: 13px; color: #f5a623; cursor: pointer; }
+        .hou_ya_yue_hdr-search {
+            display: flex; align-items: center; margin-left: 60px;
+            width: 480px; height: 40px; border: 1px solid #dfe3ea; border-radius: 20px;
+            background: #f7f8fa; padding: 0 4px 0 14px;
+        }
+        .hou_ya_yue_hdr-search .hou_ya_yue_type { font-size: 13px; color: #555; cursor: pointer; white-space: nowrap; }
+        .hou_ya_yue_hdr-search .hou_ya_yue_type:after {
+            content: ""; display: inline-block; margin-left: 4px;
+            border: 4px solid transparent; border-top-color: #999; vertical-align: 1px;
+        }
+        .hou_ya_yue_hdr-search input {
+            flex: 1; border: 0; outline: none; background: transparent;
+            padding: 0 10px; font-size: 13px; font-family: inherit; min-width: 0;
+        }
+        .hou_ya_yue_hdr-search button {
+            width: 76px; height: 32px; border: 0; border-radius: 16px; flex-shrink: 0;
+            background: var(--hou_ya_yue_blue); color: #fff; font-size: 14px;
+            cursor: pointer; font-family: inherit;
+        }
+        .hou_ya_yue_hdr-search button:hover { background: #2c66e0; }
+        .hou_ya_yue_hdr-right { margin-left: auto; display: flex; align-items: center; font-size: 13px; }
+        .hou_ya_yue_hdr-right .hou_ya_yue_item {
+            display: flex; flex-direction: column; align-items: center;
+            margin-left: 18px; color: #333; cursor: pointer; line-height: 1.3;
+        }
+        .hou_ya_yue_hdr-right .hou_ya_yue_item:hover { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_hdr-right .hou_ya_yue_item .hou_ya_yue_if { font-size: 17px; color: var(--hou_ya_yue_blue); }
+        a.hou_ya_yue_btn-login {
+            margin-left: 18px; padding: 0 20px; height: 32px; line-height: 32px;
+            background: var(--hou_ya_yue_blue); color: #fff; border-radius: 16px;
+        }
+        .hou_ya_yue_btn-more { margin-left: 16px; color: #333; cursor: pointer; }
+        .hou_ya_yue_btn-more:after {
+            content: ""; display: inline-block; margin-left: 3px;
+            border: 4px solid transparent; border-top-color: #999; vertical-align: 1px;
+        }
+
+        /* ===== 4. 主体与通用 ===== */
+        .hou_ya_yue_main { margin-left: 104px; padding: 14px 0 30px; }
+        .hou_ya_yue_card { background: #fff; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+        .hou_ya_yue_sec-hd { display: flex; align-items: center; }
+        .hou_ya_yue_sec-hd h3 { font-size: 20px; font-weight: bold; color: #111; }
+        .hou_ya_yue_sec-hd .hou_ya_yue_sub { font-size: 13px; color: #999; margin-left: 10px; }
+        .hou_ya_yue_sec-hd .hou_ya_yue_r { margin-left: auto; display: flex; align-items: center; font-size: 13px; color: #666; }
+        .hou_ya_yue_sec-hd .hou_ya_yue_r a { color: #666; margin-left: 14px; }
+        .hou_ya_yue_sec-hd .hou_ya_yue_r a:hover { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_tabs { display: flex; align-items: center; margin-left: 24px; }
+        .hou_ya_yue_tabs span {
+            font-size: 14px; color: #444; padding: 4px 2px; margin-right: 22px;
+            cursor: pointer; position: relative; white-space: nowrap;
+        }
+        .hou_ya_yue_tabs span:hover { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_tabs span.hou_ya_yue_on { color: var(--hou_ya_yue_blue); font-weight: bold; }
+        .hou_ya_yue_tabs span.hou_ya_yue_on:after {
+            content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+            bottom: -4px; width: 20px; height: 3px; border-radius: 2px; background: var(--hou_ya_yue_blue);
+        }
+        .hou_ya_yue_grad-title {
+            background: linear-gradient(90deg, #ff2c00, #ff7a00);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+
+        /* ===== 5. 找车卡片 ===== */
+        .hou_ya_yue_find-wrap { display: flex; }
+        .hou_ya_yue_find-card { width: 848px; }
+        .hou_ya_yue_rank-card { width: 292px; margin-left: 20px; padding: 14px 16px; }
+        .hou_ya_yue_cats { display: flex; align-items: center; }
+        .hou_ya_yue_cats a {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100px; font-size: 13px; color: #333;
+        }
+        .hou_ya_yue_cats a:hover { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_cats a i {
+            font-style: normal; font-size: 24px; color: #333; line-height: 34px; height: 34px;
+        }
+        .hou_ya_yue_cats a i:after {
+            content: ""; display: inline-block; margin-left: 2px;
+            border: 3px solid transparent; border-top-color: #b9c0cc; vertical-align: 6px;
+        }
+        .hou_ya_yue_cats a.hou_ya_yue_noarrow i:after { display: none; }
+        .hou_ya_yue_find-bar {
+            display: flex; align-items: center; margin-top: 12px;
+            border-bottom: 1px solid #f2f4f7; padding-bottom: 14px;
+        }
+        .hou_ya_yue_radio { display: flex; align-items: center; font-size: 14px; margin-right: 14px; }
+        .hou_ya_yue_radio b {
+            width: 15px; height: 15px; border-radius: 50%; border: 1px solid #c8cfd9;
+            margin-right: 5px; position: relative; cursor: pointer;
+        }
+        .hou_ya_yue_radio b.hou_ya_yue_on { border-color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_radio b.hou_ya_yue_on:after {
+            content: ""; position: absolute; left: 3px; top: 3px; width: 7px; height: 7px;
+            border-radius: 50%; background: var(--hou_ya_yue_blue);
+        }
+        .hou_ya_yue_radio span { margin-right: 10px; cursor: pointer; }
+        .hou_ya_yue_sel {
+            width: 158px; height: 34px; border: 1px solid #dfe3ea; border-radius: 4px;
+            font-size: 13px; color: #555; padding: 0 8px; margin-right: 10px;
+            font-family: inherit; outline: none; background: #fff;
+        }
+        a.hou_ya_yue_btn-find {
+            width: 84px; height: 34px; line-height: 32px; text-align: center;
+            border: 1px solid var(--hou_ya_yue_blue); border-radius: 4px;
+            color: var(--hou_ya_yue_blue); font-size: 14px;
+        }
+        .hou_ya_yue_btn-find:hover { background: var(--hou_ya_yue_blue_bg); }
+        .hou_ya_yue_find-links { margin-left: 14px; font-size: 13px; }
+        .hou_ya_yue_find-links a { color: #444; margin-right: 16px; }
+        .hou_ya_yue_hotcar-hd { display: flex; align-items: center; margin-top: 14px; }
+        .hou_ya_yue_hotcar-hd strong { font-size: 15px; }
+        .hou_ya_yue_hotcar-hd .hou_ya_yue_tabs { margin-left: 18px; }
+        .hou_ya_yue_hotcar-hd .hou_ya_yue_tabs span { font-size: 13px; margin-right: 18px; color: #666; }
+        .hou_ya_yue_car-rows { margin-top: 4px; }
+        .hou_ya_yue_car-row { display: flex; align-items: center; padding: 8px 0; }
+        .hou_ya_yue_car-row + .hou_ya_yue_car-row { border-top: 1px dashed #f2f4f7; }
+        .hou_ya_yue_car-row .hou_ya_yue_lab { width: 70px; font-size: 14px; font-weight: bold; flex-shrink: 0; }
+        .hou_ya_yue_car-row .hou_ya_yue_lab a { color: #222; }
+        .hou_ya_yue_car-cells { display: flex; flex: 1; }
+        .hou_ya_yue_car-cell { width: 110px; text-align: center; }
+        .hou_ya_yue_car-cell .hou_ya_yue_n {
+            font-size: 13px; color: #333; display: block;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        .hou_ya_yue_car-cell .hou_ya_yue_ops { font-size: 12px; color: #aaa; }
+        .hou_ya_yue_car-cell .hou_ya_yue_ops a { color: #aaa; margin: 0 4px; }
+        .hou_ya_yue_car-cell .hou_ya_yue_ops a:hover { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_car-strip {
+            display: flex; margin-top: 10px; padding-top: 12px; border-top: 1px solid #f2f4f7;
+        }
+        .hou_ya_yue_car-strip a { width: 76px; flex-shrink: 0; text-align: center; font-size: 12px; color: #444; }
+        .hou_ya_yue_car-strip img { width: 70px; height: 46px; object-fit: contain; margin: 0 auto 4px; }
+        .hou_ya_yue_car-strip span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+        /* ===== 6. 每日热榜卡片 ===== */
+        .hou_ya_yue_rank-hd { display: flex; align-items: center; }
+        .hou_ya_yue_rank-hd h3 { font-size: 17px; font-weight: bold; }
+        .hou_ya_yue_rank-hd h3 i { font-style: normal; color: var(--hou_ya_yue_red); margin-right: 5px; }
+        .hou_ya_yue_rank-hd .hou_ya_yue_rtabs { margin-left: auto; display: flex; font-size: 12px; color: #999; }
+        .hou_ya_yue_rank-hd .hou_ya_yue_rtabs span { cursor: pointer; margin-left: 8px; }
+        .hou_ya_yue_rank-hd .hou_ya_yue_rtabs span.hou_ya_yue_on { color: var(--hou_ya_yue_blue); font-weight: bold; }
+        .hou_ya_yue_rank-list { margin-top: 6px; }
+        .hou_ya_yue_rank-list li { display: flex; align-items: center; line-height: 30px; font-size: 13px; }
+        .hou_ya_yue_rank-list li .hou_ya_yue_no {
+            width: 20px; font-size: 14px; font-weight: bold; color: #c2c8d2; font-style: italic;
+        }
+        .hou_ya_yue_rank-list li:nth-child(-n+3) .hou_ya_yue_no { color: var(--hou_ya_yue_orange); }
+        .hou_ya_yue_rank-list li .hou_ya_yue_txt { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_rank-list li .hou_ya_yue_vv { color: #bbb; font-size: 12px; margin-left: 8px; }
+
+        /* ===== 7. 今日焦点 ===== */
+        .hou_ya_yue_focus-hd { display: flex; align-items: baseline; }
+        .hou_ya_yue_focus-hd h3 { font-size: 24px; font-weight: bold; color: #111; }
+        .hou_ya_yue_focus-hd h3 span { font-size: 15px; font-weight: bold; color: #d8dce3; letter-spacing: 2px; margin-left: 8px; }
+        .hou_ya_yue_focus-hd .hou_ya_yue_r { margin-left: auto; }
+        .hou_ya_yue_focus-body { display: flex; margin-top: 12px; }
+        .hou_ya_yue_focus-pic { width: 560px; position: relative; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+        .hou_ya_yue_focus-pic .hou_ya_yue_slide { position: absolute; inset: 0; opacity: 0; transition: opacity .5s; }
+        .hou_ya_yue_focus-pic .hou_ya_yue_slide.hou_ya_yue_on { opacity: 1; position: relative; }
+        .hou_ya_yue_focus-pic img { width: 560px; height: 336px; object-fit: cover; }
+        .hou_ya_yue_dots { position: absolute; left: 12px; bottom: 12px; display: flex; z-index: 5; }
+        .hou_ya_yue_dots i {
+            width: 18px; height: 4px; margin-right: 5px; border-radius: 2px;
+            background: rgba(255, 255, 255, .5); cursor: pointer;
+        }
+        .hou_ya_yue_dots i.hou_ya_yue_on { background: #fff; }
+        .hou_ya_yue_focus-txt { flex: 1; margin-left: 24px; min-width: 0; }
+        .hou_ya_yue_focus-txt .hou_ya_yue_tip { font-size: 12px; color: #b6bcc7; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_focus-txt h4 { font-size: 24px; line-height: 1.35; margin: 4px 0 8px; }
+        .hou_ya_yue_focus-txt h4 a { color: #111; }
+        .hou_ya_yue_focus-txt h4 a:hover { color: var(--hou_ya_yue_red); }
+        .hou_ya_yue_focus-subs { display: flex; font-size: 13px; margin-bottom: 8px; }
+        .hou_ya_yue_focus-subs a { color: #555; margin-right: 16px; white-space: nowrap; }
+        .hou_ya_yue_focus-list { display: flex; flex-wrap: wrap; }
+        .hou_ya_yue_focus-list a {
+            width: 20%; font-size: 13px; color: #444; line-height: 28px;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        .hou_ya_yue_focus-list a:before { content: "· "; color: #ccc; }
+        .hou_ya_yue_focus-list a.hou_ya_yue_red { color: var(--hou_ya_yue_red); }
+        .hou_ya_yue_focus-list a em {
+            font-style: normal; font-size: 11px; color: #fff; background: var(--hou_ya_yue_orange);
+            border-radius: 2px; padding: 0 3px; margin-left: 4px; vertical-align: 1px;
+        }
+        .hou_ya_yue_focus-foot { display: flex; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f2f4f7; }
+        .hou_ya_yue_focus-foot a { width: 25%; display: flex; align-items: center; padding-right: 14px; }
+        .hou_ya_yue_focus-foot img { width: 96px; height: 60px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+        .hou_ya_yue_focus-foot span { margin-left: 8px; font-size: 12px; color: #555; line-height: 18px; height: 36px; overflow: hidden; }
+
+        /* ===== 8. 促销四卡 ===== */
+        .hou_ya_yue_promos { display: flex; }
+        .hou_ya_yue_promo {
+            width: 275px; height: 108px; margin-right: 20px; border-radius: 10px;
+            background: linear-gradient(135deg, #eef4ff, #dfeaff);
+            display: flex; align-items: center; padding: 0 12px; position: relative; overflow: hidden;
+        }
+        .hou_ya_yue_promo:last-child { margin-right: 0; }
+        .hou_ya_yue_promo .hou_ya_yue_pinfo { position: relative; z-index: 2; }
+        .hou_ya_yue_promo h5 { font-size: 15px; color: #17325e; }
+        .hou_ya_yue_promo p { font-size: 12px; color: #7b8ba6; }
+        .hou_ya_yue_promo a.hou_ya_yue_pbtn {
+            display: inline-block; margin-top: 6px; padding: 0 10px; height: 22px; line-height: 22px;
+            background: #fff; color: var(--hou_ya_yue_blue); font-size: 12px;
+            border-radius: 11px; box-shadow: 0 2px 6px rgba(61, 126, 255, .25);
+        }
+        .hou_ya_yue_promo img { position: absolute; right: 0; bottom: 0; width: 118px; height: 84px; object-fit: contain; z-index: 1; }
+
+        /* ===== 9. 视频卡片 ===== */
+        .hou_ya_yue_vgrid { display: flex; flex-wrap: wrap; margin-top: 14px; }
+        .hou_ya_yue_vcard { width: 265px; margin: 0 20px 20px 0; }
+        .hou_ya_yue_vcard:nth-child(4n) { margin-right: 0; }
+        .hou_ya_yue_vcard.hou_ya_yue_v3 { width: 260px; }
+        .hou_ya_yue_vcard.hou_ya_yue_v3:nth-child(3n) { margin-right: 0; }
+        .hou_ya_yue_vauthor { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; color: #333; }
+        .hou_ya_yue_vauthor img { width: 24px; height: 24px; border-radius: 50%; margin-right: 7px; }
+        .hou_ya_yue_vauthor em { font-style: normal; color: #aaa; font-size: 12px; margin-left: auto; }
+        .hou_ya_yue_vcover { position: relative; border-radius: 8px; overflow: hidden; display: block; }
+        .hou_ya_yue_vcover img { width: 100%; height: 154px; object-fit: cover; }
+        .hou_ya_yue_vcard.hou_ya_yue_v3 .hou_ya_yue_vcover img { height: 146px; }
+        .hou_ya_yue_vcover .hou_ya_yue_src {
+            position: absolute; left: 8px; top: 8px; font-size: 12px; color: #fff;
+            background: rgba(0, 0, 0, .45); border-radius: 3px; padding: 1px 6px;
+        }
+        .hou_ya_yue_vcover .hou_ya_yue_dur {
+            position: absolute; right: 8px; bottom: 8px; font-size: 12px; color: #fff;
+            background: rgba(0, 0, 0, .6); border-radius: 3px; padding: 0 5px;
+        }
+        .hou_ya_yue_vcover .hou_ya_yue_live {
+            position: absolute; left: 8px; top: 8px; font-size: 12px; color: #fff;
+            background: linear-gradient(90deg, #ff4d2e, #ff7a00); border-radius: 9px; padding: 1px 8px;
+        }
+        .hou_ya_yue_vcover .hou_ya_yue_when {
+            position: absolute; right: 8px; top: 8px; font-size: 12px; color: #fff;
+            background: rgba(0, 0, 0, .45); border-radius: 3px; padding: 1px 6px;
+        }
+        .hou_ya_yue_vcover .hou_ya_yue_vuser {
+            position: absolute; left: 8px; bottom: 8px; display: flex; align-items: center;
+            font-size: 12px; color: #fff;
+        }
+        .hou_ya_yue_vcover .hou_ya_yue_vuser img { width: 20px; height: 20px; border-radius: 50%; margin-right: 5px; }
+        .hou_ya_yue_vcard h5 { font-size: 14px; font-weight: normal; line-height: 20px; margin-top: 8px; height: 40px; overflow: hidden; }
+        .hou_ya_yue_vcard .hou_ya_yue_pv { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+        /* ===== 10. 双栏布局与右侧榜单 ===== */
+        .hou_ya_yue_two-col { display: flex; }
+        .hou_ya_yue_two-col .hou_ya_yue_left { width: 820px; }
+        .hou_ya_yue_side-col { width: 320px; margin-left: 20px; }
+        .hou_ya_yue_side-col .hou_ya_yue_vgrid { margin-top: 0; }
+        .hou_ya_yue_side-col .hou_ya_yue_vcard { width: 320px; margin: 0 0 14px 0; }
+        .hou_ya_yue_side-col .hou_ya_yue_vcard .hou_ya_yue_vcover img { height: 150px; }
+        .hou_ya_yue_bang-hd { display: flex; align-items: center; font-size: 17px; font-weight: bold; color: #111; }
+        .hou_ya_yue_bang-hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; color: #999; }
+        .hou_ya_yue_bang-list { margin-top: 6px; }
+        .hou_ya_yue_bang-list li { display: flex; align-items: center; line-height: 32px; font-size: 13px; }
+        .hou_ya_yue_bang-list li .hou_ya_yue_no { width: 22px; font-style: italic; font-weight: bold; color: #c2c8d2; font-size: 14px; }
+        .hou_ya_yue_bang-list li:nth-child(-n+3) .hou_ya_yue_no { color: var(--hou_ya_yue_orange); }
+        .hou_ya_yue_bang-list li .hou_ya_yue_txt { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_bang-list li .hou_ya_yue_vv { color: #bbb; font-size: 12px; margin-left: 8px; }
+        .hou_ya_yue_bang-list.hou_ya_yue_with-img img {
+            width: 46px; height: 30px; object-fit: contain; margin: 0 8px 0 4px;
+        }
+
+        /* ===== 11. 活动大 banner（CSS 渐变绘制） ===== */
+        .hou_ya_yue_banner {
+            height: 110px; border-radius: 12px; margin-bottom: 14px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .hou_ya_yue_banner .hou_ya_yue_b1 {
+            font-size: 40px; font-weight: bold; color: #fff; letter-spacing: 6px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+        .hou_ya_yue_banner .hou_ya_yue_b2 { margin-left: 20px; font-size: 18px; color: #fff; letter-spacing: 4px; }
+        .hou_ya_yue_banner.hou_ya_yue_life { background: linear-gradient(90deg, #ff9a3c, #ff4d2e 55%, #e0338f); }
+        .hou_ya_yue_banner.hou_ya_yue_lowprice { background: linear-gradient(90deg, #ff5f8f, #ff2c54 60%, #c3155c); }
+        .hou_ya_yue_banner.hou_ya_yue_qi {
+            background: linear-gradient(90deg, #10151f, #1d2635 45%, #33435c);
+            justify-content: flex-start; padding: 0 60px;
+        }
+        .hou_ya_yue_banner.hou_ya_yue_qi .hou_ya_yue_qlogo {
+            font-size: 26px; color: #d5b98a; letter-spacing: 8px; font-family: "SimSun", serif;
+        }
+        .hou_ya_yue_banner.hou_ya_yue_qi .hou_ya_yue_qt { margin-left: 40px; }
+        .hou_ya_yue_banner.hou_ya_yue_qi .hou_ya_yue_qt p { color: #d5b98a; font-size: 14px; letter-spacing: 3px; }
+        .hou_ya_yue_banner.hou_ya_yue_qi .hou_ya_yue_qt h4 { color: #fff; font-size: 30px; letter-spacing: 4px; }
+        .hou_ya_yue_banner.hou_ya_yue_qi .hou_ya_yue_qprice {
+            margin-left: 50px; display: flex; color: #cdd6e4; font-size: 12px; text-align: center;
+        }
+        .hou_ya_yue_banner.hou_ya_yue_qi .hou_ya_yue_qprice div { margin-right: 26px; }
+        .hou_ya_yue_banner.hou_ya_yue_qi .hou_ya_yue_qprice strong {
+            display: block; color: #fff; font-size: 15px; margin-bottom: 2px;
+        }
+        .hou_ya_yue_banner.hou_ya_yue_idaura {
+            background: linear-gradient(90deg, #4a6cf7, #7b9bff 55%, #a9c4ff); justify-content: flex-start;
+        }
+        .hou_ya_yue_banner.hou_ya_yue_idaura .hou_ya_yue_vlogo {
+            font-size: 30px; font-weight: bold; color: #fff; letter-spacing: 2px; margin: 0 30px;
+        }
+        .hou_ya_yue_banner.hou_ya_yue_idaura .hou_ya_yue_vtxt { font-size: 20px; color: #fff; letter-spacing: 4px; }
+        .hou_ya_yue_banner.hou_ya_yue_idaura img {
+            position: absolute; right: 40px; bottom: 0; width: 300px; height: 86px; object-fit: contain;
+        }
+        .hou_ya_yue_banner.hou_ya_yue_idaura .hou_ya_yue_vtag {
+            margin-left: auto; margin-right: 360px; color: #fff; font-size: 15px; letter-spacing: 6px;
+        }
+
+        /* ===== 12. 文章卡片 ===== */
+        .hou_ya_yue_ngrid { display: flex; flex-wrap: wrap; margin-top: 14px; }
+        .hou_ya_yue_ncard { width: 260px; margin: 0 20px 18px 0; }
+        .hou_ya_yue_ncard:nth-child(3n) { margin-right: 0; }
+        .hou_ya_yue_ncover { position: relative; border-radius: 8px; overflow: hidden; }
+        .hou_ya_yue_ncover img { width: 260px; height: 156px; object-fit: cover; }
+        .hou_ya_yue_ncover .hou_ya_yue_src {
+            position: absolute; left: 8px; top: 8px; font-size: 12px; color: #fff;
+            background: rgba(0, 0, 0, .5); border-radius: 3px; padding: 1px 6px;
+        }
+        .hou_ya_yue_ncard h5 { font-size: 14px; font-weight: normal; line-height: 20px; margin-top: 8px; height: 40px; overflow: hidden; }
+        .hou_ya_yue_ncard .hou_ya_yue_pv { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+        /* ===== 13. 论坛精选 ===== */
+        .hou_ya_yue_club-grid { display: flex; margin-top: 14px; }
+        .hou_ya_yue_club-grid a { width: 260px; margin-right: 20px; position: relative; border-radius: 8px; overflow: hidden; }
+        .hou_ya_yue_club-grid a:last-child { margin-right: 0; }
+        .hou_ya_yue_club-grid img { width: 260px; height: 158px; object-fit: cover; }
+        .hou_ya_yue_club-grid .hou_ya_yue_cmask {
+            position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 10px 8px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .7)); color: #fff;
+        }
+        .hou_ya_yue_club-grid .hou_ya_yue_cmask h5 { font-size: 13px; font-weight: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_club-grid .hou_ya_yue_cmask p {
+            font-size: 12px; display: flex; align-items: center; margin-top: 3px;
+        }
+        .hou_ya_yue_club-grid .hou_ya_yue_cmask img { width: 18px; height: 18px; border-radius: 50%; margin-right: 5px; }
+        .hou_ya_yue_hotpost { margin-top: 16px; padding-top: 14px; border-top: 1px solid #f2f4f7; }
+        .hou_ya_yue_hotpost-hd { display: flex; align-items: center; font-size: 16px; font-weight: bold; }
+        .hou_ya_yue_hotpost-hd .hou_ya_yue_badge {
+            font-size: 12px; color: #b8860b; background: linear-gradient(90deg, #fdf3d8, #f9e3a8);
+            border-radius: 3px; padding: 1px 6px; margin-left: 10px; font-weight: normal;
+        }
+        .hou_ya_yue_hotpost-body { display: flex; margin-top: 10px; }
+        .hou_ya_yue_hotpost-body .hou_ya_yue_hp-item { width: 50%; display: flex; padding-right: 16px; }
+        .hou_ya_yue_hotpost-body img { width: 108px; height: 68px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+        .hou_ya_yue_hotpost-body .hou_ya_yue_hp-t { margin-left: 10px; min-width: 0; }
+        .hou_ya_yue_hotpost-body .hou_ya_yue_hp-t h5 {
+            font-size: 14px; font-weight: normal; line-height: 20px; height: 40px; overflow: hidden;
+        }
+        .hou_ya_yue_hotpost-body .hou_ya_yue_hp-t p {
+            font-size: 12px; color: #999; display: flex; align-items: center; margin-top: 4px;
+        }
+        .hou_ya_yue_hotpost-body .hou_ya_yue_hp-t p img { width: 16px; height: 16px; margin-right: 4px; }
+        .hou_ya_yue_hotpost-list { margin-top: 10px; }
+        .hou_ya_yue_hotpost-list li {
+            font-size: 13px; color: #555; line-height: 26px;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        .hou_ya_yue_hotpost-list li:before { content: "· "; color: #ccc; }
+        .hou_ya_yue_forum-links { display: flex; margin-top: 10px; }
+        .hou_ya_yue_forum-links a {
+            font-size: 12px; color: #666; border: 1px solid #e8ebf0; border-radius: 13px;
+            padding: 2px 12px; margin-right: 10px;
+        }
+        .hou_ya_yue_forum-links a:hover { color: var(--hou_ya_yue_blue); border-color: var(--hou_ya_yue_blue); }
+
+        /* ===== 14. 车主价格卡 ===== */
+        .hou_ya_yue_price-card { margin-top: 16px; padding: 14px; background: #f8f9fb; border-radius: 10px; }
+        .hou_ya_yue_price-card .hou_ya_yue_hd { display: flex; align-items: center; font-size: 16px; font-weight: bold; }
+        .hou_ya_yue_price-card .hou_ya_yue_hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; }
+        .hou_ya_yue_price-card .hou_ya_yue_hd .hou_ya_yue_r a { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_price-card li {
+            display: flex; align-items: center; padding: 8px 0; border-bottom: 1px dashed #eceff4;
+        }
+        .hou_ya_yue_price-card li:last-child { border-bottom: 0; }
+        .hou_ya_yue_price-card img { width: 110px; height: 70px; border-radius: 6px; object-fit: cover; }
+        .hou_ya_yue_price-card .hou_ya_yue_pi { margin-left: 12px; flex: 1; min-width: 0; }
+        .hou_ya_yue_price-card .hou_ya_yue_pi strong { display: block; font-size: 13px; font-weight: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_price-card .hou_ya_yue_pi em { font-style: normal; color: var(--hou_ya_yue_orange); font-size: 16px; font-weight: bold; }
+        .hou_ya_yue_price-card .hou_ya_yue_pi em i { font-style: normal; font-size: 12px; font-weight: normal; }
+        a.hou_ya_yue_all {
+            display: block; margin-top: 10px; text-align: center; height: 34px; line-height: 34px;
+            border: 1px solid var(--hou_ya_yue_blue); border-radius: 4px;
+            color: var(--hou_ya_yue_blue); font-size: 13px;
+        }
+
+        /* ===== 15. 经销商横条 ===== */
+        .hou_ya_yue_dealer-strip { display: flex; margin-bottom: 14px; }
+        .hou_ya_yue_dealer-strip a {
+            flex: 1; margin-right: 14px; background: #fff; border-radius: 10px; padding: 10px;
+            display: flex; align-items: center; font-size: 12px;
+        }
+        .hou_ya_yue_dealer-strip a:last-child { margin-right: 0; }
+        .hou_ya_yue_dealer-strip img { width: 74px; height: 50px; object-fit: contain; }
+        .hou_ya_yue_dealer-strip .hou_ya_yue_di { margin-left: 8px; min-width: 0; }
+        .hou_ya_yue_dealer-strip .hou_ya_yue_di strong {
+            display: block; font-size: 13px; font-weight: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        .hou_ya_yue_dealer-strip .hou_ya_yue_di em { font-style: normal; color: #999; }
+
+        /* ===== 16. 车型库 ===== */
+        .hou_ya_yue_lib-grid { display: flex; margin-top: 14px; }
+        .hou_ya_yue_lib-grid a { width: 260px; margin-right: 20px; }
+        .hou_ya_yue_lib-grid a:last-child { margin-right: 0; }
+        .hou_ya_yue_lib-grid img { width: 260px; height: 160px; border-radius: 8px; object-fit: cover; }
+        .hou_ya_yue_lib-grid p { font-size: 14px; margin-top: 8px; text-align: center; }
+        .hou_ya_yue_lib-dots { display: flex; justify-content: center; margin-top: 10px; }
+        .hou_ya_yue_lib-dots i {
+            width: 18px; height: 4px; border-radius: 2px; margin-right: 5px;
+            background: #e3e7ee; cursor: pointer;
+        }
+        .hou_ya_yue_lib-dots i.hou_ya_yue_on { background: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_sale-hd { display: flex; align-items: center; font-size: 17px; font-weight: bold; }
+        .hou_ya_yue_sale-hd .hou_ya_yue_month {
+            font-size: 12px; color: #fff; background: var(--hou_ya_yue_blue); border-radius: 3px;
+            padding: 1px 5px; margin-left: 8px; font-weight: normal;
+        }
+        .hou_ya_yue_sale-hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; color: #999; }
+        .hou_ya_yue_sale-tabs { display: flex; font-size: 13px; margin: 8px 0 4px; color: #666; }
+        .hou_ya_yue_sale-tabs span { margin-right: 16px; cursor: pointer; }
+        .hou_ya_yue_sale-tabs span.hou_ya_yue_on { color: var(--hou_ya_yue_blue); font-weight: bold; }
+        .hou_ya_yue_sale-list li { display: flex; align-items: center; line-height: 36px; font-size: 13px; }
+        .hou_ya_yue_sale-list li .hou_ya_yue_no { width: 22px; font-style: italic; font-weight: bold; color: #c2c8d2; font-size: 14px; }
+        .hou_ya_yue_sale-list li:nth-child(-n+3) .hou_ya_yue_no { color: var(--hou_ya_yue_orange); }
+        .hou_ya_yue_sale-list li img { width: 50px; height: 32px; object-fit: contain; margin-right: 8px; }
+        .hou_ya_yue_sale-list li .hou_ya_yue_txt { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_sale-list li .hou_ya_yue_num { color: #999; font-size: 12px; }
+        .hou_ya_yue_sale-note { font-size: 11px; color: #bbb; margin-top: 6px; }
+
+        /* ===== 17. 车主口碑 ===== */
+        .hou_ya_yue_kb-grid { display: flex; margin-top: 14px; }
+        .hou_ya_yue_kb-item {
+            width: 260px; margin-right: 20px; background: #fff; border: 1px solid #f0f2f6;
+            border-radius: 10px; padding: 14px; position: relative;
+        }
+        .hou_ya_yue_kb-item:nth-child(3n) { margin-right: 0; }
+        .hou_ya_yue_kb-score { font-size: 26px; font-weight: bold; color: var(--hou_ya_yue_orange); }
+        .hou_ya_yue_kb-score i { font-style: normal; font-size: 14px; }
+        .hou_ya_yue_kb-item .hou_ya_yue_all {
+            position: absolute; right: 14px; top: 16px; font-size: 12px; color: #999;
+        }
+        .hou_ya_yue_kb-item .hou_ya_yue_all:hover { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_kb-name { font-size: 16px; font-weight: bold; margin-top: 2px; }
+        .hou_ya_yue_kb-name + p { font-size: 12px; color: #aaa; }
+        .hou_ya_yue_kb-item .hou_ya_yue_kcar {
+            position: absolute; right: 10px; top: 52px; width: 120px; height: 74px; object-fit: contain;
+        }
+        .hou_ya_yue_kb-user { display: flex; align-items: center; font-size: 12px; color: #999; margin: 46px 0 6px; }
+        .hou_ya_yue_kb-user img { width: 20px; height: 20px; border-radius: 50%; margin-right: 6px; }
+        .hou_ya_yue_kb-spec { font-size: 13px; color: #333; }
+        .hou_ya_yue_kb-spec b { color: var(--hou_ya_yue_red); margin-left: 8px; }
+        .hou_ya_yue_kb-txt { font-size: 12px; color: #777; line-height: 20px; margin-top: 4px; height: 80px; overflow: hidden; }
+        .hou_ya_yue_kb-radar { margin: 40px 0 4px; text-align: center; }
+        .hou_ya_yue_kb-radar p { font-size: 12px; color: #999; }
+        .hou_ya_yue_kb-new-hd { display: flex; align-items: center; font-size: 17px; font-weight: bold; }
+        .hou_ya_yue_kb-new-hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; color: #999; }
+        .hou_ya_yue_kb-new { margin-top: 10px; }
+        .hou_ya_yue_kb-new li { display: flex; padding: 8px 0; border-bottom: 1px dashed #f0f2f6; }
+        .hou_ya_yue_kb-new li:last-child { border-bottom: 0; }
+        .hou_ya_yue_kb-new img { width: 96px; height: 60px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+        .hou_ya_yue_kb-new .hou_ya_yue_ki { margin-left: 10px; min-width: 0; }
+        .hou_ya_yue_kb-new .hou_ya_yue_ki h5 { font-size: 13px; font-weight: normal; line-height: 19px; height: 38px; overflow: hidden; }
+        .hou_ya_yue_kb-new .hou_ya_yue_ki em { font-style: normal; font-size: 12px; color: #999; }
+        .hou_ya_yue_kb-new .hou_ya_yue_ki em b { color: var(--hou_ya_yue_orange); font-weight: normal; }
+
+        /* ===== 18. 本地优惠 ===== */
+        .hou_ya_yue_local-body { display: flex; margin-top: 14px; }
+        .hou_ya_yue_local-left { width: 820px; }
+        .hou_ya_yue_bargain-grid { display: flex; flex-wrap: wrap; }
+        .hou_ya_yue_bargain {
+            width: 260px; margin: 0 20px 14px 0; border: 1px solid #f0f2f6; border-radius: 10px;
+            padding: 12px; display: flex; position: relative;
+        }
+        .hou_ya_yue_bargain:nth-child(3n) { margin-right: 0; }
+        .hou_ya_yue_bargain .hou_ya_yue_bt { flex: 1; min-width: 0; }
+        .hou_ya_yue_bargain .hou_ya_yue_bt h5 { font-size: 13px; font-weight: normal; line-height: 19px; height: 38px; overflow: hidden; }
+        .hou_ya_yue_bargain .hou_ya_yue_bt p { font-size: 12px; color: #999; margin-top: 2px; }
+        .hou_ya_yue_bargain .hou_ya_yue_bbtns { display: flex; align-items: center; margin-top: 8px; }
+        a.hou_ya_yue_bbtn {
+            font-size: 12px; color: var(--hou_ya_yue_blue);
+            border: 1px solid var(--hou_ya_yue_blue); border-radius: 3px; padding: 1px 8px;
+        }
+        .hou_ya_yue_bargain .hou_ya_yue_btel { margin-left: 10px; font-size: 12px; color: #999; }
+        .hou_ya_yue_bargain img { width: 96px; height: 64px; object-fit: contain; margin-left: 6px; flex-shrink: 0; }
+        .hou_ya_yue_cut-hd { display: flex; align-items: center; font-size: 17px; font-weight: bold; margin-top: 8px; }
+        .hou_ya_yue_cut-hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; color: #999; }
+        .hou_ya_yue_cut-grid { display: flex; margin-top: 10px; }
+        .hou_ya_yue_cut-grid .hou_ya_yue_cut-item {
+            width: 50%; display: flex; padding-right: 16px;
+        }
+        .hou_ya_yue_cut-grid img { width: 118px; height: 76px; border-radius: 6px; object-fit: cover; }
+        .hou_ya_yue_cut-grid .hou_ya_yue_ct { margin-left: 10px; min-width: 0; }
+        .hou_ya_yue_cut-grid .hou_ya_yue_ct h5 { font-size: 14px; font-weight: normal; line-height: 20px; height: 40px; overflow: hidden; }
+        .hou_ya_yue_cut-grid .hou_ya_yue_ct p { font-size: 12px; color: #999; }
+        .hou_ya_yue_cut-grid .hou_ya_yue_ct p b { color: var(--hou_ya_yue_orange); font-weight: normal; }
+        .hou_ya_yue_cut-list { margin-top: 8px; }
+        .hou_ya_yue_cut-list li { font-size: 13px; color: #555; line-height: 27px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_cut-list li:before { content: "· "; color: #ccc; }
+        .hou_ya_yue_jxs-hd { display: flex; align-items: center; font-size: 17px; font-weight: bold; margin-top: 8px; }
+        .hou_ya_yue_jxs-hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; color: #999; }
+        .hou_ya_yue_jxs-list { margin-top: 8px; }
+        .hou_ya_yue_jxs-list li {
+            display: flex; align-items: center; padding: 7px 0; border-bottom: 1px dashed #f0f2f6;
+            font-size: 13px;
+        }
+        .hou_ya_yue_jxs-list li:last-child { border-bottom: 0; }
+        .hou_ya_yue_jxs-list img { width: 84px; height: 52px; border-radius: 5px; object-fit: cover; }
+        .hou_ya_yue_jxs-list .hou_ya_yue_ji { margin-left: 10px; flex: 1; min-width: 0; }
+        .hou_ya_yue_jxs-list .hou_ya_yue_ji strong { display: block; font-weight: normal; }
+        .hou_ya_yue_jxs-list .hou_ya_yue_ji em { font-style: normal; font-size: 12px; color: var(--hou_ya_yue_orange); }
+        .hou_ya_yue_jxs-list .hou_ya_yue_ji em i { font-style: normal; color: #999; font-size: 12px; }
+        .hou_ya_yue_city-tabs { display: flex; font-size: 13px; color: #666; margin-top: 8px; flex-wrap: wrap; }
+        .hou_ya_yue_city-tabs span { margin-right: 14px; cursor: pointer; line-height: 26px; }
+        .hou_ya_yue_city-tabs span.hou_ya_yue_on { color: var(--hou_ya_yue_blue); font-weight: bold; }
+        .hou_ya_yue_cut-table { margin-top: 8px; }
+        .hou_ya_yue_cut-table li {
+            display: flex; align-items: center; line-height: 32px; font-size: 13px;
+            border-bottom: 1px dashed #f0f2f6;
+        }
+        .hou_ya_yue_cut-table li:last-child { border-bottom: 0; }
+        .hou_ya_yue_cut-table .hou_ya_yue_cn { flex: 1; }
+        .hou_ya_yue_cut-table .hou_ya_yue_cd { color: #22ac38; width: 78px; }
+        .hou_ya_yue_cut-table .hou_ya_yue_cp { color: var(--hou_ya_yue_orange); width: 78px; text-align: right; }
+        .hou_ya_yue_brand-box { margin-top: 12px; padding: 12px; background: #f8f9fb; border-radius: 10px; }
+        .hou_ya_yue_brand-box .hou_ya_yue_hd { display: flex; align-items: center; font-size: 15px; font-weight: bold; }
+        .hou_ya_yue_brand-box .hou_ya_yue_hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; color: #999; }
+        .hou_ya_yue_brand-grid { display: flex; flex-wrap: wrap; margin-top: 10px; }
+        .hou_ya_yue_brand-grid a {
+            width: 25%; text-align: center; font-size: 12px; color: #555; margin-bottom: 10px;
+        }
+        .hou_ya_yue_brand-grid a i {
+            display: block; width: 42px; height: 42px; line-height: 42px; margin: 0 auto 4px;
+            border-radius: 50%; background: #fff; border: 1px solid #eceff4;
+            font-style: normal; font-size: 13px; color: #666; overflow: hidden;
+        }
+        .hou_ya_yue_brand-grid.hou_ya_yue_w3 a { width: 33.33%; }
+        .hou_ya_yue_price-tabs { display: flex; font-size: 13px; margin-top: 8px; }
+        .hou_ya_yue_price-tabs span { margin-right: 16px; color: #666; cursor: pointer; }
+        .hou_ya_yue_price-tabs span.hou_ya_yue_on { color: var(--hou_ya_yue_blue); font-weight: bold; }
+        .hou_ya_yue_price-grid { display: flex; flex-wrap: wrap; margin-top: 6px; }
+        .hou_ya_yue_price-grid a {
+            width: 33.33%; font-size: 13px; color: #555; line-height: 28px;
+        }
+        .hou_ya_yue_series-grid { display: flex; flex-wrap: wrap; margin-top: 6px; }
+        .hou_ya_yue_series-grid a { width: 50%; font-size: 13px; color: #555; line-height: 28px; }
+        .hou_ya_yue_two-btn { display: flex; margin-top: 12px; }
+        .hou_ya_yue_two-btn a {
+            flex: 1; text-align: center; height: 36px; line-height: 36px; border-radius: 4px;
+            font-size: 14px; margin-right: 12px;
+        }
+        .hou_ya_yue_two-btn a:last-child { margin-right: 0; }
+        a.hou_ya_yue_primary { background: var(--hou_ya_yue_blue); color: #fff; }
+        a.hou_ya_yue_dark { background: #1d2635; color: #fff; }
+
+        /* ===== 19. 超级补贴 ===== */
+        .hou_ya_yue_sub-grid { display: flex; flex-wrap: wrap; margin-top: 14px; width: 820px; }
+        .hou_ya_yue_sub-item {
+            width: 260px; margin: 0 20px 16px 0; border: 1px solid #f0f2f6; border-radius: 10px;
+            padding: 12px; text-align: center; position: relative;
+        }
+        .hou_ya_yue_sub-item:nth-child(3n) { margin-right: 0; }
+        .hou_ya_yue_sub-item img { width: 180px; height: 108px; object-fit: contain; margin: 0 auto; }
+        .hou_ya_yue_sub-item .hou_ya_yue_logo {
+            display: inline-block; font-size: 12px; color: #666; margin-top: 6px;
+        }
+        .hou_ya_yue_sub-item strong { display: block; font-size: 14px; margin-top: 2px; }
+        .hou_ya_yue_sub-item .hou_ya_yue_tags { margin-top: 4px; }
+        .hou_ya_yue_sub-item .hou_ya_yue_tags span {
+            display: inline-block; font-size: 11px; color: var(--hou_ya_yue_orange);
+            background: #fff3e8; border-radius: 2px; padding: 0 5px; margin: 0 3px;
+        }
+        .hou_ya_yue_juhui-list { margin-top: 10px; }
+        .hou_ya_yue_juhui-list li { display: flex; align-items: center; padding: 6px 0; }
+        .hou_ya_yue_juhui-list img { width: 76px; height: 46px; object-fit: contain; }
+        .hou_ya_yue_juhui-list .hou_ya_yue_ji { margin-left: 8px; flex: 1; min-width: 0; }
+        .hou_ya_yue_juhui-list .hou_ya_yue_ji strong { display: block; font-size: 13px; font-weight: normal; }
+        .hou_ya_yue_juhui-list .hou_ya_yue_ji em { font-style: normal; font-size: 12px; color: var(--hou_ya_yue_orange); }
+        a.hou_ya_yue_get {
+            font-size: 12px; color: var(--hou_ya_yue_blue);
+            border: 1px solid var(--hou_ya_yue_blue); border-radius: 3px; padding: 1px 7px;
+        }
+
+        /* ===== 20. 二手车 / 车友会 / 金融 ===== */
+        .hou_ya_yue_used-grid { display: flex; flex-wrap: wrap; margin-top: 14px; width: 820px; }
+        .hou_ya_yue_used-item { width: 260px; margin: 0 20px 16px 0; }
+        .hou_ya_yue_used-item:nth-child(3n) { margin-right: 0; }
+        .hou_ya_yue_used-item img { width: 260px; height: 158px; border-radius: 8px; object-fit: cover; }
+        .hou_ya_yue_used-item h5 { font-size: 14px; font-weight: normal; margin-top: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_used-item .hou_ya_yue_uinfo { font-size: 12px; color: #999; margin-top: 2px; }
+        .hou_ya_yue_used-item .hou_ya_yue_urow { display: flex; align-items: center; margin-top: 4px; }
+        .hou_ya_yue_used-item .hou_ya_yue_uprice { color: var(--hou_ya_yue_orange); font-size: 18px; font-weight: bold; }
+        .hou_ya_yue_used-item .hou_ya_yue_uprice i { font-style: normal; font-size: 12px; }
+        .hou_ya_yue_used-item .hou_ya_yue_umer { margin-left: 8px; font-size: 12px; color: #bbb; }
+        a.hou_ya_yue_uget {
+            margin-left: auto; font-size: 12px; color: #fff;
+            background: var(--hou_ya_yue_blue); border-radius: 3px; padding: 1px 9px;
+        }
+        .hou_ya_yue_club-photo { width: 265px; margin: 0 20px 16px 0; position: relative; border-radius: 8px; overflow: hidden; }
+        .hou_ya_yue_club-photo:nth-child(4n) { margin-right: 0; }
+        .hou_ya_yue_club-photo img { width: 265px; height: 162px; object-fit: cover; }
+        .hou_ya_yue_club-photo .hou_ya_yue_cmask {
+            position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 10px 8px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .7)); color: #fff;
+        }
+        .hou_ya_yue_club-photo .hou_ya_yue_cmask h5 { font-size: 13px; font-weight: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_club-photo .hou_ya_yue_cmask p { font-size: 12px; display: flex; align-items: center; margin-top: 2px; }
+        .hou_ya_yue_club-photo .hou_ya_yue_cmask img { width: 18px; height: 18px; border-radius: 50%; margin-right: 5px; }
+        .hou_ya_yue_act-grid { display: flex; margin-top: 14px; }
+        .hou_ya_yue_act-grid a { flex: 1; display: flex; margin-right: 16px; }
+        .hou_ya_yue_act-grid a:last-child { margin-right: 0; }
+        .hou_ya_yue_act-grid img { width: 96px; height: 62px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+        .hou_ya_yue_act-grid .hou_ya_yue_at { margin-left: 8px; min-width: 0; }
+        .hou_ya_yue_act-grid .hou_ya_yue_at h5 { font-size: 13px; font-weight: normal; line-height: 19px; height: 38px; overflow: hidden; }
+        .hou_ya_yue_act-grid .hou_ya_yue_at p { font-size: 12px; color: #999; }
+        .hou_ya_yue_fin-grid { display: flex; flex-wrap: wrap; margin-top: 14px; width: 820px; }
+        .hou_ya_yue_fin-item {
+            width: 260px; margin: 0 20px 16px 0; border: 1px solid #f0f2f6; border-radius: 10px; overflow: hidden;
+        }
+        .hou_ya_yue_fin-item:nth-child(3n) { margin-right: 0; }
+        .hou_ya_yue_fin-item img { width: 100%; height: 128px; object-fit: cover; }
+        .hou_ya_yue_fin-item .hou_ya_yue_fi { padding: 10px 12px; }
+        .hou_ya_yue_fin-item .hou_ya_yue_fi strong { font-size: 15px; }
+        .hou_ya_yue_fin-item .hou_ya_yue_frow { display: flex; margin-top: 4px; }
+        .hou_ya_yue_fin-item .hou_ya_yue_frow div { flex: 1; text-align: center; }
+        .hou_ya_yue_fin-item .hou_ya_yue_frow div:first-child { text-align: left; }
+        .hou_ya_yue_fin-item .hou_ya_yue_frow div:last-child { text-align: right; }
+        .hou_ya_yue_fin-item .hou_ya_yue_frow em { font-style: normal; display: block; color: var(--hou_ya_yue_orange); font-size: 15px; font-weight: bold; }
+        .hou_ya_yue_fin-item .hou_ya_yue_frow em i { font-style: normal; font-size: 12px; font-weight: normal; }
+        .hou_ya_yue_fin-item .hou_ya_yue_frow span { font-size: 12px; color: #999; }
+
+        /* ===== 21. 底部四榜 ===== */
+        .hou_ya_yue_rank4 { display: flex; }
+        .hou_ya_yue_rank4 .hou_ya_yue_rk-col {
+            flex: 1; margin-right: 14px; background: #fff; border-radius: 12px; padding: 14px 16px;
+        }
+        .hou_ya_yue_rank4 .hou_ya_yue_rk-col:last-child { margin-right: 0; }
+        .hou_ya_yue_rank4 .hou_ya_yue_hd { display: flex; align-items: center; font-size: 16px; font-weight: bold; }
+        .hou_ya_yue_rank4 .hou_ya_yue_hd .hou_ya_yue_r { margin-left: auto; font-size: 12px; font-weight: normal; color: #999; }
+        .hou_ya_yue_rank4 li { display: flex; align-items: center; line-height: 34px; font-size: 13px; }
+        .hou_ya_yue_rank4 li .hou_ya_yue_no { width: 22px; font-style: italic; font-weight: bold; color: #c2c8d2; font-size: 14px; }
+        .hou_ya_yue_rank4 li:nth-child(-n+3) .hou_ya_yue_no { color: var(--hou_ya_yue_orange); }
+        .hou_ya_yue_rank4 li img { width: 48px; height: 30px; object-fit: contain; margin-right: 6px; }
+        .hou_ya_yue_rank4 li .hou_ya_yue_txt { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .hou_ya_yue_rank4 li .hou_ya_yue_val { color: #999; font-size: 12px; }
+        .hou_ya_yue_rank4 .hou_ya_yue_note { font-size: 11px; color: #bbb; margin-top: 4px; }
+
+        /* ===== 22. 悬浮球 / 返回顶部 ===== */
+        .hou_ya_yue_float {
+            position: fixed; right: 18px; bottom: 90px; z-index: 950; text-align: center;
+        }
+        .hou_ya_yue_float .hou_ya_yue_avatar {
+            width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .18); margin: 0 auto;
+        }
+        .hou_ya_yue_float-menu {
+            position: absolute; right: 52px; bottom: 0; background: #fff; border-radius: 8px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .12); padding: 6px 0; display: none; min-width: 108px;
+        }
+        .hou_ya_yue_float:hover .hou_ya_yue_float-menu { display: block; }
+        .hou_ya_yue_float-menu a {
+            display: block; text-align: center; font-size: 13px; color: #333; line-height: 30px;
+        }
+        .hou_ya_yue_float-menu a:hover, .hou_ya_yue_float-menu a.hou_ya_yue_on {
+            color: var(--hou_ya_yue_blue); background: #f5f8ff;
+        }
+        .hou_ya_yue_backtop {
+            position: fixed; right: 18px; bottom: 34px; z-index: 950;
+            width: 44px; height: 44px; border-radius: 50%; background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .14); text-align: center; line-height: 44px;
+            font-size: 12px; color: #333; cursor: pointer;
+        }
+        .hou_ya_yue_backtop:hover { color: var(--hou_ya_yue_blue); }
+
+        /* ===== 23. 页脚 ===== */
+        .hou_ya_yue_footer { margin-left: 104px; padding: 20px 0 30px; }
+        .hou_ya_yue_footer .hou_ya_yue_card { padding: 20px 24px; }
+        .hou_ya_yue_fnav { text-align: center; font-size: 12px; color: #777; padding-bottom: 12px; }
+        .hou_ya_yue_fnav a { color: #777; margin: 0 8px; }
+        .hou_ya_yue_fnav a:hover { color: var(--hou_ya_yue_blue); }
+        .hou_ya_yue_copy { text-align: center; font-size: 12px; color: #aaa; line-height: 22px; }
+        .hou_ya_yue_copy a { color: #aaa; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== 左侧固定导航 ==================== -->
+<aside class="hou_ya_yue_aside" id="hou_ya_yue_aside">
+    <a href="javascript:;" class="hou_ya_yue_on"><i class="hou_ya_yue_if hou_ya_yue_i-shouye"></i>首页</a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-xuanche"></i>选车<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-butie"></i>国家补贴</a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-tuku"></i>图库<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-paihang"></i>排行榜</a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-dengpao"></i>每日热榜</a>
+    <div class="hou_ya_yue_gap"></div>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-wenzhang"></i>文章</a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-shipin"></i>视频<em></em></a>
+    <a href="javascript:;" class="hou_ya_yue_hot"><i class="hou_ya_yue_if hou_ya_yue_i-zhibo"></i>直播<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-chejiahao"></i>车家号<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-luntan"></i>论坛<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-koubei"></i>口碑<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-jingxiaoshang"></i>经销商<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-ershouche"></i>二手车<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-butie"></i>超级补贴<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-jiangjia"></i>降价<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-pinpai"></i>品牌空间</a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-yongche"></i>用车<em></em></a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-gongju"></i>工具<em></em></a>
+    <div class="hou_ya_yue_gap"></div>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-zuijin"></i>最近浏览</a>
+    <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-quan"></i>问题举报</a>
+</aside>
+
+<!-- ==================== 顶部通栏 ==================== -->
+<header class="hou_ya_yue_header">
+    <div class="hou_ya_yue_w">
+        <a href="javascript:;" class="hou_ya_yue_logo"><img src="image/autohome_logo.png" alt="汽车之家"></a>
+        <span class="hou_ya_yue_hdr-city" id="hou_ya_yue_city">大连</span>
+        <span class="hou_ya_yue_hdr-weather">&#9728; 晴</span>
+
+        <div class="hou_ya_yue_hdr-search">
+            <span class="hou_ya_yue_type">综合</span>
+            <input type="text" id="hou_ya_yue_keyword" placeholder="">
+            <button id="hou_ya_yue_searchBtn">搜索</button>
+        </div>
+
+        <div class="hou_ya_yue_hdr-right">
+            <span class="hou_ya_yue_item"><i class="hou_ya_yue_if hou_ya_yue_i-quan"></i>发作品</span>
+            <span class="hou_ya_yue_item"><i class="hou_ya_yue_if hou_ya_yue_i-store"></i>下载App</span>
+            <span class="hou_ya_yue_item"><i class="hou_ya_yue_if hou_ya_yue_i-14"></i>小程序</span>
+            <a href="javascript:;" class="hou_ya_yue_btn-login">登录</a>
+            <span class="hou_ya_yue_btn-more">更多</span>
+        </div>
+    </div>
+</header>
+
+<!-- ==================== 主体 ==================== -->
+<div class="hou_ya_yue_main">
+<div class="hou_ya_yue_w">
+
+    <!-- ---------- 找车 + 每日热榜 ---------- -->
+    <div class="hou_ya_yue_find-wrap" style="margin-bottom:14px;">
+        <div class="hou_ya_yue_card hou_ya_yue_find-card" style="margin-bottom:0;">
+            <div class="hou_ya_yue_cats">
+                <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-xuanche"></i>新能源</a>
+                <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-xuanche"></i>轿车</a>
+                <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-xuanche"></i>SUV</a>
+                <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-xuanche"></i>MPV</a>
+                <a href="javascript:;" class="hou_ya_yue_noarrow"><i class="hou_ya_yue_if hou_ya_yue_i-yongche"></i>购车</a>
+                <a href="javascript:;" class="hou_ya_yue_noarrow"><i class="hou_ya_yue_if hou_ya_yue_i-yongche"></i>皮卡</a>
+                <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-yongche"></i>摩托车</a>
+                <a href="javascript:;"><i class="hou_ya_yue_if hou_ya_yue_i-yongche"></i>电动车</a>
+            </div>
+            <div class="hou_ya_yue_find-bar">
+                <div class="hou_ya_yue_radio" id="hou_ya_yue_radio">
+                    <b class="hou_ya_yue_on"></b><span>新车</span>
+                    <b></b><span>二手车</span>
+                </div>
+                <select class="hou_ya_yue_sel" id="hou_ya_yue_selBrand">
+                    <option>请选择品牌/车系</option>
+                    <option>比亚迪</option><option>大众</option><option>丰田</option>
+                    <option>吉利</option><option>长安</option><option>宝马</option>
+                    <option>奥迪</option><option>奔驰</option><option>特斯拉</option>
+                </select>
+                <select class="hou_ya_yue_sel" id="hou_ya_yue_selSpec">
+                    <option>请选择车型（可不选）</option>
+                </select>
+                <a href="javascript:;" class="hou_ya_yue_btn-find" id="hou_ya_yue_btnFind">找车</a>
+                <div class="hou_ya_yue_find-links">
+                    <a href="javascript:;">精准找车&#9662;</a>
+                    <a href="javascript:;">品牌找车&#9662;</a>
+                </div>
+            </div>
+            <div class="hou_ya_yue_hotcar-hd">
+                <strong>热门车</strong>
+                <div class="hou_ya_yue_tabs" id="hou_ya_yue_priceTabs">
+                    <span class="hou_ya_yue_on">5-8万</span><span>8-15万</span><span>15-20万</span>
+                    <span>20-30万</span><span>30-50万</span><span>推荐车</span><span>二手车</span>
+                    <span>商用车</span><span>摩托车</span><span>超级补贴</span>
+                </div>
+            </div>
+            <div class="hou_ya_yue_car-rows">
+                <div class="hou_ya_yue_car-row">
+                    <span class="hou_ya_yue_lab"><a href="javascript:;">SUV</a></span>
+                    <div class="hou_ya_yue_car-cells">
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">长城H10</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">星光L</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">RAV4荣放</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">传祺越7</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">华境S</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">钛7</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">Model Y</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_car-row">
+                    <span class="hou_ya_yue_lab"><a href="javascript:;">紧凑型车</a></span>
+                    <div class="hou_ya_yue_car-cells">
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">奥迪A3</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">思域</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">秦PLUS</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">速腾</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">奔驰CLA级新能源</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">AION UT</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">轩逸</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_car-row">
+                    <span class="hou_ya_yue_lab"><a href="javascript:;">中型车</a></span>
+                    <div class="hou_ya_yue_car-cells">
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">凯美瑞</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">ID. ERA 5S</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">迈腾</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">亚洲龙</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">宝马3系</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">Model 3</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                        <div class="hou_ya_yue_car-cell"><a href="javascript:;" class="hou_ya_yue_n">君越</a><span class="hou_ya_yue_ops"><a href="javascript:;">报价</a><a href="javascript:;">图库</a><a href="javascript:;">论坛</a></span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_car-strip">
+                <a href="javascript:;"><img src="image/kb_idaura_t6.png" alt="ID. AURA T6"><span>ID. AURA T6</span></a>
+                <a href="javascript:;"><img src="image/kb_song_ultra.png" alt="秦PLUS DM-i"><span>秦PLUS DM-i</span></a>
+                <a href="javascript:;"><img src="image/kb_ti3.png" alt="澜悦8"><span>澜悦8</span></a>
+                <a href="javascript:;"><img src="image/kb_greatwall_h10.png" alt="魏牌高山8"><span>魏牌高山8</span></a>
+                <a href="javascript:;"><img src="image/kb_lantu_zhuiguangs.png" alt="XTS PHEV"><span>XTS PHEV</span></a>
+                <a href="javascript:;"><img src="image/kb_datang.png" alt="奥迪E7X"><span>奥迪E7X</span></a>
+                <a href="javascript:;"><img src="image/kb_xingyuan.png" alt="星愿"><span>星愿</span></a>
+                <a href="javascript:;"><img src="image/kb_camry.png" alt="奥迪A6L"><span>奥迪A6L</span></a>
+                <a href="javascript:;"><img src="image/kb_mg07.png" alt="大汉"><span>大汉</span></a>
+                <a href="javascript:;"><img src="image/kb_yinhe_zhanjian700.png" alt="岚图追光S"><span>岚图追光S</span></a>
+                <a href="javascript:;"><img src="image/kb_huajing_s.png" alt="汉兰达"><span>汉兰达</span></a>
+            </div>
+        </div>
+
+        <div class="hou_ya_yue_card hou_ya_yue_rank-card" style="margin-bottom:0;">
+            <div class="hou_ya_yue_rank-hd">
+                <h3><i>&#128293;</i>每日热榜</h3>
+                <div class="hou_ya_yue_rtabs" id="hou_ya_yue_rankTabs">
+                    <span class="hou_ya_yue_on">最新优惠</span><span>重磅新车</span>
+                </div>
+            </div>
+            <ul class="hou_ya_yue_rank-list">
+                <li><span class="hou_ya_yue_no">1</span><a href="javascript:;" class="hou_ya_yue_txt">全新比亚迪秦PLUS上市限时7.69万起</a><span class="hou_ya_yue_vv">483.3万</span></li>
+                <li><span class="hou_ya_yue_no">2</span><a href="javascript:;" class="hou_ya_yue_txt">奥迪官宣双品牌战略调整</a><span class="hou_ya_yue_vv">394.4万</span></li>
+                <li><span class="hou_ya_yue_no">3</span><a href="javascript:;" class="hou_ya_yue_txt">大众小鹏合作架构将走出中国</a><span class="hou_ya_yue_vv">344.2万</span></li>
+                <li><span class="hou_ya_yue_no">4</span><a href="javascript:;" class="hou_ya_yue_txt">特斯拉Model Y撞卡车起火</a><span class="hou_ya_yue_vv">263.5万</span></li>
+                <li><span class="hou_ya_yue_no">5</span><a href="javascript:;" class="hou_ya_yue_txt">新款丰田亚洲龙到店</a><span class="hou_ya_yue_vv">225.3万</span></li>
+                <li><span class="hou_ya_yue_no">6</span><a href="javascript:;" class="hou_ya_yue_txt">小鹏Robotaxi获广州L4示范运营资质</a><span class="hou_ya_yue_vv">148.9万</span></li>
+                <li><span class="hou_ya_yue_no">7</span><a href="javascript:;" class="hou_ya_yue_txt">大众获得L3级自动驾驶道路测试牌照</a><span class="hou_ya_yue_vv">129.7万</span></li>
+                <li><span class="hou_ya_yue_no">8</span><a href="javascript:;" class="hou_ya_yue_txt">魏牌高山8 HEV限时25.98万起</a><span class="hou_ya_yue_vv">116.7万</span></li>
+                <li><span class="hou_ya_yue_no">9</span><a href="javascript:;" class="hou_ya_yue_txt">特斯拉FSD获准进入拉脱维亚</a><span class="hou_ya_yue_vv">104.3万</span></li>
+                <li><span class="hou_ya_yue_no">10</span><a href="javascript:;" class="hou_ya_yue_txt">新款海豹07开启盲订</a><span class="hou_ya_yue_vv">94.5万</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ---------- 今日焦点 ---------- -->
+    <div class="hou_ya_yue_card" id="op-focus-news">
+        <div class="hou_ya_yue_focus-hd">
+            <h3>今日焦点<span>NEWS</span></h3>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多焦点 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_focus-body">
+            <div class="hou_ya_yue_focus-pic" id="hou_ya_yue_focusPic">
+                <a href="javascript:;" class="hou_ya_yue_slide hou_ya_yue_on"><img src="image/zj_video_idera_5s.png" alt="ID.ERA 5S众测中期汇报"></a>
+                <a href="javascript:;" class="hou_ya_yue_slide"><img src="image/focus_byd_qinplus_launch.png" alt="全新比亚迪秦PLUS上市直击"></a>
+                <a href="javascript:;" class="hou_ya_yue_slide"><img src="image/focus_weipai_lanshan_live.png" alt="全新蓝山首发直播中"></a>
+                <a href="javascript:;" class="hou_ya_yue_slide"><img src="image/focus_tengshi_n8.png" alt="腾势N8"></a>
+                <div class="hou_ya_yue_dots" id="hou_ya_yue_dots">
+                    <i class="hou_ya_yue_on"></i><i></i><i></i><i></i>
+                </div>
+            </div>
+            <div class="hou_ya_yue_focus-txt">
+                <p class="hou_ya_yue_tip">岚图追光S 享终身免费政策+提心服务</p>
+                <h4><a href="javascript:;">现款售11.59万起 2027款奕派007将上市</a></h4>
+                <div class="hou_ya_yue_focus-subs">
+                    <a href="javascript:;">钛9计划11月上市</a>
+                    <a href="javascript:;">日产探陆纪念版官图</a>
+                    <a href="javascript:;">银河星耀6EF将上市</a>
+                    <a href="javascript:;">填问卷抽iPhone 18</a>
+                </div>
+                <div class="hou_ya_yue_focus-list">
+                    <a href="javascript:;">27款极狐阿尔法S5预售</a>
+                    <a href="javascript:;">斯巴鲁BRZ限量版上市</a>
+                    <a href="javascript:;">试驾捷途自由者7</a>
+                    <a href="javascript:;">赛力斯AIVA ME7亮相</a>
+                    <a href="javascript:;">巴迪曾BRZ限量版上市</a>
+                    <a href="javascript:;">试驾捷途自由者7 奏鸣曲</a>
+                    <a href="javascript:;">试驾iCAR V25</a>
+                    <a href="javascript:;">菱展廓AIVA ME7亮相</a>
+                    <a href="javascript:;">试驾日产N7</a>
+                    <a href="javascript:;">试驾银河战舰700</a>
+                    <a href="javascript:;">体验捷途旅行者</a>
+                    <a href="javascript:;">探店理想i9</a>
+                    <a href="javascript:;">体验斯巴鲁旭豹</a>
+                    <a href="javascript:;">启源A06对比MG 07</a>
+                    <a href="javascript:;">试驾纵横G700</a>
+                    <a href="javascript:;">试驾马自达EZ-60</a>
+                    <a href="javascript:;">试驾魏牌高山8 HEV</a>
+                    <a href="javascript:;">实拍iCAR V25</a>
+                    <a href="javascript:;">实拍岚图追光S</a>
+                    <a href="javascript:;">试驾斯巴鲁傲虎</a>
+                    <a href="javascript:;">荣威家越07正式上市</a>
+                    <a href="javascript:;">试驾iCAR V25</a>
+                    <a href="javascript:;">雷克萨斯GX550h用车</a>
+                    <a href="javascript:;">体验第三代唐EV</a>
+                    <a href="javascript:;">体验新宝马iX3</a>
+                    <a href="javascript:;">试驾新马自达EZ-60</a>
+                    <a href="javascript:;">启源Q06对比宋Ultra</a>
+                    <a href="javascript:;">探店艾尼氪V</a>
+                    <a href="javascript:;">探店元UP飞驰版</a>
+                    <a href="javascript:;">试驾高山8 HEV</a>
+                    <a href="javascript:;">实拍AIVA ME7</a>
+                    <a href="javascript:;">试驾smart精灵#2</a>
+                    <a href="javascript:;">缤果S对比缤果Pro</a>
+                    <a href="javascript:;">探店卡罗拉锐放</a>
+                    <a href="javascript:;">体验红旗HQ9 PHEV</a>
+                    <a href="javascript:;">探店2027款海鸥</a>
+                    <a href="javascript:;">MG 07对比启源A06</a>
+                    <a href="javascript:;">旅行者7购车指南</a>
+                    <a href="javascript:;">探店丰田RAV4荣放</a>
+                    <a href="javascript:;">试驾宝马X1 M35Li</a>
+                    <a href="javascript:;">试驾长城猛龙PLUS</a>
+                    <a href="javascript:;">试驾新马自达EZ-60</a>
+                    <a href="javascript:;">风云T7能耗测试</a>
+                    <a href="javascript:;">捷达M6配置推荐</a>
+                    <a href="javascript:;">试驾猛龙PLUS力魂版</a>
+                    <a href="javascript:;">体验奥迪E5 Sportback</a>
+                    <a href="javascript:;">启源Q06智驾实测</a>
+                    <a href="javascript:;">试驾宝马M3 Touring</a>
+                    <a href="javascript:;">试驾大众与众09</a>
+                    <a href="javascript:;">试驾高山8智慧版</a>
+                    <a href="javascript:;">试驾现代艾尼氪V</a>
+                    <a href="javascript:;">试驾猛龙PLUS力魂版</a>
+                    <a href="javascript:;">体验哈弗H9</a>
+                    <a href="javascript:;">实拍腾势旗舰8系</a>
+                    <a href="javascript:;">静态体验日产NX7</a>
+                    <a href="javascript:;">探店27款奥德赛</a>
+                    <a href="javascript:;">探店2027款天逸</a>
+                    <a href="javascript:;">试驾荣威家越07</a>
+                    <a href="javascript:;">体验日产NX7</a>
+                    <a href="javascript:;">试驾高山8智慧版</a>
+                </div>
+            </div>
+        </div>
+        <div class="hou_ya_yue_focus-foot">
+            <a href="javascript:;"><img src="image/focus_video_richan_nx7.png" alt=""><span>首搭全新巨幕座舱，第三代唐静态体验</span></a>
+            <a href="javascript:;"><img src="image/focus_video_1.png" alt=""><span>缤果S和缤果Pro，这两款纯电小车，谁实力更强</span></a>
+            <a href="javascript:;"><img src="image/focus_video_2.png" alt=""><span>一眼惊艳！科技+豪华的大五座SUV，腾势旗舰8系</span></a>
+            <a href="javascript:;"><img src="image/focus_video_l2_l3.png" alt=""><span>#车若你试了# 和精灵2号玩了两天 这才是sma...</span></a>
+        </div>
+    </div>
+
+    <!-- ---------- 促销四卡 ---------- -->
+    <div class="hou_ya_yue_promos">
+        <div class="hou_ya_yue_promo">
+            <div class="hou_ya_yue_pinfo">
+                <h5>蔚来ET7户外用电不花愁</h5>
+                <p>至高6万元置换补贴</p>
+                <a href="javascript:;" class="hou_ya_yue_pbtn">了解详情</a>
+            </div>
+            <img src="image/carlib_xiaomi_su7_chixia.jpg" alt="蔚来ET7">
+        </div>
+        <div class="hou_ya_yue_promo">
+            <div class="hou_ya_yue_pinfo">
+                <h5>星海V6等电终身质保</h5>
+                <p>首批车主三电终身享</p>
+                <a href="javascript:;" class="hou_ya_yue_pbtn">免费报价</a>
+            </div>
+            <img src="image/vr_lixiang_i8.png" alt="星海V6">
+        </div>
+        <div class="hou_ya_yue_promo">
+            <div class="hou_ya_yue_pinfo">
+                <h5>长城猛龙PLUS，品质卓越</h5>
+                <p>限时出行好礼</p>
+                <a href="javascript:;" class="hou_ya_yue_pbtn">立即查看</a>
+            </div>
+            <img src="image/carlib_weipai_v9x.jpg" alt="长城猛龙PLUS">
+        </div>
+        <div class="hou_ya_yue_promo">
+            <div class="hou_ya_yue_pinfo">
+                <h5>换新檒含 优选车型</h5>
+                <p>超级试驾员 试驾赢豪礼</p>
+                <a href="javascript:;" class="hou_ya_yue_pbtn">速去体验</a>
+            </div>
+            <img src="image/carlib_bmw_ix3_new.jpg" alt="优选车型">
+        </div>
+    </div>
+
+    <!-- ---------- 汽车之家 精选 ---------- -->
+    <div class="hou_ya_yue_card" id="op-recommend">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>汽车之家<span class="hou_ya_yue_grad-title">精选</span></h3>
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_zjTabs">
+                <span class="hou_ya_yue_on">推荐</span>
+                <span>新车首测</span><span>首发首测</span><span>运行笔记</span>
+                <span>智能车工作室</span><span>极速三分半</span><span>之家试车</span>
+                <span>选车智囊团</span><span>超级测试</span><span>崛起之路</span>
+            </div>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_vgrid">
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_yuelaoledeng.jpg" alt="越野老登">越野老登<em>共156期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_shaba_rainforest.png" alt="整装待发，沙巴雨林我们来了！">
+                    <span class="hou_ya_yue_dur">&#9654; 05:57</span>
+                </a>
+                <h5><a href="javascript:;">整装待发，沙巴雨林我们来了！</a></h5>
+                <div class="hou_ya_yue_pv">1300播放</div>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_mingrichechang.jpg" alt="明日车场">明日车场<em>共123期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_saidou_me7.png" alt="半价问界来了">
+                    <span class="hou_ya_yue_dur">&#9654; 02:09</span>
+                </a>
+                <h5><a href="javascript:;">"半价问界"来了！赛豆ME7和问界M7同线生产，带字节豆包大模型</a></h5>
+                <div class="hou_ya_yue_pv">4043播放</div>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_racing_team.jpg" alt="汽车之家赛车队">汽车之家赛车队<em>共469期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_tcr_chassis.png" alt="赛车小课堂">
+                    <span class="hou_ya_yue_dur">&#9654; 01:35</span>
+                </a>
+                <h5><a href="javascript:;">赛车小课堂 底盘数据设定对TCR赛车有多重要？</a></h5>
+                <div class="hou_ya_yue_pv">1553播放</div>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_zhijia_shiche.jpg" alt="之家试车">之家试车<em>共3311期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_zhiji_ls8.jpg" alt="试驾全新智己LS8纯电版">
+                    <span class="hou_ya_yue_dur">&#9654; 06:55</span>
+                </a>
+                <h5><a href="javascript:;">很稳很灵活 试驾全新智己LS8纯电版</a></h5>
+                <div class="hou_ya_yue_pv">4268播放</div>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_zhijia_xuanche.jpg" alt="之家选车">之家选车<em>共312期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_fanghezi_20w.png" alt="20万方盒子选车">
+                    <span class="hou_ya_yue_dur">&#9654; 20:04</span>
+                </a>
+                <h5><a href="javascript:;">家用、舒适、个性化 20万方盒子选车终极答案奉献上</a></h5>
+                <div class="hou_ya_yue_pv">2.5万播放</div>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_chaikaishuo.jpg" alt="拆开说">拆开说<em>共78期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_benz_cla_crash.png" alt="56km/h真车碰撞">
+                    <span class="hou_ya_yue_dur">&#9654; 04:01</span>
+                </a>
+                <h5><a href="javascript:;">56km/h真车碰撞！奔驰CLA纯电VS燃油，有多安全？</a></h5>
+                <div class="hou_ya_yue_pv">3216播放</div>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_yexing.jpg" alt="野行">野行<em>共218期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_daxinganling.jpg" alt="大兴安岭秋景">
+                    <span class="hou_ya_yue_dur">&#9654; 03:01</span>
+                </a>
+                <h5><a href="javascript:;">自驾2000公里来到课本里的大兴安岭，藏着国内最顶级的秋景！</a></h5>
+                <div class="hou_ya_yue_pv">1万播放</div>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <div class="hou_ya_yue_vauthor"><img src="image/author_cheshiwuyu.jpg" alt="车市物语">车市物语<em>共196期 &gt;</em></div>
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/zj_video_cheshi_zaoxin.png" alt="车企造芯">
+                    <span class="hou_ya_yue_dur">&#9654; 05:39</span>
+                </a>
+                <h5><a href="javascript:;">卖一辆车只赚三千，车企为何争相砸几十亿造芯？</a></h5>
+                <div class="hou_ya_yue_pv">1.9万播放</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 美好生活节 banner ---------- -->
+    <div class="hou_ya_yue_banner hou_ya_yue_life">
+        <span class="hou_ya_yue_b1">美好生活节</span>
+        <span class="hou_ya_yue_b2">好车低价购</span>
+    </div>
+
+    <!-- ---------- 之家直播 ---------- -->
+    <div class="hou_ya_yue_card" id="op-live">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>之家直播</h3>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多直播 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_vgrid">
+            <div class="hou_ya_yue_vcard">
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/focus_weipai_lanshan_live.png" alt="十月钜惠超优惠">
+                    <span class="hou_ya_yue_live">&#9679; 直播中<span class="hou_ya_yue_watch"> 7.51万观看</span></span>
+                    <span class="hou_ya_yue_vuser"><img src="image/autohome_app_logo.png" alt="汽车之家选买">汽车之家选买</span>
+                </a>
+                <h5><a href="javascript:;">十月钜惠超优惠，直播间底价等你拿</a></h5>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/focus_byd_qinplus_launch.png" alt="第三代秦PLUS DM-i上市直击">
+                    <span class="hou_ya_yue_live">&#9679; 直播中<span class="hou_ya_yue_watch"> 35.37万观看</span></span>
+                    <span class="hou_ya_yue_vuser"><img src="image/autohome_app_logo.png" alt="Auto新车直击">Auto新车直击</span>
+                </a>
+                <h5><a href="javascript:;">第三代秦PLUS DM-i上市直击！</a></h5>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/focus_tengshi_n8.png" alt="魏牌二代蓝山全球首秀">
+                    <span class="hou_ya_yue_live">&#9679; 直播中<span class="hou_ya_yue_watch"> 2737观看</span></span>
+                    <span class="hou_ya_yue_vuser"><img src="image/autohome_app_logo.png" alt="汽车之家Live">汽车之家Live</span>
+                </a>
+                <h5><a href="javascript:;">魏牌二代蓝山全球首秀</a></h5>
+            </div>
+            <div class="hou_ya_yue_vcard">
+                <a href="javascript:;" class="hou_ya_yue_vcover">
+                    <img src="image/focus_lexus_es200.png" alt="科学技术奖励大会">
+                    <span class="hou_ya_yue_when">10-28 09:30</span>
+                    <span class="hou_ya_yue_vuser"><img src="image/autohome_app_logo.png" alt="汽车之家Live">汽车之家Live</span>
+                </a>
+                <h5><a href="javascript:;">中国汽车工程学会科学技术奖励大会</a></h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 汽车视频 + 视频排行榜 ---------- -->
+    <div class="hou_ya_yue_card" id="op-video">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>汽车视频</h3>
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_videoTabs">
+                <span class="hou_ya_yue_on">最新</span><span>新车</span><span>安全智能</span>
+                <span>评测</span><span>导购</span><span>越野竞速</span><span>行业文化</span>
+            </div>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多视频 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_left">
+                <div class="hou_ya_yue_vgrid">
+                    <div class="hou_ya_yue_vcard hou_ya_yue_v3">
+                        <a href="javascript:;" class="hou_ya_yue_vcover">
+                            <img src="image/video_idera_5s.png" alt="ID.ERA 5S长途体验">
+                            <span class="hou_ya_yue_src">汽车之家</span>
+                            <span class="hou_ya_yue_dur">&#9654; 04:07</span>
+                            <span class="hou_ya_yue_vuser"><img src="image/author_changceji.jpg" alt="长测纪">长测纪</span>
+                        </a>
+                        <h5><a href="javascript:;">高能耗&驾乘辅助 ID.ERA 5S长途体验</a></h5>
+                    </div>
+                    <div class="hou_ya_yue_vcard hou_ya_yue_v3">
+                        <a href="javascript:;" class="hou_ya_yue_vcover">
+                            <img src="image/video_richan_nx7.png" alt="东风风神L8智驾体验">
+                            <span class="hou_ya_yue_src">汽车之家</span>
+                            <span class="hou_ya_yue_dur">&#9654; 09:39</span>
+                            <span class="hou_ya_yue_vuser"><img src="image/author_zhijia_shiche.jpg" alt="智能车工作室">智能车工作室</span>
+                        </a>
+                        <h5><a href="javascript:;">Momentum R7附体 东风风神L8·武汉智驾体验</a></h5>
+                    </div>
+                    <div class="hou_ya_yue_vcard hou_ya_yue_v3">
+                        <a href="javascript:;" class="hou_ya_yue_vcover">
+                            <img src="image/video_cheqi_zaoxin.png" alt="15万激光雷达智驾">
+                            <span class="hou_ya_yue_src">新出行</span>
+                            <span class="hou_ya_yue_dur">&#9654; 01:51</span>
+                            <span class="hou_ya_yue_vuser"><img src="image/author_zhijia_shiche.jpg" alt="智能车工作室">智能车工作室</span>
+                        </a>
+                        <h5><a href="javascript:;">离谱！15万就能买到激光雷达+旗舰智驾芯片？</a></h5>
+                    </div>
+                    <div class="hou_ya_yue_vcard hou_ya_yue_v3">
+                        <a href="javascript:;" class="hou_ya_yue_vcover">
+                            <img src="image/video_lianxiang_dianchi.png" alt="纯视觉智驾体验">
+                            <span class="hou_ya_yue_src">汽车之家</span>
+                            <span class="hou_ya_yue_dur">&#9654; 13:01</span>
+                            <span class="hou_ya_yue_vuser"><img src="image/author_yuelaoledeng.jpg" alt="毕豫工作室">毕豫工作室</span>
+                        </a>
+                        <h5><a href="javascript:;">暴雨天！全程一把到底，纯视觉智驾开起来什么感受？</a></h5>
+                    </div>
+                    <div class="hou_ya_yue_vcard hou_ya_yue_v3">
+                        <a href="javascript:;" class="hou_ya_yue_vcover">
+                            <img src="image/video_biyadi_han_gaikuan.png" alt="长安启源Q06试驾">
+                            <span class="hou_ya_yue_src">汽车之家</span>
+                            <span class="hou_ya_yue_dur">&#9654; 04:37</span>
+                            <span class="hou_ya_yue_vuser"><img src="image/author_zhijia_xuanche.jpg" alt="牛翔说车">牛翔说车</span>
+                        </a>
+                        <h5><a href="javascript:;">交付即体验：长安启源Q06场地试驾+城区领航实测</a></h5>
+                    </div>
+                    <div class="hou_ya_yue_vcard hou_ya_yue_v3">
+                        <a href="javascript:;" class="hou_ya_yue_vcover">
+                            <img src="image/video_fanghezi_xuanche.png" alt="奥迪A5L乾崑智驾">
+                            <span class="hou_ya_yue_src">新出行</span>
+                            <span class="hou_ya_yue_dur">&#9654; 02:12</span>
+                            <span class="hou_ya_yue_vuser"><img src="image/author_mingrichechang.jpg" alt="明日车场">明日车场</span>
+                        </a>
+                        <h5><a href="javascript:;">奥迪A5L乾崑智驾版，能不能替代特斯拉FSD？</a></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_bang-hd">视频排行榜<span class="hou_ya_yue_r"><a href="javascript:;">查看完整榜单 &gt;</a></span></div>
+                <ul class="hou_ya_yue_bang-list">
+                    <li><span class="hou_ya_yue_no">1</span><a href="javascript:;" class="hou_ya_yue_txt">懂车的人为什么都不买小米SU7了？</a><span class="hou_ya_yue_vv">109.4万</span></li>
+                    <li><span class="hou_ya_yue_no">2</span><a href="javascript:;" class="hou_ya_yue_txt">被雾灯冒烟吓坏，车主：厂家真该醒了</a><span class="hou_ya_yue_vv">71.8万</span></li>
+                    <li><span class="hou_ya_yue_no">3</span><a href="javascript:;" class="hou_ya_yue_txt">智驾辅助国家标准要来了？</a><span class="hou_ya_yue_vv">59.5万</span></li>
+                    <li><span class="hou_ya_yue_no">4</span><a href="javascript:;" class="hou_ya_yue_txt">自主品牌一脚油门，把"老牌大厂"甩开了</a><span class="hou_ya_yue_vv">52.7万</span></li>
+                    <li><span class="hou_ya_yue_no">5</span><a href="javascript:;" class="hou_ya_yue_txt">硬派越野这点事、都被它们玩明白了</a><span class="hou_ya_yue_vv">48.4万</span></li>
+                    <li><span class="hou_ya_yue_no">6</span><a href="javascript:;" class="hou_ya_yue_txt">健身都拿下了，还有什么是它做不到的？</a><span class="hou_ya_yue_vv">46.1万</span></li>
+                    <li><span class="hou_ya_yue_no">7</span><a href="javascript:;" class="hou_ya_yue_txt">即将上市！比亚迪海鸥冠军版体验</a><span class="hou_ya_yue_vv">41.4万</span></li>
+                    <li><span class="hou_ya_yue_no">8</span><a href="javascript:;" class="hou_ya_yue_txt">这次大众能打吗？实测与众09</a><span class="hou_ya_yue_vv">34.7万</span></li>
+                    <li><span class="hou_ya_yue_no">9</span><a href="javascript:;" class="hou_ya_yue_txt">锋兰达大改款，模样你给打几分？</a><span class="hou_ya_yue_vv">31.1万</span></li>
+                    <li><span class="hou_ya_yue_no">10</span><a href="javascript:;" class="hou_ya_yue_txt">全新MG 07，合资B级车新卷王？</a><span class="hou_ya_yue_vv">26.7万</span></li>
+                </ul>
+                <div class="hou_ya_yue_promo" style="width:320px;margin:0;">
+                    <div class="hou_ya_yue_pinfo">
+                        <h5>盛夏购车享礼遇</h5>
+                        <p>登悦-悦蓝光 至高优惠6.2万</p>
+                        <a href="javascript:;" class="hou_ya_yue_pbtn">领券优惠</a>
+                    </div>
+                    <img src="image/kb_idera_8x.png" alt="登悦">
+                </div>
+                <div class="hou_ya_yue_promo" style="width:320px;margin-top:14px;">
+                    <div class="hou_ya_yue_pinfo">
+                        <h5>奔驰GLE置换享补贴</h5>
+                        <p>至高1.5万元补贴</p>
+                        <a href="javascript:;" class="hou_ya_yue_pbtn">免费报价</a>
+                    </div>
+                    <img src="image/kb_fangcheng_s.png" alt="奔驰GLE">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 热门文章 + 文章排行榜 ---------- -->
+    <div class="hou_ya_yue_card" id="op-news">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>热门文章</h3>
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_newsTabs">
+                <span class="hou_ya_yue_on">最新</span><span>导购</span><span>试驾评测</span><span>车闻</span>
+                <span>用车</span><span>文化</span><span>游记</span><span>技术</span>
+                <span>改装/赛事</span><span>车家号</span><span>新能源</span><span>行业</span>
+            </div>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多文章 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_left">
+                <div class="hou_ya_yue_ngrid">
+                    <div class="hou_ya_yue_ncard">
+                        <a href="javascript:;" class="hou_ya_yue_ncover">
+                            <img src="image/news_byd_qinplus_dmi.png" alt="秦PLUS DM-i">
+                            <span class="hou_ya_yue_src">之家原创车闻</span>
+                        </a>
+                        <h5><a href="javascript:;">全新比亚迪秦PLUS上市限时7.69万起，值得买吗？</a></h5>
+                        <div class="hou_ya_yue_pv">12.3万阅读</div>
+                    </div>
+                    <div class="hou_ya_yue_ncard">
+                        <a href="javascript:;" class="hou_ya_yue_ncover">
+                            <img src="image/news_shangqi_audi_e7x.png" alt="奥迪E7X">
+                            <span class="hou_ya_yue_src">之家原创车闻</span>
+                        </a>
+                        <h5><a href="javascript:;">预售23.98万起 上汽奥迪E7X正式开启预订</a></h5>
+                        <div class="hou_ya_yue_pv">8.7万阅读</div>
+                    </div>
+                    <div class="hou_ya_yue_ncard">
+                        <a href="javascript:;" class="hou_ya_yue_ncover">
+                            <img src="image/news_fangchengbao_ti9.jpg" alt="方程豹钛9">
+                            <span class="hou_ya_yue_src">之家原创车闻</span>
+                        </a>
+                        <h5><a href="javascript:;">计划11月上市 方程豹钛9申报图曝光</a></h5>
+                        <div class="hou_ya_yue_pv">7.5万阅读</div>
+                    </div>
+                    <div class="hou_ya_yue_ncard">
+                        <a href="javascript:;" class="hou_ya_yue_ncover">
+                            <img src="image/news_yipai_007_2027.png" alt="奕派007">
+                            <span class="hou_ya_yue_src">之家原创车闻</span>
+                        </a>
+                        <h5><a href="javascript:;">现款售11.59万起 2027款奕派007将上市</a></h5>
+                        <div class="hou_ya_yue_pv">6.9万阅读</div>
+                    </div>
+                    <div class="hou_ya_yue_ncard">
+                        <a href="javascript:;" class="hou_ya_yue_ncover">
+                            <img src="image/news_vw_europe_software.png" alt="大众软件">
+                            <span class="hou_ya_yue_src">之家原创车闻</span>
+                        </a>
+                        <h5><a href="javascript:;">大众与小鹏合作架构将走出中国</a></h5>
+                        <div class="hou_ya_yue_pv">6.1万阅读</div>
+                    </div>
+                    <div class="hou_ya_yue_ncard">
+                        <a href="javascript:;" class="hou_ya_yue_ncover">
+                            <img src="image/news_yangwang_dingyao.jpg" alt="仰望定要">
+                            <span class="hou_ya_yue_src">之家原创车闻</span>
+                        </a>
+                        <h5><a href="javascript:;">仰望定要超4秒破百，纯电性能新旗舰</a></h5>
+                        <div class="hou_ya_yue_pv">5.4万阅读</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_bang-hd">文章排行榜<span class="hou_ya_yue_r"><a href="javascript:;">查看完整榜单 &gt;</a></span></div>
+                <ul class="hou_ya_yue_bang-list">
+                    <li><span class="hou_ya_yue_no">1</span><a href="javascript:;" class="hou_ya_yue_txt">探店魏牌高山8 HEV，值得买吗</a><span class="hou_ya_yue_vv">694.5万</span></li>
+                    <li><span class="hou_ya_yue_no">2</span><a href="javascript:;" class="hou_ya_yue_txt">试驾长城猛龙PLUS力魂版</a><span class="hou_ya_yue_vv">318.7万</span></li>
+                    <li><span class="hou_ya_yue_no">3</span><a href="javascript:;" class="hou_ya_yue_txt">试驾捷途自由者7 奏鸣曲</a><span class="hou_ya_yue_vv">258.2万</span></li>
+                    <li><span class="hou_ya_yue_no">4</span><a href="javascript:;" class="hou_ya_yue_txt">MG 07对比启源A06</a><span class="hou_ya_yue_vv">198.6万</span></li>
+                    <li><span class="hou_ya_yue_no">5</span><a href="javascript:;" class="hou_ya_yue_txt">低电量能耗测试：星愿</a><span class="hou_ya_yue_vv">167.3万</span></li>
+                    <li><span class="hou_ya_yue_no">6</span><a href="javascript:;" class="hou_ya_yue_txt">实拍AIVA ME7，国产新豪华</a><span class="hou_ya_yue_vv">155.9万</span></li>
+                    <li><span class="hou_ya_yue_no">7</span><a href="javascript:;" class="hou_ya_yue_txt">探店银河战舰700</a><span class="hou_ya_yue_vv">142.4万</span></li>
+                    <li><span class="hou_ya_yue_no">8</span><a href="javascript:;" class="hou_ya_yue_txt">日产NX7静态体验</a><span class="hou_ya_yue_vv">128.8万</span></li>
+                    <li><span class="hou_ya_yue_no">9</span><a href="javascript:;" class="hou_ya_yue_txt">奥迪E5 Sportback 用车报告</a><span class="hou_ya_yue_vv">113.2万</span></li>
+                    <li><span class="hou_ya_yue_no">10</span><a href="javascript:;" class="hou_ya_yue_txt">探店2027款海鸥</a><span class="hou_ya_yue_vv">101.7万</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 论坛精选 + 热帖榜 ---------- -->
+    <div class="hou_ya_yue_card" id="op-bbs">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>论坛精选</h3>
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_bbsTabs">
+                <span class="hou_ya_yue_on">热门</span><span>新能源</span><span>媳妇当车模</span><span>SUV</span>
+            </div>
+            <div class="hou_ya_yue_r">
+                <a href="javascript:;">问答</a><a href="javascript:;">车主价格</a>
+                <a href="javascript:;">口碑</a><a href="javascript:;">论坛首页 &gt;</a>
+            </div>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_left">
+                <div class="hou_ya_yue_club-grid">
+                    <a href="javascript:;">
+                        <img src="image/club_audi_a6l.jpg" alt="奥迪A6L车主聚会">
+                        <div class="hou_ya_yue_cmask">
+                            <h5>周末车友聚会，A6L车主齐聚星海湾</h5>
+                            <p><img src="image/club_user_haozi.jpg" alt="好滋滋">好滋滋</p>
+                        </div>
+                    </a>
+                    <a href="javascript:;">
+                        <img src="image/club_paoshan.jpg" alt="跑山">
+                        <div class="hou_ya_yue_cmask">
+                            <h5>大连滨海路跑山，风景和操控都在线</h5>
+                            <p><img src="image/club_user_yan.jpg" alt="燕儿">燕儿</p>
+                        </div>
+                    </a>
+                    <a href="javascript:;">
+                        <img src="image/club_longji_moto.jpg" alt="隆鑫摩托">
+                        <div class="hou_ya_yue_cmask">
+                            <h5>提车三个月，隆鑫机车长途作业</h5>
+                            <p><img src="image/club_user_haozi.jpg" alt="风行者">风行者</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="hou_ya_yue_hotpost">
+                    <div class="hou_ya_yue_hotpost-hd">热门帖精选<span class="hou_ya_yue_badge">超级试驾员</span></div>
+                    <div class="hou_ya_yue_hotpost-body">
+                        <div class="hou_ya_yue_hp-item">
+                            <img src="image/video_daxinganling_qiujing.jpg" alt="大兴安岭">
+                            <div class="hou_ya_yue_hp-t">
+                                <h5><a href="javascript:;">国庆自驾大兴安岭，2000公里秋色绝了</a></h5>
+                                <p><img src="image/club_user_yan.jpg" alt="野行">野行</p>
+                            </div>
+                        </div>
+                        <div class="hou_ya_yue_hp-item">
+                            <img src="image/carlib_lotus_for_me.jpg" alt="莲花">
+                            <div class="hou_ya_yue_hp-t">
+                                <h5><a href="javascript:;">提车莲花EMEYA，聊聊两个月用车感受</a></h5>
+                                <p><img src="image/club_user_haozi.jpg" alt="老张">老张</p>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="hou_ya_yue_hotpost-list">
+                        <li><a href="javascript:;">新车首保都做什么？老司机来告诉你</a></li>
+                        <li><a href="javascript:;">10万预算买SUV，这两款闭眼入</a></li>
+                        <li><a href="javascript:;">冬季电车续航实测，掉电真的有那么夸张吗</a></li>
+                        <li><a href="javascript:;">大连二手车市场实拍，教你避坑</a></li>
+                        <li><a href="javascript:;">改装避震到底值不值，我的真实体验</a></li>
+                        <li><a href="javascript:;">一年养车成本算一算，看看花在哪</a></li>
+                    </ul>
+                    <div class="hou_ya_yue_forum-links">
+                        <a href="javascript:;">自驾游</a><a href="javascript:;">提车作业</a>
+                        <a href="javascript:;">用车心得</a><a href="javascript:;">改装</a>
+                        <a href="javascript:;">维修保养</a><a href="javascript:;">媳妇当车模</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_bang-hd">论坛热帖排行榜<span class="hou_ya_yue_r"><a href="javascript:;">查看完整榜单 &gt;</a></span></div>
+                <ul class="hou_ya_yue_bang-list">
+                    <li><span class="hou_ya_yue_no">1</span><a href="javascript:;" class="hou_ya_yue_txt">提车三个月，说说高山8真实油耗</a><span class="hou_ya_yue_vv">38.6万</span></li>
+                    <li><span class="hou_ya_yue_no">2</span><a href="javascript:;" class="hou_ya_yue_txt">海边露营，后备箱这样装才合理</a><span class="hou_ya_yue_vv">29.4万</span></li>
+                    <li><span class="hou_ya_yue_no">3</span><a href="javascript:;" class="hou_ya_yue_txt">卡罗拉锐放用车一年感受分享</a><span class="hou_ya_yue_vv">25.1万</span></li>
+                    <li><span class="hou_ya_yue_no">4</span><a href="javascript:;" class="hou_ya_yue_txt">新手上路第一天，记录一下</a><span class="hou_ya_yue_vv">21.8万</span></li>
+                    <li><span class="hou_ya_yue_no">5</span><a href="javascript:;" class="hou_ya_yue_txt">20万级纯电怎么选，求推荐</a><span class="hou_ya_yue_vv">19.3万</span></li>
+                </ul>
+                <div class="hou_ya_yue_price-card">
+                    <div class="hou_ya_yue_hd">车主价格<span class="hou_ya_yue_r"><a href="javascript:;">查看最新车主价格 &gt;</a></span></div>
+                    <ul>
+                        <li>
+                            <img src="image/price_audi_e5.jpg" alt="奥迪E5">
+                            <div class="hou_ya_yue_pi"><strong>奥迪E5 Sportback</strong><em>23.59<i>万起</i></em></div>
+                        </li>
+                        <li>
+                            <img src="image/price_benz_e300l.jpg" alt="奔驰E级">
+                            <div class="hou_ya_yue_pi"><strong>奔驰E级</strong><em>44.72<i>万起</i></em></div>
+                        </li>
+                        <li>
+                            <img src="image/price_jike_001.jpg" alt="极氪001">
+                            <div class="hou_ya_yue_pi"><strong>极氪001</strong><em>25.90<i>万起</i></em></div>
+                        </li>
+                        <li>
+                            <img src="image/price_model_yl.jpg" alt="Model Y L">
+                            <div class="hou_ya_yue_pi"><strong>Model Y L</strong><em>33.90<i>万起</i></em></div>
+                        </li>
+                    </ul>
+                    <a href="javascript:;" class="hou_ya_yue_all">查看最新车主价格</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 经销商促销条 ---------- -->
+    <div class="hou_ya_yue_dealer-strip">
+        <a href="javascript:;"><img src="image/kb_rav4.png" alt="沃尔沃XC60"><div class="hou_ya_yue_di"><strong>沃尔沃XC60</strong><em>万元补贴</em></div></a>
+        <a href="javascript:;"><img src="image/kb_lantu_zhiyin.png" alt="岚图泰山"><div class="hou_ya_yue_di"><strong>岚图泰山</strong><em>三年零息</em></div></a>
+        <a href="javascript:;"><img src="image/kb_aion_i60.png" alt="艾瑞泽8"><div class="hou_ya_yue_di"><strong>艾瑞泽8</strong><em>购车享0息</em></div></a>
+        <a href="javascript:;"><img src="image/kb_qiyuan_q05.png" alt="海豹07"><div class="hou_ya_yue_di"><strong>颠覆终结者</strong><em>海豹07巅峰</em></div></a>
+        <a href="javascript:;"><img src="image/kb_mg4.png" alt="汽车之家"><div class="hou_ya_yue_di"><strong>汽车之家</strong><em>贴心周到</em></div></a>
+        <a href="javascript:;"><img src="image/kb_ioniq_v.png" alt="星海V6"><div class="hou_ya_yue_di"><strong>星海V6</strong><em>购车享好礼</em></div></a>
+    </div>
+
+    <!-- ---------- 车型库 + 销量榜 ---------- -->
+    <div class="hou_ya_yue_card" id="op-library">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>车型库</h3>
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_libTabs">
+                <span class="hou_ya_yue_on">报价</span><span>图片</span><span>视频</span><span>VR看车</span>
+                <span>二手车</span><span>百科</span><span>精图</span><span>智能买车</span>
+            </div>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_left">
+                <div class="hou_ya_yue_lib-grid">
+                    <a href="javascript:;">
+                        <img src="image/carlib_benz_s_class.jpg" alt="奔驰S级">
+                        <p>延续传统豪华 奔驰S级</p>
+                    </a>
+                    <a href="javascript:;">
+                        <img src="image/carlib_bmw_i7.jpg" alt="宝马i7">
+                        <p>宝马史上最强纯电旗舰 宝马i7</p>
+                    </a>
+                    <a href="javascript:;">
+                        <img src="image/carlib_weilai_es9.jpg" alt="蔚来ES9">
+                        <p>家族旗舰SUV 蔚来ES9</p>
+                    </a>
+                </div>
+                <div class="hou_ya_yue_lib-dots"><i class="hou_ya_yue_on"></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_sale-hd">销量排行榜<span class="hou_ya_yue_month">09月</span><span class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></span></div>
+                <div class="hou_ya_yue_sale-tabs" id="hou_ya_yue_saleTabs">
+                    <span class="hou_ya_yue_on">月销榜</span><span>周销榜</span><span>品牌月销榜</span>
+                </div>
+                <ul class="hou_ya_yue_sale-list">
+                    <li><span class="hou_ya_yue_no">1</span><img src="image/kb_model_y.png" alt="Model Y"><span class="hou_ya_yue_txt"><a href="javascript:;">Model Y</a></span><span class="hou_ya_yue_num">51,106</span></li>
+                    <li><span class="hou_ya_yue_no">2</span><img src="image/kb_song_ultra.png" alt="宋Ultra"><span class="hou_ya_yue_txt"><a href="javascript:;">宋Ultra</a></span><span class="hou_ya_yue_num">42,853</span></li>
+                    <li><span class="hou_ya_yue_no">3</span><img src="image/kb_xingyuan.png" alt="星愿"><span class="hou_ya_yue_txt"><a href="javascript:;">星愿</a></span><span class="hou_ya_yue_num">40,216</span></li>
+                    <li><span class="hou_ya_yue_no">4</span><img src="image/kb_ti7.png" alt="钛7"><span class="hou_ya_yue_txt"><a href="javascript:;">钛7</a></span><span class="hou_ya_yue_num">33,978</span></li>
+                    <li><span class="hou_ya_yue_no">5</span><img src="image/kb_camry.png" alt="凯美瑞"><span class="hou_ya_yue_txt"><a href="javascript:;">凯美瑞</a></span><span class="hou_ya_yue_num">28,672</span></li>
+                    <li><span class="hou_ya_yue_no">6</span><img src="image/kb_rav4.png" alt="RAV4荣放"><span class="hou_ya_yue_txt"><a href="javascript:;">RAV4荣放</a></span><span class="hou_ya_yue_num">25,431</span></li>
+                    <li><span class="hou_ya_yue_no">7</span><img src="image/kb_qiyuan_q06.png" alt="启源Q06"><span class="hou_ya_yue_txt"><a href="javascript:;">启源Q06</a></span><span class="hou_ya_yue_num">23,109</span></li>
+                    <li><span class="hou_ya_yue_no">8</span><img src="image/kb_mg07.png" alt="MG 07"><span class="hou_ya_yue_txt"><a href="javascript:;">MG 07</a></span><span class="hou_ya_yue_num">21,845</span></li>
+                    <li><span class="hou_ya_yue_no">9</span><img src="image/kb_idaura_t6.png" alt="ID.AURA T6"><span class="hou_ya_yue_txt"><a href="javascript:;">ID.AURA T6</a></span><span class="hou_ya_yue_num">20,376</span></li>
+                    <li><span class="hou_ya_yue_no">10</span><img src="image/kb_huajing_s.png" alt="华境S"><span class="hou_ya_yue_txt"><a href="javascript:;">华境S</a></span><span class="hou_ya_yue_num">18,924</span></li>
+                </ul>
+                <div class="hou_ya_yue_sale-note">更新时间：2026-10-15｜数据来自乘联会</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 车主口碑 ---------- -->
+    <div class="hou_ya_yue_card" id="op-koubei">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>车主口碑</h3>
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_kbTabs">
+                <span class="hou_ya_yue_on">热门</span><span>新能源</span><span>轿车</span><span>SUV</span><span>MPV</span>
+            </div>
+            <div class="hou_ya_yue_r">
+                <a href="javascript:;" id="hou_ya_yue_kbPrev">&#9664;</a>
+                <a href="javascript:;" id="hou_ya_yue_kbNext">&#9654;</a>
+            </div>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_left">
+                <div class="hou_ya_yue_kb-grid">
+                    <div class="hou_ya_yue_kb-item">
+                        <span class="hou_ya_yue_kb-score">4.48<i>分</i></span>
+                        <a href="javascript:;" class="hou_ya_yue_all">全部评分 &gt;</a>
+                        <div class="hou_ya_yue_kb-name">ID.AURA T6</div>
+                        <p>共152篇口碑</p>
+                        <img src="image/kb_idaura_t6.png" alt="ID.AURA T6" class="hou_ya_yue_kcar">
+                        <div class="hou_ya_yue_kb-user"><img src="image/club_user_haozi.jpg" alt="lajiangfy">lajiangfy</div>
+                        <div class="hou_ya_yue_kb-spec">2026款 660 Max 激光雷达版<b>5.00分</b></div>
+                        <p class="hou_ya_yue_kb-txt">提车一个月跑了2300公里，市区通勤电耗14.5左右，高速120定速在17个左右。底盘调校偏舒适，过减速带很整，激光雷达的领航在环路上表现很稳，值得推荐。</p>
+                    </div>
+                    <div class="hou_ya_yue_kb-item">
+                        <span class="hou_ya_yue_kb-score">4.52<i>分</i></span>
+                        <a href="javascript:;" class="hou_ya_yue_all">全部评分 &gt;</a>
+                        <div class="hou_ya_yue_kb-name">钛7</div>
+                        <p>共2945篇口碑</p>
+                        <img src="image/kb_ti7.png" alt="钛7" class="hou_ya_yue_kcar">
+                        <div class="hou_ya_yue_kb-radar">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <polygon points="75,8 128,38 128,82 75,112 22,82 22,38" fill="none" stroke="#eceff4" stroke-width="1"></polygon>
+                                <polygon points="75,32 111,51 111,76 75,95 39,76 39,51" fill="none" stroke="#eceff4" stroke-width="1"></polygon>
+                                <polygon points="75,52 95,62 95,74 75,84 55,74 55,62" fill="none" stroke="#eceff4" stroke-width="1"></polygon>
+                                <line x1="75" y1="60" x2="75" y2="8" stroke="#eceff4"></line>
+                                <line x1="75" y1="60" x2="128" y2="38" stroke="#eceff4"></line>
+                                <line x1="75" y1="60" x2="128" y2="82" stroke="#eceff4"></line>
+                                <line x1="75" y1="60" x2="75" y2="112" stroke="#eceff4"></line>
+                                <line x1="75" y1="60" x2="22" y2="82" stroke="#eceff4"></line>
+                                <line x1="75" y1="60" x2="22" y2="38" stroke="#eceff4"></line>
+                                <polygon points="75,22 112,44 108,78 75,98 42,74 46,44" fill="rgba(61,126,255,.25)" stroke="#3d7eff" stroke-width="2"></polygon>
+                            </svg>
+                            <p>空间 4.6 · 动力 4.5 · 操控 4.4</p>
+                        </div>
+                        <p class="hou_ya_yue_kb-txt" style="margin-top:6px;">方盒子造型很有辨识度，城市通勤油耗8个左右，越野模式在海边土路表现不错，家用和玩乐都能兼顾。</p>
+                    </div>
+                    <div class="hou_ya_yue_kb-item">
+                        <span class="hou_ya_yue_kb-score">4.48<i>分</i></span>
+                        <a href="javascript:;" class="hou_ya_yue_all">全部评分 &gt;</a>
+                        <div class="hou_ya_yue_kb-name">MG 07</div>
+                        <p>反复过滤 共1321篇口碑</p>
+                        <img src="image/kb_mg07.png" alt="MG 07" class="hou_ya_yue_kcar">
+                        <div class="hou_ya_yue_kb-user"><img src="image/club_user_yan.jpg" alt="大连老李">大连老李</div>
+                        <div class="hou_ya_yue_kb-spec">2026款 610 激光雷达版<b>5.00分</b></div>
+                        <p class="hou_ya_yue_kb-txt">合资B级车里性价比很高，内饰用料扎实，车机流畅度比上一代提升明显，后排空间足够家用，底盘滤震舒服。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_kb-new-hd">最新精选口碑<span class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></span></div>
+                <ul class="hou_ya_yue_kb-new">
+                    <li>
+                        <img src="image/kb_new_audi_a3.jpg" alt="奥迪A3">
+                        <div class="hou_ya_yue_ki"><h5><a href="javascript:;">奥迪A3 家用代步首选，油耗低好停车</a></h5><em>口碑 <b>4.51</b> 分</em></div>
+                    </li>
+                    <li>
+                        <img src="image/kb_new_bmw_3.jpg" alt="宝马3系">
+                        <div class="hou_ya_yue_ki"><h5><a href="javascript:;">宝马3系 操控依旧是同级标杆</a></h5><em>口碑 <b>4.49</b> 分</em></div>
+                    </li>
+                    <li>
+                        <img src="image/kb_new_cs75plus.jpg" alt="CS75 PLUS">
+                        <div class="hou_ya_yue_ki"><h5><a href="javascript:;">长安CS75 PLUS 空间大配置足</a></h5><em>口碑 <b>4.46</b> 分</em></div>
+                    </li>
+                    <li>
+                        <img src="image/kb_new_geruiviya.jpg" alt="格瑞维亚">
+                        <div class="hou_ya_yue_ki"><h5><a href="javascript:;">格瑞维亚 二胎家庭出行好帮手</a></h5><em>口碑 <b>4.58</b> 分</em></div>
+                    </li>
+                    <li>
+                        <img src="image/kb_new_xiaomi_su7.jpg" alt="小米SU7">
+                        <div class="hou_ya_yue_ki"><h5><a href="javascript:;">小米SU7 提车半年，智能化体验优秀</a></h5><em>口碑 <b>4.62</b> 分</em></div>
+                    </li>
+                    <li>
+                        <img src="image/koubei_car_1.jpg" alt="汉兰达">
+                        <div class="hou_ya_yue_ki"><h5><a href="javascript:;">汉兰达 保值率依旧坚挺</a></h5><em>口碑 <b>4.55</b> 分</em></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- ID.AURA T6 banner ---------- -->
+    <div class="hou_ya_yue_banner hou_ya_yue_idaura">
+        <span class="hou_ya_yue_vlogo">ID.AURA T6</span>
+        <span class="hou_ya_yue_vtxt">全家人的智稳纯电SUV</span>
+        <span class="hou_ya_yue_vtag">无忧之选</span>
+        <img src="image/kb_idaura_t6.png" alt="ID.AURA T6">
+    </div>
+
+    <!-- ---------- 本地优惠 + 降价信息 ---------- -->
+    <div class="hou_ya_yue_card" id="op-local">
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_local-left">
+                <div class="hou_ya_yue_sec-hd">
+                    <h3>本地优惠</h3>
+                    <span class="hou_ya_yue_sub" id="hou_ya_yue_localCity">大连 &#9662;</span>
+                    <div class="hou_ya_yue_r"><a href="javascript:;">更多优惠 &gt;</a></div>
+                </div>
+                <div class="hou_ya_yue_bargain-grid" style="margin-top:14px;">
+                    <div class="hou_ya_yue_bargain">
+                        <div class="hou_ya_yue_bt">
+                            <h5><a href="javascript:;">华境S｜15.28万起</a></h5>
+                            <p>大连瑞一授权4S店</p>
+                            <div class="hou_ya_yue_bbtns">
+                                <a href="javascript:;" class="hou_ya_yue_bbtn">获取底价</a>
+                                <span class="hou_ya_yue_btel">95013050984</span>
+                            </div>
+                        </div>
+                        <img src="image/model_audi_a5l.png" alt="华境S">
+                    </div>
+                    <div class="hou_ya_yue_bargain">
+                        <div class="hou_ya_yue_bt">
+                            <h5><a href="javascript:;">奥迪A6L｜36.29万起</a></h5>
+                            <p>大连中升汇迪4S店</p>
+                            <div class="hou_ya_yue_bbtns">
+                                <a href="javascript:;" class="hou_ya_yue_bbtn">获取底价</a>
+                                <span class="hou_ya_yue_btel">95013050987</span>
+                            </div>
+                        </div>
+                        <img src="image/model_audi_a7l.png" alt="奥迪A6L">
+                    </div>
+                    <div class="hou_ya_yue_bargain">
+                        <div class="hou_ya_yue_bt">
+                            <h5><a href="javascript:;">RAV4荣放｜16.98万起</a></h5>
+                            <p>大连中升丰田4S店</p>
+                            <div class="hou_ya_yue_bbtns">
+                                <a href="javascript:;" class="hou_ya_yue_bbtn">获取底价</a>
+                                <span class="hou_ya_yue_btel">95013050990</span>
+                            </div>
+                        </div>
+                        <img src="image/model_audi_q6.png" alt="RAV4荣放">
+                    </div>
+                    <div class="hou_ya_yue_bargain">
+                        <div class="hou_ya_yue_bt">
+                            <h5><a href="javascript:;">日产N7｜13.99万起</a></h5>
+                            <p>大连东风日产4S店</p>
+                            <div class="hou_ya_yue_bbtns">
+                                <a href="javascript:;" class="hou_ya_yue_bbtn">获取底价</a>
+                                <span class="hou_ya_yue_btel">95013050993</span>
+                            </div>
+                        </div>
+                        <img src="image/model_richan_n7.png" alt="日产N7">
+                    </div>
+                    <div class="hou_ya_yue_bargain">
+                        <div class="hou_ya_yue_bt">
+                            <h5><a href="javascript:;">传祺M8｜17.98万起</a></h5>
+                            <p>大连广汽传祺4S店</p>
+                            <div class="hou_ya_yue_bbtns">
+                                <a href="javascript:;" class="hou_ya_yue_bbtn">获取底价</a>
+                                <span class="hou_ya_yue_btel">95013050996</span>
+                            </div>
+                        </div>
+                        <img src="image/model_trumpchi_m8.png" alt="传祺M8">
+                    </div>
+                    <div class="hou_ya_yue_bargain">
+                        <div class="hou_ya_yue_bt">
+                            <h5><a href="javascript:;">传祺向往M8｜20.68万起</a></h5>
+                            <p>大连广汽传祺4S店</p>
+                            <div class="hou_ya_yue_bbtns">
+                                <a href="javascript:;" class="hou_ya_yue_bbtn">获取底价</a>
+                                <span class="hou_ya_yue_btel">95013050999</span>
+                            </div>
+                        </div>
+                        <img src="image/model_trumpchi_xiangwang_m8.png" alt="传祺向往M8">
+                    </div>
+                </div>
+
+                <div class="hou_ya_yue_sec-hd" style="margin-top:6px;">
+                    <h3>大连降价信息</h3>
+                    <div class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></div>
+                </div>
+                <div class="hou_ya_yue_cut-grid" style="margin-top:10px;">
+                    <div class="hou_ya_yue_cut-item">
+                        <img src="image/news_fangchengbao_ti7_ota.png" alt="钛7">
+                        <div class="hou_ya_yue_ct">
+                            <h5><a href="javascript:;">方程豹钛7 限时优惠1.2万，现车充足</a></h5>
+                            <p>指导价<b>17.98万</b>起</p>
+                        </div>
+                    </div>
+                    <div class="hou_ya_yue_cut-item">
+                        <img src="image/news_geely_binyue_2027.png" alt="缤越">
+                        <div class="hou_ya_yue_ct">
+                            <h5><a href="javascript:;">吉利缤越 2027款现金优惠0.8万</a></h5>
+                            <p>指导价<b>7.58万</b>起</p>
+                        </div>
+                    </div>
+                </div>
+                <ul class="hou_ya_yue_cut-list">
+                    <li><a href="javascript:;">迈腾 最高优惠5.70万</a></li>
+                    <li><a href="javascript:;">星愿 最高优惠4.30万</a></li>
+                    <li><a href="javascript:;">奥迪A6L 最高优惠2.50万</a></li>
+                    <li><a href="javascript:;">RAV4荣放 最高优惠2.30万</a></li>
+                    <li><a href="javascript:;">卡罗拉锐放 最高优惠3.10万</a></li>
+                    <li><a href="javascript:;">汉兰达 最高优惠1.80万</a></li>
+                </ul>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_cut-hd">最新降价信息<span class="hou_ya_yue_r"><a href="javascript:;">更多降价 &gt;</a></span></div>
+                <div class="hou_ya_yue_city-tabs" id="hou_ya_yue_cityTabs">
+                    <span class="hou_ya_yue_on">全国</span><span>北京</span><span>上海</span><span>广东</span>
+                    <span>山东</span><span>浙江</span><span>江苏</span><span>河北</span>
+                    <span>河南</span><span>辽宁</span><span>安徽</span><span>更多</span>
+                </div>
+                <ul class="hou_ya_yue_cut-table">
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">奥迪A6L</a></span><span class="hou_ya_yue_cd">↓2.50万</span><span class="hou_ya_yue_cp">36.29万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">星愿</a></span><span class="hou_ya_yue_cd">↓4.30万</span><span class="hou_ya_yue_cp">8.38万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">迈腾</a></span><span class="hou_ya_yue_cd">↓5.70万</span><span class="hou_ya_yue_cp">13.29万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">RAV4荣放</a></span><span class="hou_ya_yue_cd">↓2.30万</span><span class="hou_ya_yue_cp">16.98万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">凯美瑞</a></span><span class="hou_ya_yue_cd">↓3.20万</span><span class="hou_ya_yue_cp">17.18万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">钛7</a></span><span class="hou_ya_yue_cd">↓1.20万</span><span class="hou_ya_yue_cp">18.98万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">卡罗拉锐放</a></span><span class="hou_ya_yue_cd">↓3.10万</span><span class="hou_ya_yue_cp">9.88万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">MG 07</a></span><span class="hou_ya_yue_cd">↓1.50万</span><span class="hou_ya_yue_cp">13.99万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">汉兰达</a></span><span class="hou_ya_yue_cd">↓1.80万</span><span class="hou_ya_yue_cp">24.98万</span></li>
+                    <li><span class="hou_ya_yue_cn"><a href="javascript:;">QQ冰淇淋</a></span><span class="hou_ya_yue_cd">↓0.30万</span><span class="hou_ya_yue_cp">3.69万</span></li>
+                </ul>
+
+                <div class="hou_ya_yue_jxs-hd">经销商促销<span class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></span></div>
+                <ul class="hou_ya_yue_jxs-list">
+                    <li>
+                        <img src="image/kb_rav4.png" alt="RAV4荣放">
+                        <div class="hou_ya_yue_ji"><strong>RAV4荣放</strong><em>↓2.30万 <i>广汽丰田中升红港店</i></em></div>
+                    </li>
+                    <li>
+                        <img src="image/kb_camry.png" alt="奥迪A6L">
+                        <div class="hou_ya_yue_ji"><strong>奥迪A6L</strong><em>优惠 16.89万 <i>大连中升汇迪</i></em></div>
+                    </li>
+                    <li>
+                        <img src="image/kb_xingyuan.png" alt="星愿">
+                        <div class="hou_ya_yue_ji"><strong>星愿</strong><em>↓0.30万 <i>上汽大众体验中心</i></em></div>
+                    </li>
+                    <li>
+                        <img src="image/koubei_car_2.jpg" alt="迈腾">
+                        <div class="hou_ya_yue_ji"><strong>迈腾</strong><em>↓5.70万 <i>奔驰利星大连</i></em></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 红旗天工07 banner ---------- -->
+    <div class="hou_ya_yue_banner hou_ya_yue_qi">
+        <span class="hou_ya_yue_qlogo">红旗</span>
+        <div class="hou_ya_yue_qt">
+            <p>不负7待</p>
+            <h4>天工07 正式上市</h4>
+        </div>
+        <div class="hou_ya_yue_qprice">
+            <div><strong>22.98万起</strong>售价区间</div>
+            <div><strong>730km</strong>CLTC续航</div>
+            <div><strong>3.9s</strong>零百加速</div>
+            <div><strong>终身质保</strong>三电质保</div>
+        </div>
+    </div>
+
+    <!-- ---------- 超级补贴 ---------- -->
+    <div class="hou_ya_yue_card" id="op-subsidy">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>超级补贴</h3>
+            <div class="hou_ya_yue_r"><a href="javascript:;">进入超级补贴 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_sub-grid">
+                <div class="hou_ya_yue_sub-item">
+                    <img src="image/kb_ti7.png" alt="钛7">
+                    <span class="hou_ya_yue_logo">方程豹</span>
+                    <strong>钛7</strong>
+                    <div class="hou_ya_yue_tags"><span>500 元现金补贴</span></div>
+                </div>
+                <div class="hou_ya_yue_sub-item">
+                    <img src="image/kb_huajing_s.png" alt="华境S">
+                    <span class="hou_ya_yue_logo">五菱</span>
+                    <strong>华境S</strong>
+                    <div class="hou_ya_yue_tags"><span>500 元现金补贴</span></div>
+                </div>
+                <div class="hou_ya_yue_sub-item">
+                    <img src="image/kb_greatwall_h10.png" alt="长城H10">
+                    <span class="hou_ya_yue_logo">长城</span>
+                    <strong>长城H10</strong>
+                    <div class="hou_ya_yue_tags"><span>500 元现金补贴</span></div>
+                </div>
+                <div class="hou_ya_yue_sub-item">
+                    <img src="image/kb_datang.png" alt="大唐">
+                    <span class="hou_ya_yue_logo">比亚迪</span>
+                    <strong>大唐</strong>
+                    <div class="hou_ya_yue_tags"><span>1000 元现金补贴</span></div>
+                </div>
+                <div class="hou_ya_yue_sub-item">
+                    <img src="image/kb_song_ultra.png" alt="宋Ultra">
+                    <span class="hou_ya_yue_logo">比亚迪</span>
+                    <strong>宋Ultra</strong>
+                    <div class="hou_ya_yue_tags"><span>500 元现金补贴</span></div>
+                </div>
+                <div class="hou_ya_yue_sub-item">
+                    <img src="image/kb_yinhe_zhanjian700.png" alt="银河战舰700">
+                    <span class="hou_ya_yue_logo">吉利</span>
+                    <strong>银河战舰700</strong>
+                    <div class="hou_ya_yue_tags"><span>1000 元现金补贴</span></div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">热门品牌<span class="hou_ya_yue_r"><a href="javascript:;">查看更多品牌 &gt;</a></span></div>
+                    <div class="hou_ya_yue_brand-grid hou_ya_yue_w3">
+                        <a href="javascript:;"><i>奥迪</i>奥迪</a>
+                        <a href="javascript:;"><i>奇瑞</i>奇瑞</a>
+                        <a href="javascript:;"><i>大众</i>大众</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">聚惠好车<span class="hou_ya_yue_r"><a href="javascript:;">查看厂商直推 更多优惠好车 &gt;</a></span></div>
+                    <ul class="hou_ya_yue_juhui-list">
+                        <li>
+                            <img src="image/kb_ti3.png" alt="传祺E8">
+                            <div class="hou_ya_yue_ji"><strong>传祺E8</strong><em>500元现金补贴</em></div>
+                            <a href="javascript:;" class="hou_ya_yue_get">去领取</a>
+                        </li>
+                        <li>
+                            <img src="image/kb_mg4.png" alt="传祺M8">
+                            <div class="hou_ya_yue_ji"><strong>传祺M8</strong><em>500元现金补贴</em></div>
+                            <a href="javascript:;" class="hou_ya_yue_get">限时领</a>
+                        </li>
+                        <li>
+                            <img src="image/kb_idera_5s.png" alt="奥迪A6L e-tron">
+                            <div class="hou_ya_yue_ji"><strong>奥迪A6L e-tron</strong><em>1000元现金补贴</em></div>
+                            <a href="javascript:;" class="hou_ya_yue_get">限时领</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 购车盛惠 banner ---------- -->
+    <div class="hou_ya_yue_banner hou_ya_yue_lowprice">
+        <span class="hou_ya_yue_b1">好车低价购</span>
+        <span class="hou_ya_yue_b2">购车盛惠！诚意放价</span>
+    </div>
+
+    <!-- ---------- 大连二手车 ---------- -->
+    <div class="hou_ya_yue_card" id="op-used">
+        <div class="hou_ya_yue_sec-hd">
+            <h3><span id="hou_ya_yue_usedCity">大连</span>二手车</h3>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多二手车 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_city-tabs" id="hou_ya_yue_usedTabs">
+            <span class="hou_ya_yue_on">全国</span><span>北京</span><span>上海</span><span>广东</span>
+            <span>山东</span><span>浙江</span><span>江苏</span><span>河北</span>
+            <span>河南</span><span>辽宁</span><span>安徽</span><span>重庆</span>
+            <span>四川</span><span>山西</span><span>湖南</span><span>湖北</span><span>更多</span>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_used-grid">
+                <div class="hou_ya_yue_used-item">
+                    <a href="javascript:;"><img src="image/1.jpg" alt="奥迪A4L"></a>
+                    <h5><a href="javascript:;">奥迪A4L 2023款 40 TFSI</a></h5>
+                    <div class="hou_ya_yue_uinfo">2023年 | 2.1万公里</div>
+                    <div class="hou_ya_yue_urow">
+                        <span class="hou_ya_yue_uprice">21.80<i>万</i></span>
+                        <span class="hou_ya_yue_umer">北股车商 · 72.93万</span>
+                        <a href="javascript:;" class="hou_ya_yue_uget">砍价</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_used-item">
+                    <a href="javascript:;"><img src="image/18.jpg" alt="宝马3系"></a>
+                    <h5><a href="javascript:;">宝马3系 2022款 325Li</a></h5>
+                    <div class="hou_ya_yue_uinfo">2022年 | 3.6万公里</div>
+                    <div class="hou_ya_yue_urow">
+                        <span class="hou_ya_yue_uprice">24.50<i>万</i></span>
+                        <span class="hou_ya_yue_umer">大连诚信车行</span>
+                        <a href="javascript:;" class="hou_ya_yue_uget">砍价</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_used-item">
+                    <a href="javascript:;"><img src="image/19.jpg" alt="凯美瑞"></a>
+                    <h5><a href="javascript:;">凯美瑞 2021款 2.5G</a></h5>
+                    <div class="hou_ya_yue_uinfo">2021年 | 5.2万公里</div>
+                    <div class="hou_ya_yue_urow">
+                        <span class="hou_ya_yue_uprice">13.98<i>万</i></span>
+                        <span class="hou_ya_yue_umer">大连优车汇</span>
+                        <a href="javascript:;" class="hou_ya_yue_uget">砍价</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_used-item">
+                    <a href="javascript:;"><img src="image/2.jpeg" alt="汉兰达"></a>
+                    <h5><a href="javascript:;">汉兰达 2020款 2.0T 四驱</a></h5>
+                    <div class="hou_ya_yue_uinfo">2020年 | 6.8万公里</div>
+                    <div class="hou_ya_yue_urow">
+                        <span class="hou_ya_yue_uprice">19.60<i>万</i></span>
+                        <span class="hou_ya_yue_umer">大连中升二手车</span>
+                        <a href="javascript:;" class="hou_ya_yue_uget">砍价</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_used-item">
+                    <a href="javascript:;"><img src="image/20.jpg" alt="Model Y"></a>
+                    <h5><a href="javascript:;">Model Y 2023款 长续航</a></h5>
+                    <div class="hou_ya_yue_uinfo">2023年 | 1.9万公里</div>
+                    <div class="hou_ya_yue_urow">
+                        <span class="hou_ya_yue_uprice">22.30<i>万</i></span>
+                        <span class="hou_ya_yue_umer">大连新能源优选</span>
+                        <a href="javascript:;" class="hou_ya_yue_uget">砍价</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_used-item">
+                    <a href="javascript:;"><img src="image/3.jpeg" alt="奔驰GLC"></a>
+                    <h5><a href="javascript:;">奔驰GLC 2022款 260 L</a></h5>
+                    <div class="hou_ya_yue_uinfo">2022年 | 4.4万公里</div>
+                    <div class="hou_ya_yue_urow">
+                        <span class="hou_ya_yue_uprice">31.80<i>万</i></span>
+                        <span class="hou_ya_yue_umer">大连之星二手车</span>
+                        <a href="javascript:;" class="hou_ya_yue_uget">砍价</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">热门品牌</div>
+                    <div class="hou_ya_yue_brand-grid">
+                        <a href="javascript:;"><i>丰田</i>丰田</a><a href="javascript:;"><i>奥迪</i>奥迪</a>
+                        <a href="javascript:;"><i>奔驰</i>奔驰</a><a href="javascript:;"><i>大众</i>大众</a>
+                        <a href="javascript:;"><i>宝马</i>宝马</a><a href="javascript:;"><i>本田</i>本田</a>
+                        <a href="javascript:;"><i>马自达</i>马自达</a><a href="javascript:;"><i>雷诺</i>雷克萨斯</a>
+                        <a href="javascript:;"><i>日产</i>日产</a><a href="javascript:;"><i>路虎</i>路虎</a>
+                        <a href="javascript:;"><i>福特</i>福特</a><a href="javascript:;"><i>保时捷</i>保时捷</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">价格</div>
+                    <div class="hou_ya_yue_price-grid">
+                        <a href="javascript:;">3万以下</a><a href="javascript:;">3-5万</a><a href="javascript:;">5-8万</a>
+                        <a href="javascript:;">8-10万</a><a href="javascript:;">10-15万</a><a href="javascript:;">15-20万</a>
+                        <a href="javascript:;">20-30万</a><a href="javascript:;">30-50万</a><a href="javascript:;">50-70万</a>
+                        <a href="javascript:;">70万以上</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">热门车系</div>
+                    <div class="hou_ya_yue_series-grid">
+                        <a href="javascript:;">奥迪A6L</a><a href="javascript:;">宝马5系</a>
+                        <a href="javascript:;">奔驰E级</a><a href="javascript:;">凯美瑞</a>
+                        <a href="javascript:;">汉兰达</a><a href="javascript:;">Model Y</a>
+                        <a href="javascript:;">迈腾</a><a href="javascript:;">CR-V</a>
+                        <a href="javascript:;">卡罗拉</a><a href="javascript:;">哈弗H6</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_two-btn">
+                    <a href="javascript:;" class="hou_ya_yue_primary">我要卖车</a>
+                    <a href="javascript:;" class="hou_ya_yue_dark">爱车估价</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 之家车友会 ---------- -->
+    <div class="hou_ya_yue_card" id="op-club">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>之家车友会</h3>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多车友会 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_vgrid">
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/club_audi_a6l.jpg" alt="奥迪A6L车友会">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>奥迪A6L车友会 秋季滨海自驾</h5>
+                        <p><img src="image/club_user_haozi.jpg" alt="好滋滋">好滋滋</p>
+                    </div>
+                </a>
+            </div>
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/club_paoshan.jpg" alt="跑山活动">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>周末跑山 感受弯道乐趣</h5>
+                        <p><img src="image/club_user_yan.jpg" alt="燕儿">燕儿</p>
+                    </div>
+                </a>
+            </div>
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/club_longji_moto.jpg" alt="机车车友会">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>机车车友会 沿海公路巡游</h5>
+                        <p><img src="image/club_user_haozi.jpg" alt="风行者">风行者</p>
+                    </div>
+                </a>
+            </div>
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/video_daxinganling_qiujing.jpg" alt="自驾游">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>千里自驾 打卡大兴安岭秋色</h5>
+                        <p><img src="image/club_user_yan.jpg" alt="野行">野行</p>
+                    </div>
+                </a>
+            </div>
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/zj_video_daxinganling.jpg" alt="露营">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>露营季 车友们齐聚星空下</h5>
+                        <p><img src="image/club_user_haozi.jpg" alt="老张">老张</p>
+                    </div>
+                </a>
+            </div>
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/carlib_lotus_for_me.jpg" alt="性能车聚会">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>性能车聚会 赛道日体验</h5>
+                        <p><img src="image/club_user_yan.jpg" alt="小明">小明</p>
+                    </div>
+                </a>
+            </div>
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/focus_video_1.png" alt="新能源车主">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>新能源车主交流 充电攻略分享</h5>
+                        <p><img src="image/club_user_haozi.jpg" alt="大连老李">大连老李</p>
+                    </div>
+                </a>
+            </div>
+            <div class="hou_ya_yue_club-photo">
+                <a href="javascript:;">
+                    <img src="image/focus_video_2.png" alt="亲子活动">
+                    <div class="hou_ya_yue_cmask">
+                        <h5>亲子嘉年华 全家一起出发</h5>
+                        <p><img src="image/club_user_yan.jpg" alt="宝妈">宝妈</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="hou_ya_yue_act-grid">
+            <a href="javascript:;">
+                <img src="image/kb_aion_i60.png" alt="周末自驾">
+                <div class="hou_ya_yue_at"><h5><a href="javascript:;">周末自驾金石滩，报名进行中</a></h5><p>10月30日 · 已报名86人</p></div>
+            </a>
+            <a href="javascript:;">
+                <img src="image/video_jiayue_07.png" alt="新车体验">
+                <div class="hou_ya_yue_at"><h5><a href="javascript:;">家越07 新车品鉴会大连站</a></h5><p>11月2日 · 已报名42人</p></div>
+            </a>
+            <a href="javascript:;">
+                <img src="image/autovideo_jietu_ziyouzhe7.png" alt="越野体验">
+                <div class="hou_ya_yue_at"><h5><a href="javascript:;">捷途自由者7 越野体验营</a></h5><p>11月8日 · 已报名63人</p></div>
+            </a>
+            <a href="javascript:;">
+                <img src="image/autovideo_seagull.png" alt="城市探店">
+                <div class="hou_ya_yue_at"><h5><a href="javascript:;">海鸥城市穿梭挑战 大连站</a></h5><p>11月15日 · 已报名97人</p></div>
+            </a>
+        </div>
+    </div>
+
+    <!-- ---------- 汽车金融 ---------- -->
+    <div class="hou_ya_yue_card" id="op-finance">
+        <div class="hou_ya_yue_sec-hd">
+            <h3>汽车金融</h3>
+            <div class="hou_ya_yue_r"><a href="javascript:;">更多金融产品 &gt;</a></div>
+        </div>
+        <div class="hou_ya_yue_two-col">
+            <div class="hou_ya_yue_fin-grid">
+                <div class="hou_ya_yue_fin-item">
+                    <img src="image/carlib_xiaomi_su7_chixia.jpg" alt="小米SU7">
+                    <div class="hou_ya_yue_fi">
+                        <strong>小米SU7</strong>
+                        <div class="hou_ya_yue_frow">
+                            <div><em>11.6<i>万</i></em><span>首付</span></div>
+                            <div><em>9892<i>元</i></em><span>月供</span></div>
+                            <div><em>12<i>期</i></em><span>期数</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_fin-item">
+                    <img src="image/kb_camry.png" alt="凯美瑞">
+                    <div class="hou_ya_yue_fi">
+                        <strong>凯美瑞</strong>
+                        <div class="hou_ya_yue_frow">
+                            <div><em>4.5<i>万</i></em><span>首付</span></div>
+                            <div><em>3280<i>元</i></em><span>月供</span></div>
+                            <div><em>36<i>期</i></em><span>期数</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_fin-item">
+                    <img src="image/kb_rav4.png" alt="RAV4荣放">
+                    <div class="hou_ya_yue_fi">
+                        <strong>RAV4荣放</strong>
+                        <div class="hou_ya_yue_frow">
+                            <div><em>5.2<i>万</i></em><span>首付</span></div>
+                            <div><em>3760<i>元</i></em><span>月供</span></div>
+                            <div><em>36<i>期</i></em><span>期数</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_fin-item">
+                    <img src="image/model_audi_a5l.png" alt="奥迪A5L">
+                    <div class="hou_ya_yue_fi">
+                        <strong>奥迪A5L</strong>
+                        <div class="hou_ya_yue_frow">
+                            <div><em>8.9<i>万</i></em><span>首付</span></div>
+                            <div><em>6180<i>元</i></em><span>月供</span></div>
+                            <div><em>48<i>期</i></em><span>期数</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_fin-item">
+                    <img src="image/kb_mg4.png" alt="MG4">
+                    <div class="hou_ya_yue_fi">
+                        <strong>MG4</strong>
+                        <div class="hou_ya_yue_frow">
+                            <div><em>2.8<i>万</i></em><span>首付</span></div>
+                            <div><em>1980<i>元</i></em><span>月供</span></div>
+                            <div><em>24<i>期</i></em><span>期数</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_fin-item">
+                    <img src="image/kb_mg07.png" alt="MG 07">
+                    <div class="hou_ya_yue_fi">
+                        <strong>MG 07</strong>
+                        <div class="hou_ya_yue_frow">
+                            <div><em>4.2<i>万</i></em><span>首付</span></div>
+                            <div><em>2950<i>元</i></em><span>月供</span></div>
+                            <div><em>36<i>期</i></em><span>期数</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_side-col">
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">热门品牌<span class="hou_ya_yue_r"><a href="javascript:;">查看更多品牌 &gt;</a></span></div>
+                    <div class="hou_ya_yue_brand-grid">
+                        <a href="javascript:;"><i>特斯拉</i>特斯拉</a><a href="javascript:;"><i>比亚迪</i>比亚迪</a>
+                        <a href="javascript:;"><i>小米</i>小米汽车</a><a href="javascript:;"><i>奥迪</i>奥迪</a>
+                        <a href="javascript:;"><i>奔驰</i>奔驰</a><a href="javascript:;"><i>红旗</i>红旗</a>
+                        <a href="javascript:;"><i>理想</i>理想汽车</a><a href="javascript:;"><i>丰田</i>丰田</a>
+                        <a href="javascript:;"><i>五菱</i>五菱汽车</a><a href="javascript:;"><i>本田</i>本田</a>
+                        <a href="javascript:;"><i>大众</i>大众</a><a href="javascript:;"><i>别克</i>别克</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">按车价</div>
+                    <div class="hou_ya_yue_price-grid">
+                        <a href="javascript:;">8万以下</a><a href="javascript:;">8-10万</a><a href="javascript:;">10-15万</a>
+                        <a href="javascript:;">15-20万</a><a href="javascript:;">20-30万</a><a href="javascript:;">更多</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_brand-box">
+                    <div class="hou_ya_yue_hd">按贷款特色</div>
+                    <div class="hou_ya_yue_price-grid">
+                        <a href="javascript:;">贴息</a><a href="javascript:;">低首付</a><a href="javascript:;">低月供</a>
+                        <a href="javascript:;">快速审批</a><a href="javascript:;">更多</a>
+                    </div>
+                </div>
+                <div class="hou_ya_yue_two-btn">
+                    <a href="javascript:;" class="hou_ya_yue_primary">微贷计算器</a>
+                    <a href="javascript:;" class="hou_ya_yue_dark">申请贷款</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------- 底部四榜 ---------- -->
+    <div class="hou_ya_yue_rank4">
+        <div class="hou_ya_yue_rk-col">
+            <div class="hou_ya_yue_hd">新能源-销量榜<span class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></span></div>
+            <ul>
+                <li><span class="hou_ya_yue_no">1</span><img src="image/kb_model_y.png" alt="Model Y"><span class="hou_ya_yue_txt"><a href="javascript:;">Model Y</a></span><span class="hou_ya_yue_val">51,106辆</span></li>
+                <li><span class="hou_ya_yue_no">2</span><img src="image/kb_xingyuan.png" alt="星愿"><span class="hou_ya_yue_txt"><a href="javascript:;">星愿</a></span><span class="hou_ya_yue_val">40,216辆</span></li>
+                <li><span class="hou_ya_yue_no">3</span><img src="image/kb_song_ultra.png" alt="宋Ultra"><span class="hou_ya_yue_txt"><a href="javascript:;">宋Ultra</a></span><span class="hou_ya_yue_val">38,742辆</span></li>
+                <li><span class="hou_ya_yue_no">4</span><img src="image/kb_qiyuan_q06.png" alt="启源Q06"><span class="hou_ya_yue_txt"><a href="javascript:;">启源Q06</a></span><span class="hou_ya_yue_val">23,109辆</span></li>
+                <li><span class="hou_ya_yue_no">5</span><img src="image/kb_mg07.png" alt="MG 07"><span class="hou_ya_yue_txt"><a href="javascript:;">MG 07</a></span><span class="hou_ya_yue_val">21,845辆</span></li>
+                <li><span class="hou_ya_yue_no">6</span><img src="image/kb_idaura_t6.png" alt="ID.AURA T6"><span class="hou_ya_yue_txt"><a href="javascript:;">ID.AURA T6</a></span><span class="hou_ya_yue_val">20,376辆</span></li>
+                <li><span class="hou_ya_yue_no">7</span><img src="image/kb_mg4.png" alt="MG4"><span class="hou_ya_yue_txt"><a href="javascript:;">MG4</a></span><span class="hou_ya_yue_val">18,530辆</span></li>
+                <li><span class="hou_ya_yue_no">8</span><img src="image/kb_ioniq_v.png" alt="艾尼氪V"><span class="hou_ya_yue_txt"><a href="javascript:;">艾尼氪V</a></span><span class="hou_ya_yue_val">16,204辆</span></li>
+                <li><span class="hou_ya_yue_no">9</span><img src="image/kb_aion_i60.png" alt="AION i60"><span class="hou_ya_yue_txt"><a href="javascript:;">AION i60</a></span><span class="hou_ya_yue_val">14,983辆</span></li>
+                <li><span class="hou_ya_yue_no">10</span><img src="image/kb_lantu_zhiyin.png" alt="岚图知音"><span class="hou_ya_yue_txt"><a href="javascript:;">岚图知音</a></span><span class="hou_ya_yue_val">13,675辆</span></li>
+            </ul>
+            <div class="hou_ya_yue_note">统计周期：2026年09月</div>
+        </div>
+        <div class="hou_ya_yue_rk-col">
+            <div class="hou_ya_yue_hd">新能源-电耗榜<span class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></span></div>
+            <ul>
+                <li><span class="hou_ya_yue_no">1</span><img src="image/kb_xingyuan.png" alt="星愿"><span class="hou_ya_yue_txt"><a href="javascript:;">星愿</a></span><span class="hou_ya_yue_val">10.2度</span></li>
+                <li><span class="hou_ya_yue_no">2</span><img src="image/kb_mg4.png" alt="MG4"><span class="hou_ya_yue_txt"><a href="javascript:;">MG4</a></span><span class="hou_ya_yue_val">11.1度</span></li>
+                <li><span class="hou_ya_yue_no">3</span><img src="image/kb_model_y.png" alt="Model Y"><span class="hou_ya_yue_txt"><a href="javascript:;">Model Y</a></span><span class="hou_ya_yue_val">12.4度</span></li>
+                <li><span class="hou_ya_yue_no">4</span><img src="image/kb_idaura_t6.png" alt="ID.AURA T6"><span class="hou_ya_yue_txt"><a href="javascript:;">ID.AURA T6</a></span><span class="hou_ya_yue_val">13.0度</span></li>
+                <li><span class="hou_ya_yue_no">5</span><img src="image/kb_ioniq_v.png" alt="艾尼氪V"><span class="hou_ya_yue_txt"><a href="javascript:;">艾尼氪V</a></span><span class="hou_ya_yue_val">13.3度</span></li>
+                <li><span class="hou_ya_yue_no">6</span><img src="image/kb_aion_i60.png" alt="AION i60"><span class="hou_ya_yue_txt"><a href="javascript:;">AION i60</a></span><span class="hou_ya_yue_val">13.8度</span></li>
+                <li><span class="hou_ya_yue_no">7</span><img src="image/kb_qiyuan_q06.png" alt="启源Q06"><span class="hou_ya_yue_txt"><a href="javascript:;">启源Q06</a></span><span class="hou_ya_yue_val">14.1度</span></li>
+                <li><span class="hou_ya_yue_no">8</span><img src="image/kb_lantu_zhiyin.png" alt="岚图知音"><span class="hou_ya_yue_txt"><a href="javascript:;">岚图知音</a></span><span class="hou_ya_yue_val">14.6度</span></li>
+                <li><span class="hou_ya_yue_no">9</span><img src="image/kb_mg07.png" alt="MG 07"><span class="hou_ya_yue_txt"><a href="javascript:;">MG 07</a></span><span class="hou_ya_yue_val">15.0度</span></li>
+                <li><span class="hou_ya_yue_no">10</span><img src="image/kb_song_ultra.png" alt="宋Ultra"><span class="hou_ya_yue_txt"><a href="javascript:;">宋Ultra</a></span><span class="hou_ya_yue_val">15.4度</span></li>
+            </ul>
+            <div class="hou_ya_yue_note">百公里电耗（实测）</div>
+        </div>
+        <div class="hou_ya_yue_rk-col">
+            <div class="hou_ya_yue_hd">新能源-续航榜<span class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></span></div>
+            <ul>
+                <li><span class="hou_ya_yue_no">1</span><img src="image/kb_idera_8x.png" alt="ID.ERA 8X"><span class="hou_ya_yue_txt"><a href="javascript:;">ID.ERA 8X</a></span><span class="hou_ya_yue_val">802km</span></li>
+                <li><span class="hou_ya_yue_no">2</span><img src="image/kb_lantu_zhuiguangs.png" alt="岚图追光S"><span class="hou_ya_yue_txt"><a href="javascript:;">岚图追光S</a></span><span class="hou_ya_yue_val">760km</span></li>
+                <li><span class="hou_ya_yue_no">3</span><img src="image/kb_model_y.png" alt="Model Y"><span class="hou_ya_yue_txt"><a href="javascript:;">Model Y</a></span><span class="hou_ya_yue_val">719km</span></li>
+                <li><span class="hou_ya_yue_no">4</span><img src="image/kb_idaura_t6.png" alt="ID.AURA T6"><span class="hou_ya_yue_txt"><a href="javascript:;">ID.AURA T6</a></span><span class="hou_ya_yue_val">660km</span></li>
+                <li><span class="hou_ya_yue_no">5</span><img src="image/kb_yinhe_zhanjian700.png" alt="银河战舰700"><span class="hou_ya_yue_txt"><a href="javascript:;">银河战舰700</a></span><span class="hou_ya_yue_val">650km</span></li>
+                <li><span class="hou_ya_yue_no">6</span><img src="image/kb_ioniq_v.png" alt="艾尼氪V"><span class="hou_ya_yue_txt"><a href="javascript:;">艾尼氪V</a></span><span class="hou_ya_yue_val">632km</span></li>
+                <li><span class="hou_ya_yue_no">7</span><img src="image/kb_aion_i60.png" alt="AION i60"><span class="hou_ya_yue_txt"><a href="javascript:;">AION i60</a></span><span class="hou_ya_yue_val">610km</span></li>
+                <li><span class="hou_ya_yue_no">8</span><img src="image/kb_mg07.png" alt="MG 07"><span class="hou_ya_yue_txt"><a href="javascript:;">MG 07</a></span><span class="hou_ya_yue_val">610km</span></li>
+                <li><span class="hou_ya_yue_no">9</span><img src="image/kb_lantu_zhiyin.png" alt="岚图知音"><span class="hou_ya_yue_txt"><a href="javascript:;">岚图知音</a></span><span class="hou_ya_yue_val">590km</span></li>
+                <li><span class="hou_ya_yue_no">10</span><img src="image/kb_mg4.png" alt="MG4"><span class="hou_ya_yue_txt"><a href="javascript:;">MG4</a></span><span class="hou_ya_yue_val">537km</span></li>
+            </ul>
+            <div class="hou_ya_yue_note">CLTC 续航里程</div>
+        </div>
+        <div class="hou_ya_yue_rk-col">
+            <div class="hou_ya_yue_hd">保值榜<span class="hou_ya_yue_r"><a href="javascript:;">更多 &gt;</a></span></div>
+            <ul>
+                <li><span class="hou_ya_yue_no">1</span><img src="image/kb_camry.png" alt="凯美瑞"><span class="hou_ya_yue_txt"><a href="javascript:;">凯美瑞</a></span><span class="hou_ya_yue_val">78.2%</span></li>
+                <li><span class="hou_ya_yue_no">2</span><img src="image/kb_rav4.png" alt="RAV4荣放"><span class="hou_ya_yue_txt"><a href="javascript:;">RAV4荣放</a></span><span class="hou_ya_yue_val">76.9%</span></li>
+                <li><span class="hou_ya_yue_no">3</span><img src="image/kb_huajing_s.png" alt="汉兰达"><span class="hou_ya_yue_txt"><a href="javascript:;">汉兰达</a></span><span class="hou_ya_yue_val">75.4%</span></li>
+                <li><span class="hou_ya_yue_no">4</span><img src="image/kb_model_y.png" alt="Model Y"><span class="hou_ya_yue_txt"><a href="javascript:;">Model Y</a></span><span class="hou_ya_yue_val">73.8%</span></li>
+                <li><span class="hou_ya_yue_no">5</span><img src="image/kb_ti7.png" alt="钛7"><span class="hou_ya_yue_txt"><a href="javascript:;">钛7</a></span><span class="hou_ya_yue_val">72.5%</span></li>
+                <li><span class="hou_ya_yue_no">6</span><img src="image/kb_camry.png" alt="雅阁"><span class="hou_ya_yue_txt"><a href="javascript:;">雅阁</a></span><span class="hou_ya_yue_val">71.9%</span></li>
+                <li><span class="hou_ya_yue_no">7</span><img src="image/kb_greatwall_h10.png" alt="长城H10"><span class="hou_ya_yue_txt"><a href="javascript:;">长城H10</a></span><span class="hou_ya_yue_val">70.3%</span></li>
+                <li><span class="hou_ya_yue_no">8</span><img src="image/kb_datang.png" alt="唐"><span class="hou_ya_yue_txt"><a href="javascript:;">唐</a></span><span class="hou_ya_yue_val">69.7%</span></li>
+                <li><span class="hou_ya_yue_no">9</span><img src="image/kb_rav4.png" alt="CR-V"><span class="hou_ya_yue_txt"><a href="javascript:;">CR-V</a></span><span class="hou_ya_yue_val">69.1%</span></li>
+                <li><span class="hou_ya_yue_no">10</span><img src="image/kb_qiyuan_q05.png" alt="启源Q05"><span class="hou_ya_yue_txt"><a href="javascript:;">启源Q05</a></span><span class="hou_ya_yue_val">68.4%</span></li>
+            </ul>
+            <div class="hou_ya_yue_note">三年保值率</div>
+        </div>
+    </div>
+
+</div><!-- end .hou_ya_yue_w -->
+</div><!-- end .hou_ya_yue_main -->
+
+<!-- ==================== 页脚 ==================== -->
+<div class="hou_ya_yue_footer">
+    <div class="hou_ya_yue_w">
+        <div class="hou_ya_yue_card">
+            <div class="hou_ya_yue_fnav">
+                <a href="javascript:;">关于我们</a>|
+                <a href="javascript:;">联系我们</a>|
+                <a href="javascript:;">联系方式</a>|
+                <a href="javascript:;">加入我们</a>|
+                <a href="javascript:;">意见反馈</a>|
+                <a href="javascript:;">版权声明</a>|
+                <a href="javascript:;">隐私声明</a>|
+                <a href="javascript:;">网站地图</a>|
+                <a href="javascript:;">帮助中心</a>|
+                <a href="javascript:;">经销商合作</a>
+            </div>
+            <div class="hou_ya_yue_copy">
+                <p>Copyright &copy; 2026 汽车之家 autohome.com.cn. All Rights Reserved.</p>
+                <p>本页面为《高级网页设计》课程练习作品，数据均为示例，与汽车之家官方无关。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 悬浮入口 ==================== -->
+<div class="hou_ya_yue_float">
+    <div class="hou_ya_yue_float-menu">
+        <a href="javascript:;" class="hou_ya_yue_on">今日焦点</a>
+        <a href="#op-recommend">之家精选</a>
+        <a href="#op-live">之家直播</a>
+        <a href="#op-video">汽车视频</a>
+        <a href="#op-news">热门文章</a>
+        <a href="#op-bbs">论坛精选</a>
+        <a href="#op-library">车型库</a>
+        <a href="#op-koubei">车主口碑</a>
+        <a href="#op-local">本地优惠</a>
+        <a href="#op-subsidy">超级补贴</a>
+        <a href="#op-used">二手车</a>
+        <a href="#op-club">车友会</a>
+        <a href="#op-finance">汽车金融</a>
+    </div>
+    <img src="image/autohome_app_logo.png" alt="个人中心" class="hou_ya_yue_avatar">
+</div>
+<div class="hou_ya_yue_backtop" id="hou_ya_yue_backtop">顶部</div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* 通用 Tab 切换 */
+    function bindTabs(id) {
+        var box = document.getElementById(id);
+        if (!box) { return; }
+        box.addEventListener('click', function (e) {
+            var t = e.target;
+            if (t.tagName !== 'SPAN') { return; }
+            var items = box.getElementsByTagName('span');
+            for (var i = 0; i < items.length; i++) { items[i].className = ''; }
+            t.className = 'hou_ya_yue_on';
+        });
+    }
+    var tabIds = ['hou_ya_yue_priceTabs', 'hou_ya_yue_rankTabs', 'hou_ya_yue_zjTabs',
+        'hou_ya_yue_videoTabs', 'hou_ya_yue_newsTabs', 'hou_ya_yue_bbsTabs',
+        'hou_ya_yue_libTabs', 'hou_ya_yue_kbTabs', 'hou_ya_yue_saleTabs',
+        'hou_ya_yue_cityTabs', 'hou_ya_yue_usedTabs'];
+    for (var i = 0; i < tabIds.length; i++) { bindTabs(tabIds[i]); }
+
+    /* 焦点图轮播 */
+    var slides = document.querySelectorAll('#hou_ya_yue_focusPic .hou_ya_yue_slide');
+    var dots = document.querySelectorAll('#hou_ya_yue_dots i');
+    var idx = 0;
+    function show(n) {
+        for (var i = 0; i < slides.length; i++) { slides[i].className = 'hou_ya_yue_slide'; }
+        for (var j = 0; j < dots.length; j++) { dots[j].className = ''; }
+        slides[n].className = 'hou_ya_yue_slide hou_ya_yue_on';
+        dots[n].className = 'hou_ya_yue_on';
+        idx = n;
+    }
+    if (slides.length) {
+        setInterval(function () { show((idx + 1) % slides.length); }, 4000);
+        for (var d = 0; d < dots.length; d++) {
+            (function (n) {
+                dots[n].addEventListener('click', function () { show(n); });
+            })(d);
+        }
+    }
+
+    /* 车型库指示点 */
+    var libDots = document.querySelectorAll('.hou_ya_yue_lib-dots i');
+    for (var l = 0; l < libDots.length; l++) {
+        (function (n) {
+            libDots[n].addEventListener('click', function () {
+                for (var k = 0; k < libDots.length; k++) { libDots[k].className = ''; }
+                libDots[n].className = 'hou_ya_yue_on';
+            });
+        })(l);
+    }
+
+    /* 口碑左右翻页（示例：提示） */
+    var prev = document.getElementById('hou_ya_yue_kbPrev');
+    var next = document.getElementById('hou_ya_yue_kbNext');
+    if (prev) { prev.addEventListener('click', function () { alert('上一组口碑车型'); }); }
+    if (next) { next.addEventListener('click', function () { alert('下一组口碑车型'); }); }
+
+    /* 搜索 */
+    var btn = document.getElementById('hou_ya_yue_searchBtn');
+    if (btn) {
+        btn.addEventListener('click', function () {
+            var kw = document.getElementById('hou_ya_yue_keyword').value;
+            alert(kw ? '搜索：' + kw : '请输入搜索关键词');
+        });
+    }
+
+    /* 找车 */
+    var btnFind = document.getElementById('hou_ya_yue_btnFind');
+    if (btnFind) {
+        btnFind.addEventListener('click', function () {
+            var brand = document.getElementById('hou_ya_yue_selBrand').value;
+            alert('找车条件：' + brand);
+        });
+    }
+
+    /* 新车/二手车 单选 */
+    var radios = document.querySelectorAll('#hou_ya_yue_radio b');
+    for (var r = 0; r < radios.length; r++) {
+        radios[r].addEventListener('click', function () {
+            for (var k = 0; k < radios.length; k++) { radios[k].className = ''; }
+            this.className = 'hou_ya_yue_on';
+        });
+    }
+
+    /* 切换城市 */
+    var city = document.getElementById('hou_ya_yue_city');
+    if (city) {
+        city.addEventListener('click', function () {
+            var v = prompt('请输入城市', '大连');
+            if (v) {
+                this.innerHTML = v;
+                var lc = document.getElementById('hou_ya_yue_localCity');
+                var uc = document.getElementById('hou_ya_yue_usedCity');
+                if (lc) { lc.innerHTML = v + ' &#9662;'; }
+                if (uc) { uc.innerHTML = v; }
+            }
+        });
+    }
+
+    /* 返回顶部 */
+    var top = document.getElementById('hou_ya_yue_backtop');
+    if (top) {
+        top.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+})();
+</script>
+</body>
+</html>
