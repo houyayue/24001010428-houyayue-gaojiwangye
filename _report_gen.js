@@ -246,9 +246,27 @@ children.push(new Paragraph({ children: [new PageBreak()] }));
 
 // ===== 二、项目总结 =====
 children.push(h1('二、项目总结'));
-children.push(p('通过本次网页元素设计实验，我系统地实践了“看设计图 → 测量 → 写结构 → 写样式 → 多端验证”的完整流程。收获主要有三点：一是养成了先测量后编码的习惯，先用截图工具量出导航条高度、搜索框尺寸、主色调（#3d7eff、#ff6600、#f5f6f7 等）再动手，返工次数明显减少；二是加深了对 flex 布局的理解，一左一右用“固定宽 + flex:1”、上图下文用“flex-wrap + nth-child 清除右边距”，都能用很少的代码稳定实现；三是体会到公共 CSS 与命名规范的价值，全站统一 hou_ya_yue_ 前缀和公共样式后，三个元素乃至整个大连站首页的样式复用非常顺畅。'));
-children.push(p('教训方面：最初在卡片列表上直接写固定 margin-right，换行后最后一列出现多余空白，后改用 nth-child(3n) 清除右边距解决；另外固定 104px 的竖导航在长词条“超级补贴”处曾出现换行，通过压缩内边距并加 white-space: nowrap 修复。这也提醒我布局要考虑极端内容长度。'));
-children.push(p('AI 使用说明：本次实验使用了 CodeBuddy IDE（内置 auto 大模型）辅助开发。AI 的具体用法包括：① 根据设计图截图协助分析布局结构与测量尺寸；② 生成全局 CSS 骨架与 flex 布局初始代码；③ 批量检查代码规范（类名前缀、是否误用 id 选择器/float/表格）并自动修正；④ 使用无头浏览器对页面进行多视口截图辅助测试。所有核心代码均由本人逐行核对、调整并验证最终显示效果，理解每一行代码的作用。', { after: 240 }));
+children.push(h2('1. 所得'));
+children.push(p('本次实验完整实践了“看设计图 → 测量尺寸配色 → 规划 HTML 结构 → 写公共 CSS → 写模块选择器 → 多浏览器多视口验证”的网页制作流程，主要收获有四点：'));
+children.push(bullet('养成先测量后编码的习惯：先量出导航 64px、搜索框 480×40px、左图 560×336px、卡片 356×200px，再提取主色 #3d7eff、橙 #ff6600、底色 #f5f6f7，写样式时心里有数，返工明显减少；'));
+children.push(bullet('掌握 flex 常见套路：一左一右用“固定宽 + flex:1”，上图下文用“flex-wrap + nth-child 清除末列右边距”，导航用“flex 纵向 + align-items 居中”，比浮动更直观稳定；'));
+children.push(bullet('掌握定位与浮层：照片左下角标题用 position:absolute + linear-gradient 遮罩实现，侧栏 position:fixed 后主内容必须 margin-left 让出 104px，否则被遮挡；'));
+children.push(bullet('认识到公共 CSS 与命名规范的价值：统一 hou_ya_yue_ 前缀与公共样式后，各类卡片可互相复用，改一处全站生效，并按指导书全程使用 class、不用 id 选择器与表格布局。'));
+
+children.push(h2('2. 教训'));
+children.push(bullet('多行卡片统一写 margin-right 导致末列留白、整行不齐，需用 nth-child(3n)/nth-child(4n) 清零；'));
+children.push(bullet('flex 子项默认 min-width:auto，长标题会撑破容器，需设 min-width:0 并配合 overflow:hidden、white-space:nowrap、text-overflow:ellipsis 做省略号；'));
+children.push(bullet('按钮颜色被 a:hover 覆盖时，不应滥用 !important，而应用 a.xxx 提高选择器特异性来自然覆盖；'));
+children.push(bullet('固定 104px 竖导航遇“超级补贴”这类长词条会折行，需压缩内边距并加 white-space:nowrap，布局要预先考虑极端内容长度；'));
+children.push(bullet('1160px 固定宽在 768px 窄视口出现横向滚动条，虽与官网一致，但说明响应式设计仍有必要；图片引用必须严格核对本地文件名，否则会出现裂图。'));
+
+children.push(h2('3. 项目实施心得'));
+children.push(p('网页制作不是把元素堆上去，而是“先结构、再复用、后细节”。这次先划分模块（导航 / 一左一右 / 上图下文），再抽公共样式，最后才处理圆角、渐变与角标等细节，效率远高于一上手就写样式。同时体会到规范比技巧更重要：统一的命名前缀、公共样式、间距与配色，让几十个模块保持一致、便于修改；多浏览器多视口测试也不可省略，能发现静态检查发现不了的问题。'));
+children.push(p('合理使用 AI 能显著提升效率，但前提是自己能看懂并判断它给出的代码。我把 AI 当作“测量助手 + 代码草稿生成器 + 规范检查工具”而非替代品，每段代码都逐行核对、按需修改并在浏览器中验证效果。'));
+
+children.push(h2('4. AI 使用说明（按要求声明）'));
+children.push(p('本次实验使用 CodeBuddy IDE 内置大模型（auto）辅助开发，用途为：① 分析设计截图、判读模块结构并协助测量尺寸与提取主色（本人复核）；② 生成全局 CSS 骨架与 flex 布局初始代码（本人调整命名、补充语义化标签并逐行核对）；③ 批量规范检查与修正（id 选择器、float、表格布局、多余 !important 等）；④ 使用无头浏览器（Edge --headless）在 1920/1360/768px 三种视口批量截图并裁切效果图；⑤ 协助报告结构与排版。'));
+children.push(p('声明：所有核心 HTML/CSS 代码均由本人理解、修改并最终确认，显示效果由本人在浏览器中逐一验证，AI 仅起辅助与提效作用。', { after: 240 }));
 children.push(p('报告与源码提交文件名：学号-侯雅月（请按实际学号重命名）。', { color: '888888' }));
 
 // ---------- 组装文档 ----------
@@ -295,6 +313,12 @@ const doc = new Document({
 });
 
 Packer.toBuffer(doc).then(function (buffer) {
-  fs.writeFileSync('D:/24001010428-侯雅月-网页元素设计项目报告.docx', buffer);
+  fs.writeFileSync(BASE + '_report_out.docx', buffer);
+  try {
+    fs.copyFileSync(BASE + '_report_out.docx', 'D:/24001010428-侯雅月-网页元素设计项目报告.docx');
+    console.log('report written to D:/');
+  } catch (e) {
+    console.log('D:/ file is locked, kept at workspace: _report_out.docx');
+  }
   console.log('report written');
 });

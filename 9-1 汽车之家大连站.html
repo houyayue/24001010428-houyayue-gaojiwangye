@@ -57,7 +57,7 @@
         }
         body {
             font: 14px/1.6 "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
-            color: #222; background: #f5f6f7; min-width: 1360px;
+            color: #222; background: #f5f6f7; min-width: 320px;
         }
         ul, li { list-style: none; }
         a { color: #222; text-decoration: none; }
@@ -778,6 +778,101 @@
         .hou_ya_yue_fnav a:hover { color: var(--hou_ya_yue_blue); }
         .hou_ya_yue_copy { text-align: center; font-size: 12px; color: #aaa; line-height: 22px; }
         .hou_ya_yue_copy a { color: #aaa; }
+
+        /* ===== 24. 多视口自适应（响应式宽度） ===== */
+        /* 内容容器流体化：上限 1160px，视口变窄自动收缩，不再出现横向滚动条 */
+        .hou_ya_yue_w { width: calc(100% - 32px); max-width: 1160px; }
+        /* 单行卡片组允许换行，窄屏自动减少列数 */
+        .hou_ya_yue_promos, .hou_ya_yue_kb-grid, .hou_ya_yue_lib-grid,
+        .hou_ya_yue_club-grid, .hou_ya_yue_dealer-strip { flex-wrap: wrap; }
+        /* 允许弹性容器收缩到内容宽度以下，避免窄屏撑破布局 */
+        .hou_ya_yue_car-cells, .hou_ya_yue_tabs, .hou_ya_yue_side-col,
+        .hou_ya_yue_rank4 .hou_ya_yue_rk-col { min-width: 0; }
+        .hou_ya_yue_car-cells, .hou_ya_yue_tabs, .hou_ya_yue_car-strip { flex-wrap: wrap; row-gap: 4px; }
+        .hou_ya_yue_car-strip { row-gap: 6px; }
+        /* 固定宽模块不超过容器宽度 */
+        .hou_ya_yue_find-card, .hou_ya_yue_rank-card, .hou_ya_yue_left,
+        .hou_ya_yue_side-col, .hou_ya_yue_local-left, .hou_ya_yue_sub-grid,
+        .hou_ya_yue_used-grid, .hou_ya_yue_fin-grid, .hou_ya_yue_vcard,
+        .hou_ya_yue_vcard.hou_ya_yue_v3, .hou_ya_yue_ncard, .hou_ya_yue_club-photo,
+        .hou_ya_yue_bargain, .hou_ya_yue_used-item, .hou_ya_yue_sub-item,
+        .hou_ya_yue_fin-item, .hou_ya_yue_kb-item { max-width: 100%; }
+
+        /* ===== ≤1280px：搜索框与通栏随视口收缩 ===== */
+        @media (max-width: 1280px) {
+            .hou_ya_yue_hdr-search { width: 360px; margin-left: 28px; }
+        }
+
+        /* ===== ≤1300px：两栏结构改为上下堆叠，焦点图自适应 ===== */
+        @media (max-width: 1300px) {
+            .hou_ya_yue_two-col, .hou_ya_yue_find-wrap, .hou_ya_yue_focus-body { flex-wrap: wrap; }
+            .hou_ya_yue_two-col .hou_ya_yue_left,
+            .hou_ya_yue_local-left { width: 100%; }
+            .hou_ya_yue_side-col { width: 100%; margin-left: 0; margin-top: 14px; }
+            .hou_ya_yue_side-col .hou_ya_yue_vcard { width: 320px; margin: 0 20px 14px 0; }
+            .hou_ya_yue_find-card { width: 100%; }
+            .hou_ya_yue_rank-card { width: 100%; margin-left: 0; margin-top: 14px; }
+            .hou_ya_yue_focus-pic { width: 100%; flex-shrink: 1; }
+            .hou_ya_yue_focus-pic img { width: 100%; }
+            .hou_ya_yue_focus-txt { flex: 1 1 100%; margin-left: 0; margin-top: 12px; }
+        }
+
+        /* ===== ≤900px：隐藏左侧导航，让出全宽；标题栏可换行 ===== */
+        @media (max-width: 900px) {
+            .hou_ya_yue_aside { display: none; }
+            .hou_ya_yue_main, .hou_ya_yue_header, .hou_ya_yue_footer { margin-left: 0; }
+            .hou_ya_yue_sec-hd { flex-wrap: wrap; }
+            .hou_ya_yue_tabs { flex-wrap: wrap; row-gap: 4px; margin-left: 12px; }
+            .hou_ya_yue_hdr-search { width: auto; flex: 1; min-width: 160px; margin-left: 16px; }
+            .hou_ya_yue_find-bar { flex-wrap: wrap; row-gap: 8px; }
+            .hou_ya_yue_cats { flex-wrap: wrap; row-gap: 8px; }
+            .hou_ya_yue_dealer-strip a { flex: 1 1 44%; }
+            .hou_ya_yue_rank4 { flex-wrap: wrap; }
+            .hou_ya_yue_rank4 .hou_ya_yue_rk-col { flex: 1 1 calc(50% - 14px); margin-bottom: 14px; }
+        }
+
+        /* ===== ≤768px：卡片单列，图片满宽 ===== */
+        @media (max-width: 768px) {
+            .hou_ya_yue_hdr-right .hou_ya_yue_item { display: none; }
+            .hou_ya_yue_vcard, .hou_ya_yue_vcard.hou_ya_yue_v3, .hou_ya_yue_ncard,
+            .hou_ya_yue_club-photo, .hou_ya_yue_bargain, .hou_ya_yue_used-item,
+            .hou_ya_yue_sub-item, .hou_ya_yue_fin-item, .hou_ya_yue_kb-item,
+            .hou_ya_yue_lib-grid a, .hou_ya_yue_club-grid a {
+                width: 100%; margin-right: 0;
+            }
+            .hou_ya_yue_ncover img, .hou_ya_yue_club-photo img, .hou_ya_yue_club-grid img,
+            .hou_ya_yue_lib-grid img, .hou_ya_yue_used-item img, .hou_ya_yue_sub-item img,
+            .hou_ya_yue_fin-item img, .hou_ya_yue_kb-item img { width: 100%; height: auto; }
+            .hou_ya_yue_promo { width: calc(50% - 10px); }
+            .hou_ya_yue_focus-list a { width: 50%; }
+            .hou_ya_yue_focus-foot { flex-wrap: wrap; }
+            .hou_ya_yue_focus-foot a { width: 50%; margin-bottom: 10px; }
+            .hou_ya_yue_cut-grid { flex-wrap: wrap; }
+            .hou_ya_yue_cut-grid .hou_ya_yue_cut-item { width: 100%; padding-right: 0; }
+            .hou_ya_yue_cats a { width: 25%; }
+            .hou_ya_yue_focus-txt h4 { font-size: 20px; }
+            .hou_ya_yue_sec-hd h3 { font-size: 18px; }
+            .hou_ya_yue_focus-subs, .hou_ya_yue_act-grid { flex-wrap: wrap; }
+            .hou_ya_yue_focus-subs a { margin-right: 12px; }
+            .hou_ya_yue_act-grid > a { width: 100%; margin-bottom: 10px; }
+        }
+
+        /* ===== ≤480px：促销卡与底部信息单列 ===== */
+        @media (max-width: 480px) {
+            .hou_ya_yue_w { width: calc(100% - 20px); }
+            .hou_ya_yue_promo { width: 100%; margin-right: 0; }
+            .hou_ya_yue_focus-foot a { width: 100%; }
+            .hou_ya_yue_focus-list a { width: 100%; }
+            .hou_ya_yue_cats a { width: 25%; font-size: 12px; }
+            .hou_ya_yue_dealer-strip a { flex: 1 1 100%; }
+            .hou_ya_yue_rank4 .hou_ya_yue_rk-col { flex: 1 1 100%; margin-right: 0; }
+            .hou_ya_yue_focus-subs, .hou_ya_yue_act-grid { flex-wrap: wrap; }
+            .hou_ya_yue_focus-subs a { margin-right: 12px; }
+            .hou_ya_yue_act-grid > a { width: 100%; margin-bottom: 10px; }
+            .hou_ya_yue_rk-col { min-width: 0; }
+            .hou_ya_yue_card { padding: 14px 14px; }
+            .hou_ya_yue_bargain img, .hou_ya_yue_cut-grid img { width: 84px; }
+        }
     </style>
 </head>
 <body>
