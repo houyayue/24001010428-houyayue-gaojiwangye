@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-2 JavaScript 对象</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-10-29 14:30:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：JavaScript 对象可视化演示
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 960px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6;
+            border-left: 4px solid #1d5fa6; padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.6; }
+
+        /* ===== 对象可视化区 ===== */
+        .hou_ya_yue_obj-wrap { display: flex; flex-wrap: wrap; gap: 18px; }
+
+        .hou_ya_yue_obj {
+            flex: 1 1 360px; background: #f7fafd; border: 2px dashed #a8c4e0;
+            border-radius: 10px; padding: 22px 14px 12px; position: relative; min-height: 200px;
+        }
+
+        .hou_ya_yue_obj-label {
+            position: absolute; top: -11px; left: 14px; background: #1d5fa6; color: #fff;
+            font-size: 12px; padding: 2px 10px; border-radius: 10px;
+        }
+
+        .hou_ya_yue_kv { display: flex; align-items: center; margin-bottom: 10px; animation: hou_ya_yue_pop .35s ease; }
+
+        .hou_ya_yue_key {
+            background: linear-gradient(180deg, #3d7eff, #2c66e0); color: #fff;
+            border-radius: 8px 0 0 8px; padding: 8px 12px; min-width: 86px;
+            font-size: 13px; font-weight: bold; text-align: center;
+            box-shadow: 0 3px 6px rgba(45, 100, 200, .25); word-break: break-all;
+        }
+
+        .hou_ya_yue_arrow { color: #8aa3bd; font-size: 14px; padding: 0 6px; }
+
+        .hou_ya_yue_val {
+            background: #fff; border: 1px solid #c9d8ea; border-radius: 0 8px 8px 0;
+            padding: 8px 12px; font-size: 13px; flex: 1; min-width: 0;
+            color: #c2505a; font-family: Consolas, monospace; word-break: break-all;
+        }
+
+        .hou_ya_yue_kv.hou_ya_yue_new .hou_ya_yue_key { background: linear-gradient(180deg, #ff8a00, #ff6600); }
+
+        .hou_ya_yue_kv.hou_ya_yue_new .hou_ya_yue_val { border-color: #ffc499; background: #fff7f0; }
+
+        .hou_ya_yue_kv.hou_ya_yue_mark .hou_ya_yue_key { background: linear-gradient(180deg, #34c759, #22ac38); }
+
+        .hou_ya_yue_kv.hou_ya_yue_mark .hou_ya_yue_val { border-color: #9fe0b5; background: #f0fff5; }
+
+        .hou_ya_yue_kv.hou_ya_yue_out { animation: hou_ya_yue_fly .4s ease forwards; }
+
+        .hou_ya_yue_empty-tip { color: #b6c2ce; font-size: 14px; text-align: center; padding: 60px 0; }
+
+        /* ===== 按钮区 ===== */
+        .hou_ya_yue_btn-group { margin-bottom: 14px; }
+
+        .hou_ya_yue_btn-group h3 { font-size: 14px; color: #555; margin-bottom: 8px; }
+
+        .hou_ya_yue_btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .hou_ya_yue_btns button {
+            border: 0; border-radius: 20px; padding: 7px 14px; font-size: 13px;
+            cursor: pointer; font-family: inherit; color: #fff; transition: transform .15s, opacity .15s;
+        }
+
+        .hou_ya_yue_btns button:hover { transform: translateY(-2px); opacity: .9; }
+
+        .hou_ya_yue_btns button:active { transform: translateY(0); }
+
+        .hou_ya_yue_g-add { background: #ff6600; }
+        .hou_ya_yue_g-del { background: #e03131; }
+        .hou_ya_yue_g-visit { background: #0ca678; }
+        .hou_ya_yue_g-fn { background: #1d5fa6; }
+        .hou_ya_yue_g-struct { background: #722ed1; }
+
+        .hou_ya_yue_reset {
+            border: 1px solid #ccd6e0; background: #fff; color: #666;
+            border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer;
+            margin-top: 6px; font-family: inherit;
+        }
+
+        .hou_ya_yue_reset:hover { border-color: #1d5fa6; color: #1d5fa6; }
+
+        /* ===== 代码与结果 ===== */
+        .hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #abb2bf; min-height: 90px;
+        }
+
+        .hou_ya_yue_out .hou_ya_yue-code { color: #98c379; }
+
+        .hou_ya_yue_out .hou_ya_yue-res { color: #e5c07b; }
+
+        .hou_ya_yue_out .hou_ya_yue-cmt { color: #5c6370; }
+
+        .hou_ya_yue_out .hou_ya_yue-return { color: #61afef; }
+
+        /* ===== 对比表 ===== */
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.5;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table code {
+            background: #eef3fa; color: #c2505a; border-radius: 4px;
+            padding: 1px 6px; font-family: Consolas, monospace; font-size: 12.5px;
+        }
+
+        /* ===== 简易名片 ===== */
+        .hou_ya_yue_card-preview {
+            background: linear-gradient(135deg, #3d7eff, #2c66e0); color: #fff;
+            border-radius: 12px; padding: 18px 20px; max-width: 340px;
+            box-shadow: 0 6px 16px rgba(45, 100, 200, .3);
+        }
+
+        .hou_ya_yue_card-preview h3 { font-size: 19px; margin-bottom: 4px; }
+
+        .hou_ya_yue_card-preview .hou_ya_yue_job { font-size: 13px; opacity: .85; margin-bottom: 10px; }
+
+        .hou_ya_yue_card-preview .hou_ya_yue-line { font-size: 13px; line-height: 1.9; }
+
+        .hou_ya_yue_card-preview .hou_ya_yue-tags { margin-top: 8px; }
+
+        .hou_ya_yue_card-preview .hou_ya_yue-tags i {
+            font-style: normal; background: rgba(255, 255, 255, .2); border-radius: 10px;
+            padding: 2px 10px; font-size: 12px; margin-right: 6px;
+        }
+
+        @keyframes hou_ya_yue_pop {
+            from { transform: scale(.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes hou_ya_yue_fly {
+            to { transform: translateX(30px) scale(.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">16-2 JavaScript 对象 · 可视化演示 —— 对象就是「键 → 值」的储物柜，每个格子有名字、放一样东西</p>
+
+        <!-- ===== 对象可视化区 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>当前对象（会动的哦）</h2>
+            <p>橙色格 = 新添加的属性，绿色格 = 正被访问/遍历到的属性，红色格 = 即将删除的属性。左边是对象本体，右边是它「长什么样」——名片实时更新。</p>
+            <div class="hou_ya_yue_obj-wrap">
+                <div class="hou_ya_yue_obj">
+                    <span class="hou_ya_yue_obj-label">let car = { ... }</span>
+                    <div id="hou_ya_yue_obj"></div>
+                </div>
+                <div class="hou_ya_yue_obj">
+                    <span class="hou_ya_yue_obj-label">对象的样子（实时名片）</span>
+                    <div class="hou_ya_yue_card-preview" id="hou_ya_yue_preview"></div>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>① 创建与读取</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-visit" onclick="houYaYueRead()">car.brand（点语法）</button>
+                    <button class="hou_ya_yue_g-visit" onclick="houYaYueReadBracket()">car['price']（中括号）</button>
+                    <button class="hou_ya_yue_g-visit" onclick="houYaYueHas()">'color' in car</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>② 增加与修改</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-add" onclick="houYaYueAdd()">car.color = '红色'（新增）</button>
+                    <button class="hou_ya_yue_g-add" onclick="houYaYueModify()">car.price = 25.98（修改）</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>③ 删除</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-del" onclick="houYaYueDelete()">delete car.color</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>④ 遍历</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-visit" onclick="houYaYueForIn()">for...in（逐格点亮）</button>
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueKeys()">Object.keys()</button>
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueValues()">Object.values()</button>
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueEntries()">Object.entries()</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>⑤ 方法（函数也是值，能放进格子）</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueAddMethod()">car.intro = function()</button>
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueCallMethod()">car.intro()（调用）</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>⑥ 嵌套与展开</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-struct" onclick="houYaYueNest()">car.owner = {name...}（嵌套）</button>
+                    <button class="hou_ya_yue_g-struct" onclick="houYaYueSpread()">{...car}（展开复制）</button>
+                    <button class="hou_ya_yue_g-struct" onclick="houYaYueJson()">JSON.stringify()</button>
+                </div>
+            </div>
+
+            <button class="hou_ya_yue_reset" onclick="houYaYueReset()">↺ 重置对象</button>
+        </div>
+
+        <!-- ===== 代码输出区 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>代码与运行结果</h2>
+            <div class="hou_ya_yue_out" id="hou_ya_yue_out">
+                <span class="hou_ya_yue-cmt">// 点击上方任意按钮，这里会显示对应的代码和运行结果</span>
+            </div>
+        </div>
+
+        <!-- ===== 知识点表 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>对象 vs 数组 对比速查</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>对比项</th><th>对象 { }</th><th>数组 [ ]</th></tr>
+                <tr><td>结构</td><td>键值对（名字 → 值）</td><td>有序集合（下标 → 值）</td></tr>
+                <tr><td>访问方式</td><td><code>obj.key</code> 或 <code>obj['key']</code></td><td><code>arr[0]</code>（下标数字）</td></tr>
+                <tr><td>长度</td><td><code>Object.keys(obj).length</code></td><td><code>arr.length</code></td></tr>
+                <tr><td>遍历</td><td><code>for...in</code> / <code>Object.keys()</code></td><td><code>for</code> / <code>forEach</code></td></tr>
+                <tr><td>适用场景</td><td>描述一个事物（车的品牌、价格）</td><td>描述一组同类数据（品牌列表）</td></tr>
+                <tr><td>可以互相嵌套</td><td colspan="2"><code>car.owner.name</code>（对象套对象）、<code>car.colors[0]</code>（对象套数组）、<code>cars[0].brand</code>（数组套对象）</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        /* 侯雅月：当前演示对象 */
+        var houYaYueCar = { brand: '比亚迪', price: 24.98, type: '新能源SUV' };
+
+        /* 序列化值：字符串加引号，函数显示 [Function] */
+        function houYaYueFmt(v) {
+            if (typeof v === 'function') { return '[Function]'; }
+            if (typeof v === 'object' && v !== null) { return JSON.stringify(v, null, 1).replace(/\n\s*/g, ' '); }
+            if (typeof v === 'string') { return "'" + v + "'"; }
+            return String(v);
+        }
+
+        /* 渲染对象：newKeys 新增（橙），markKeys 命中（绿） */
+        function houYaYueRender(newKeys, markKeys) {
+            var box = document.getElementById('hou_ya_yue_obj');
+            box.innerHTML = '';
+            var keys = Object.keys(houYaYueCar);
+            if (keys.length === 0) {
+                box.innerHTML = '<div class="hou_ya_yue_empty-tip">对象空空如也～ 点「重置对象」或 car.color = ... 加点属性</div>';
+            }
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var row = document.createElement('div');
+                row.className = 'hou_ya_yue_kv';
+                if (newKeys && newKeys.indexOf(k) >= 0) { row.className += ' hou_ya_yue_new'; }
+                if (markKeys && markKeys.indexOf(k) >= 0) { row.className += ' hou_ya_yue_mark'; }
+                row.innerHTML = '<span class="hou_ya_yue_key">' + k + '</span>'
+                    + '<span class="hou_ya_yue_arrow">→</span>'
+                    + '<span class="hou_ya_yue_val">' + houYaYueFmt(houYaYueCar[k]) + '</span>';
+                box.appendChild(row);
+            }
+            houYaYuePreview();
+        }
+
+        /* 右侧实时名片 */
+        function houYaYuePreview() {
+            var pv = document.getElementById('hou_ya_yue_preview');
+            var c = houYaYueCar;
+            if (!c.brand && !c.price && !c.type) {
+                pv.innerHTML = '<div style="opacity:.7;font-size:13px;">（缺少 brand/price/type 属性，名片无法生成）</div>';
+                return;
+            }
+            var html = '<h3>' + (c.brand || '（无品牌）') + '</h3>'
+                + '<div class="hou_ya_yue_job">' + (c.type || '（无类型）') + '</div>'
+                + '<div class="hou_ya_yue_line">价格：' + (c.price !== undefined ? c.price + ' 万' : '（无价格）') + '</div>';
+            if (c.color) { html += '<div class="hou_ya_yue_line">颜色：' + c.color + '</div>'; }
+            if (c.owner) { html += '<div class="hou_ya_yue_line">车主：' + (c.owner.name || '?') + '</div>'; }
+            var tags = [];
+            if (c.color) { tags.push(c.color); }
+            if (c.type) { tags.push(c.type); }
+            if (tags.length) {
+                html += '<div class="hou_ya_yue_tags">';
+                for (var i = 0; i < tags.length; i++) { html += '<i>' + tags[i] + '</i>'; }
+                html += '</div>';
+            }
+            pv.innerHTML = html;
+        }
+
+        /* 输出代码与结果 */
+        function houYaYueShow(code, ret, extra) {
+            var html = '<span class="hou_ya_yue-code">' + code + '</span>\n'
+                + '<span class="hou_ya_yue-return">返回：</span><span class="hou_ya_yue-res">' + ret + '</span>';
+            if (extra) { html += '\n<span class="hou_ya_yue-cmt">' + extra + '</span>'; }
+            html += '\n<span class="hou_ya_yue-cmt">现在 car = ' + JSON.stringify(houYaYueCar, function (k, v) {
+                return typeof v === 'function' ? 'ƒ()' : v;
+            }) + '</span>';
+            document.getElementById('hou_ya_yue_out').innerHTML = html;
+        }
+
+        /* ===== ① 读取 ===== */
+        function houYaYueRead() {
+            if (!('brand' in houYaYueCar)) { houYaYueRender(); houYaYueShow('car.brand', 'undefined', '对象里没有 brand 属性了'); return; }
+            houYaYueRender(null, ['brand']);
+            houYaYueShow('car.brand', houYaYueFmt(houYaYueCar.brand), '点语法：像「柜子.格子名」直接拿东西，最常用');
+        }
+
+        function houYaYueReadBracket() {
+            if (!('price' in houYaYueCar)) { houYaYueRender(); houYaYueShow("car['price']", 'undefined', '对象里没有 price 属性了'); return; }
+            houYaYueRender(null, ['price']);
+            houYaYueShow("car['price']", houYaYueFmt(houYaYueCar.price), '中括号：键名可以是变量或带空格的字符串，更灵活');
+        }
+
+        function houYaYueHas() {
+            var has = 'color' in houYaYueCar;
+            houYaYueRender(null, has ? ['color'] : []);
+            houYaYueShow("'color' in car", has, has ? '有 color 这个格子（绿色）' : '没有 color 格子，in 返回 false');
+        }
+
+        /* ===== ② 增改 ===== */
+        function houYaYueAdd() {
+            houYaYueCar.color = '红色';
+            houYaYueRender(['color']);
+            houYaYueShow("car.color = '红色'", '已添加', '赋值即添加：柜子里原本没有 color 格子，一赋值就有了（橙色新增）');
+        }
+
+        function houYaYueModify() {
+            houYaYueCar.price = 25.98;
+            houYaYueRender(['price']);
+            houYaYueShow('car.price = 25.98', '已修改', '同样的写法：格子已存在就是「修改」，不存在就是「新增」');
+        }
+
+        /* ===== ③ 删 ===== */
+        function houYaYueDelete() {
+            if (!('color' in houYaYueCar)) { houYaYueRender(); houYaYueShow('delete car.color', 'false', 'color 格子不存在，没得删'); return; }
+            var rows = document.querySelectorAll('.hou_ya_yue_kv');
+            var keys = Object.keys(houYaYueCar);
+            var i = keys.indexOf('color');
+            if (rows[i]) { rows[i].classList.add('hou_ya_yue_out'); }
+            var ok = delete houYaYueCar.color;
+            setTimeout(function () { houYaYueRender(); }, 380);
+            houYaYueShow('delete car.color', ok, 'delete 直接把整个格子（键和值一起）从柜子里抽走');
+        }
+
+        /* ===== ④ 遍历 ===== */
+        function houYaYueForIn() {
+            var keys = Object.keys(houYaYueCar);
+            if (keys.length === 0) { houYaYueRender(); houYaYueShow('for (k in car) ...', '（空）', '对象是空的'); return; }
+            var idx = 0;
+            houYaYueRender(null, []);
+            var timer = setInterval(function () {
+                if (idx >= keys.length) { clearInterval(timer); return; }
+                houYaYueRender(null, keys.slice(0, idx + 1));
+                idx++;
+            }, 450);
+            houYaYueShow('for (var k in car) { console.log(k, car[k]) }', keys.join('、'), 'for...in 逐个点亮每个格子（绿色依次跳），拿到键后再用中括号取值');
+        }
+
+        function houYaYueKeys() {
+            var res = Object.keys(houYaYueCar);
+            houYaYueRender(null, res);
+            houYaYueShow('Object.keys(car)', '[' + res.join(', ') + ']', 'keys 把所有格子上的「名字牌」收集成一个数组');
+        }
+
+        function houYaYueValues() {
+            var res = Object.values(houYaYueCar);
+            houYaYueRender(null, Object.keys(houYaYueCar));
+            var fmt = [];
+            for (var i = 0; i < res.length; i++) { fmt.push(houYaYueFmt(res[i])); }
+            houYaYueShow('Object.values(car)', '[' + fmt.join(', ') + ']', 'values 把每个格子里的「东西」倒出来组成数组');
+        }
+
+        function houYaYueEntries() {
+            var res = Object.entries(houYaYueCar);
+            houYaYueRender(null, Object.keys(houYaYueCar));
+            var fmt = [];
+            for (var i = 0; i < res.length; i++) { fmt.push('[' + res[i][0] + ': ' + houYaYueFmt(res[i][1]) + ']'); }
+            houYaYueShow('Object.entries(car)', '[' + fmt.join(', ') + ']', 'entries 把「名字+东西」成对打包，适合同时要键和值时用');
+        }
+
+        /* ===== ⑤ 方法 ===== */
+        function houYaYueAddMethod() {
+            houYaYueCar.intro = function () {
+                return '我是' + (this.brand || '一辆车') + '，售价' + (this.price !== undefined ? this.price : '?') + '万';
+            };
+            houYaYueRender(['intro']);
+            houYaYueShow('car.intro = function () { return ... }', '方法已挂载', '函数也是值！塞进格子后，这个属性就叫「方法」——对象自己的动作');
+        }
+
+        function houYaYueCallMethod() {
+            if (typeof houYaYueCar.intro !== 'function') { houYaYueRender(); houYaYueShow('car.intro()', '报错！', '还没挂载 intro 方法，先点上面的「car.intro = function()」按钮'); return; }
+            houYaYueRender(null, ['intro']);
+            var ret = houYaYueCar.intro();
+            houYaYueShow('car.intro()', houYaYueFmt(ret), '调用方法：加括号才执行！方法里的 this 指向 car 自己，所以能读到 this.brand');
+        }
+
+        /* ===== ⑥ 嵌套与展开 ===== */
+        function houYaYueNest() {
+            houYaYueCar.owner = { name: '侯雅月', city: '大连' };
+            houYaYueRender(['owner']);
+            houYaYueShow("car.owner = { name: '侯雅月', city: '大连' }", '已嵌套', '对象的值可以是另一个对象：柜子格里放了个小柜子，取值用 car.owner.name 一层层拿');
+        }
+
+        function houYaYueSpread() {
+            var copy = Object.assign({}, houYaYueCar);
+            houYaYueRender(null, Object.keys(houYaYueCar));
+            houYaYueShow('var copy = { ...car }', JSON.stringify(Object.keys(copy).join(', ')), '展开运算符 ... 把每个格子原样倒进一个新柜子：得到副本，改 copy 不影响 car');
+        }
+
+        function houYaYueJson() {
+            var s = JSON.stringify(houYaYueCar, function (k, v) { return typeof v === 'function' ? undefined : v; });
+            houYaYueRender(null, Object.keys(houYaYueCar));
+            houYaYueShow('JSON.stringify(car)', s, 'stringify 把对象变成字符串（函数会被丢弃），常用于网络传输和本地存储');
+        }
+
+        /* ===== 重置 ===== */
+        function houYaYueReset() {
+            houYaYueCar = { brand: '比亚迪', price: 24.98, type: '新能源SUV' };
+            houYaYueRender();
+            houYaYueShow("car = { brand: '比亚迪', price: 24.98, type: '新能源SUV' }", '已重置', '回到最初的三格储物柜');
+        }
+
+        houYaYueRender();
+    </script>
+</body>
+</html>

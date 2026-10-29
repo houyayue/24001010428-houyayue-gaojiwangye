@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-4 音乐手机 Tab 资讯卡</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-10-29 15:20:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：音乐手机 Tab 显示卡（行情/导购/新品/评测 四榜切换）
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        a { text-decoration: none; color: inherit; }
+
+        ul, li { list-style: none; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #eef1f5;
+            color: #333;
+            padding: 40px 16px;
+        }
+
+        /* ===== 卡片 ===== */
+        .hou_ya_yue_tab-card {
+            width: 480px; max-width: 100%; margin: 0 auto;
+            background: #fff; border: 1px solid #d4dbe2;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        /* ===== 头部：标题 + 四个 Tab ===== */
+        .hou_ya_yue_tab-hd {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            background: linear-gradient(180deg, #fdfdfd, #eceff2);
+            border-bottom: 1px solid #ccd4dc; padding: 10px 10px 0 14px;
+        }
+
+        .hou_ya_yue_tab-hd h3 {
+            font-size: 19px; color: #8e1a1a; font-weight: bold;
+            padding-bottom: 8px; letter-spacing: 1px;
+        }
+
+        .hou_ya_yue_tabs { display: flex; }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab {
+            width: 62px; text-align: center; padding: 6px 0 7px;
+            font-size: 13px; color: #555; cursor: pointer;
+            background: linear-gradient(180deg, #f7f8fa, #e7eaee);
+            border: 1px solid #ccd4dc; border-bottom: 0; margin-left: -1px;
+            position: relative; transition: background .15s, color .15s;
+        }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab:first-child { margin-left: 0; }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab:hover { background: #fff; color: #333; }
+
+        /* 选中态：白底 + 蓝色描边 + 红字，底部与内容区融合 */
+        .hou_ya_yue_tabs .hou_ya_yue_tab.hou_ya_yue_on {
+            background: #fff; color: #d33; font-weight: bold;
+            border-color: #9db8dd; box-shadow: 0 -2px 0 #2f6fe4 inset;
+        }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab.hou_ya_yue_on:after {
+            content: ""; position: absolute; left: -1px; right: -1px; bottom: -1px;
+            height: 2px; background: #fff;
+        }
+
+        /* ===== 资讯列表 ===== */
+        .hou_ya_yue_news { padding: 8px 14px 10px; }
+
+        .hou_ya_yue_news li {
+            line-height: 30px; font-size: 14px;
+            white-space: nowrap; overflow: hidden;
+        }
+
+        .hou_ya_yue_news li:before {
+            content: ""; display: inline-block; width: 6px; height: 6px;
+            background: #46b450; margin-right: 9px; vertical-align: 2px;
+        }
+
+        .hou_ya_yue_news li a { color: #2f6fe4; }
+
+        .hou_ya_yue_news li a:hover { color: #d33; text-decoration: underline; }
+
+        .hou_ya_yue_news li .hou_ya_yue_date {
+            float: right; color: #9aa4ae; font-size: 12px; margin-left: 12px;
+        }
+
+        /* 红色加急条目（新品榜中的头条） */
+        .hou_ya_yue_news li.hou_ya_yue_hot a { color: #d33; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_tab-card">
+        <!-- 头部：标题 + 四个 Tab -->
+        <div class="hou_ya_yue_tab-hd">
+            <h3>音乐手机</h3>
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_tabs">
+                <span class="hou_ya_yue_tab" data-tab="hangqing">行情</span>
+                <span class="hou_ya_yue_tab" data-tab="daogou">导购</span>
+                <span class="hou_ya_yue_tab" data-tab="xinpin">新品</span>
+                <span class="hou_ya_yue_tab hou_ya_yue_on" data-tab="pingce">评测</span>
+            </div>
+        </div>
+
+        <!-- 资讯列表 -->
+        <ul class="hou_ya_yue_news" id="hou_ya_yue_news"></ul>
+    </div>
+
+    <script>
+        /* 侯雅月：四个 Tab 的资讯数据（与四张参考图一一对应） */
+        var houYaYueData = {
+            pingce: [
+                ['音乐历久弥新 TD版魅族ME3评测', '12/19'],
+                ['极致影音完美音质 步步高vivo Xplay移动版图赏', '07/24'],
+                ['都是大屏何不同？三星S4/Mega静态评测', '06/20'],
+                ['超薄四核智能机 HTC Desire 608t评测', '06/20'],
+                ['完美融合微博 魅族MX2 Flyme 2.2.5体验', '06/18'],
+                ['1080pHi-Fi旗舰 vivo Xplay娱乐体验', '06/13'],
+                ['5.7英寸高清巨屏 酷派9070+XO影音体验', '06/06'],
+                ['悬浮窗口播放 vivo Xplay视频功能体验', '06/06']
+            ],
+            hangqing: [
+                ['音乐强机苹果iPhone 5价格稳定', '12/19'],
+                ['高性能双四核音乐机 魅族MX3低价热卖', '12/19'],
+                ['音乐品质最出色 vivo X3促销2199', '12/12'],
+                ['时尚音乐手机 vivo Xplay济南2798元', '11/27'],
+                ['好音乐好拍照 OPPO Find5今报价2580元', '08/27'],
+                ['1.5GHz四核1080p OPPO Find 5降价热卖', '07/30'],
+                ['彩色呼吸灯双核机 索尼M35h促销2299', '06/08'],
+                ['1.7GHz四核1080p vivo Xplay热卖中', '06/07']
+            ],
+            daogou: [
+                ['优秀音效漂亮外观 市售音乐手机盘点', '09/13'],
+                ['不要虐待耳朵 8款独特音效的音乐手机荐', '09/06'],
+                ['最低只需799 8款高性能音乐手机推荐', '07/22'],
+                ['长假主导后高考时代 奖励孩子的智能手机全攻略', '06/13'],
+                ['降价不限时 端午后值得关注的降价四核机推荐', '06/13'],
+                ['高考之后尽情狂欢！学生超强手机推荐', '06/13'],
+                ['上半年看这里 最热1080P四核旗舰手机', '06/13'],
+                ['最厚不过7.99毫米 热门超薄强机大搜罗', '06/06']
+            ],
+            xinpin: [
+                ['无限接近完美！ vivo Xplay3S现场体验', '12/19'],
+                ['入门音乐机 诺基亚Lumia 525现身工信部', '11/05'],
+                ['传诺基亚下月将推首款WP音乐手机Glee', '09/29'],
+                ['软硬兼施 vivo Xstudio Hi-Fi音乐圈详解', '08/23'],
+                ['没有中国 谷歌All Access音乐服务登欧洲', '08/09'],
+                ['Hi-Fi录音棚 vivo X3创下Xstudio音乐系统', '08/07'],
+                ['Hi-Fi不够vivo又玩录音棚 X3音乐处理方案曝光', '08/06', true],
+                ['小伙伴都惊呆了 薄至6mm以下 vivo X3亮相', '07/31']
+            ]
+        };
+
+        /* 渲染榜单：hot 为红色加急条目，日期右浮动 */
+        function houYaYueRender(tab) {
+            var box = document.getElementById('hou_ya_yue_news');
+            var items = houYaYueData[tab];
+            var html = '';
+            for (var i = 0; i < items.length; i++) {
+                var it = items[i];
+                html += '<li' + (it[2] ? ' class="hou_ya_yue_hot"' : '') + '>'
+                    + '<span class="hou_ya_yue_date">(' + it[1] + ')</span>'
+                    + '<a href="javascript:;">' + it[0] + '</a>'
+                    + '</li>';
+            }
+            box.innerHTML = html;
+        }
+
+        /* Tab 切换（事件委托） */
+        (function () {
+            var tabs = document.getElementById('hou_ya_yue_tabs');
+            tabs.addEventListener('click', function (e) {
+                var t = e.target.closest ? e.target.closest('.hou_ya_yue_tab') : null;
+                if (!t) { return; }
+                var items = tabs.querySelectorAll('.hou_ya_yue_tab');
+                for (var i = 0; i < items.length; i++) { items[i].className = 'hou_ya_yue_tab'; }
+                t.className = 'hou_ya_yue_tab hou_ya_yue_on';
+                houYaYueRender(t.getAttribute('data-tab'));
+            });
+        })();
+
+        /* 默认显示「评测」榜（与第一张参考图一致） */
+        houYaYueRender('pingce');
+    </script>
+</body>
+</html>

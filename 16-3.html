@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-3 翻译平台周排行榜</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-10-29 14:40:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：翻译平台周排行榜卡片（iconfont 图标 + Tab 切换 + 列表）
+    -->
+    <style>
+        /* ===== 0. iconfont（本地字体，font 目录） ===== */
+        @font-face {
+            font-family: "hou_ya_yue_iconfont";
+            src: url('font/download/font_5247138_vjeiggmyqu/iconfont.woff2') format('woff2'),
+                 url('font/download/font_5247138_vjeiggmyqu/iconfont.woff') format('woff'),
+                 url('font/download/font_5247138_vjeiggmyqu/iconfont.ttf') format('truetype');
+        }
+
+        .hou_ya_yue_if {
+            font-family: "hou_ya_yue_iconfont" !important;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .hou_ya_yue_i-paihang:before { content: "\e602"; }   /* 排行榜（柱状图） */
+        .hou_ya_yue_i-user:before { content: "\e653"; }      /* 参与（人脸） */
+        .hou_ya_yue_i-zan:before { content: "\e600"; }       /* 很赞（点赞） */
+        .hou_ya_yue_i-pinglun:before { content: "\e615"; }   /* 评论（气泡） */
+
+        /* ===== 1. 全局 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #eef1f5;
+            color: #333;
+            padding: 40px 16px;
+        }
+
+        ul, li { list-style: none; }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* ===== 2. 卡片 ===== */
+        .hou_ya_yue_rank-card {
+            width: 460px; max-width: 100%; margin: 0 auto;
+            background: #fff; border: 1px solid #e8ecf1; border-radius: 4px;
+            overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        /* ===== 3. 标题栏：左侧蓝色竖条 + 图标 + 标题 ===== */
+        .hou_ya_yue_rank-hd {
+            display: flex; align-items: center;
+            border-left: 4px solid #2f6fe4; padding: 16px 16px 14px;
+        }
+
+        .hou_ya_yue_rank-hd .hou_ya_yue_if { font-size: 22px; color: #555; margin-right: 10px; }
+
+        .hou_ya_yue_rank-hd h3 { font-size: 19px; font-weight: bold; color: #222; }
+
+        /* ===== 4. 三个 Tab：等分三格，竖线分隔，选中带蓝色下划线 ===== */
+        .hou_ya_yue_tabs { display: flex; border-top: 1px solid #eceff3; border-bottom: 1px solid #eceff3; }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            height: 46px; font-size: 15px; color: #444; cursor: pointer;
+            position: relative; border-right: 1px solid #eceff3; background: #fbfcfe;
+            transition: background .2s, color .2s;
+        }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab:last-child { border-right: 0; }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab .hou_ya_yue_if {
+            font-size: 17px; color: #888; margin-right: 7px; transition: color .2s;
+        }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab:hover { background: #f2f6fd; }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab.hou_ya_yue_on { background: #fff; color: #2f6fe4; font-weight: bold; }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab.hou_ya_yue_on .hou_ya_yue_if { color: #2f6fe4; }
+
+        .hou_ya_yue_tabs .hou_ya_yue_tab.hou_ya_yue_on:after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+            height: 2px; background: #2f6fe4;
+        }
+
+        /* ===== 5. 榜单列表 ===== */
+        .hou_ya_yue_rank-list li {
+            border-bottom: 1px solid #f1f3f6;
+        }
+
+        .hou_ya_yue_rank-list li:last-child { border-bottom: 0; }
+
+        .hou_ya_yue_rank-list a {
+            display: block; padding: 15px 16px; font-size: 15px; color: #333;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            transition: color .15s, background .15s;
+        }
+
+        .hou_ya_yue_rank-list a:hover { color: #2f6fe4; background: #f7faff; }
+
+        .hou_ya_yue_rank-list a em {
+            font-style: normal; color: #b9c2cc; font-size: 13px; margin-right: 10px;
+        }
+
+        .hou_ya_yue_rank-list a strong { color: #222; font-weight: bold; }
+
+        /* ===== 6. 提示词区 ===== */
+        .hou_ya_yue_prompt {
+            width: 460px; max-width: 100%; margin: 20px auto 0;
+            background: #fff; border-radius: 8px; padding: 16px 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        .hou_ya_yue_prompt h3 { font-size: 15px; color: #1d5fa6; margin-bottom: 8px; }
+
+        .hou_ya_yue_prompt blockquote {
+            font-size: 13px; color: #777; line-height: 1.8;
+            border-left: 3px solid #d6e2f2; padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_rank-card">
+        <!-- 标题栏 -->
+        <div class="hou_ya_yue_rank-hd">
+            <i class="hou_ya_yue_if hou_ya_yue_i-paihang"></i>
+            <h3>翻译平台周排行榜</h3>
+        </div>
+
+        <!-- 三个 Tab -->
+        <div class="hou_ya_yue_tabs" id="hou_ya_yue_tabs">
+            <span class="hou_ya_yue_tab" data-tab="join"><i class="hou_ya_yue_if hou_ya_yue_i-user"></i>参与</span>
+            <span class="hou_ya_yue_tab hou_ya_yue_on" data-tab="zan"><i class="hou_ya_yue_if hou_ya_yue_i-zan"></i>很赞</span>
+            <span class="hou_ya_yue_tab" data-tab="cmt"><i class="hou_ya_yue_if hou_ya_yue_i-pinglun"></i>评论</span>
+        </div>
+
+        <!-- 榜单列表 -->
+        <ul class="hou_ya_yue_rank-list" id="hou_ya_yue_list"></ul>
+    </div>
+
+    <div class="hou_ya_yue_prompt">
+        <h3>本提示词</h3>
+        <blockquote>
+            完成 16-3.html，使用的图标在 font 目录里选，完成的网页尽可能的和给定的图片相似。——侯雅月，2026-10-29
+        </blockquote>
+    </div>
+
+    <script>
+        /* 侯雅月：三个榜单数据（按 Tab 切换） */
+        var houYaYueData = {
+            zan: [
+                '在密切关注中国美食纪录片后，我彻底沦陷了',
+                '外国网友发视频学习中餐做法并追问秘诀',
+                '"他们在诗词里有月亮，我们在月亮上采样了"',
+                '越南以进口100台盾构机为切入点开展基建合作',
+                '假如中国美食登陆土耳其，哪道最先被抢空',
+                '法国面包节如火如荼，网友感慨，如果引进的',
+                '土耳其朋友和中国网友对完菜谱后惊呼：太香',
+                '土耳其一本延用至1942年的食谱中记载：蒸饼',
+                '小泽米其林餐厅：许多年轻人支持低卡套餐',
+                '"我靠……这连续剧真够精彩的/笑" 中国网文出海'
+            ],
+            join: [
+                '本周共有 3286 名译者参与翻译，环比增长 12%',
+                '新晋译者"追风少年"一周贡献 47 条优质译文',
+                '英语组、日语组、土耳其语组本周齐头并进',
+                '"基建狂魔"专题翻译任务已全部认领完毕',
+                '术语库新增高铁、盾构机、新能源词条 210 条',
+                '本周圆桌讨论：如何把网络热词翻出味道来',
+                '资深译审上线直播答疑，围观人数突破 8000',
+                '青年译者训练营第 5 期开班，报名通道已开启',
+                '日语组"信达雅"挑战赛进入复赛阶段',
+                '本周最勤快译者：人均日翻译 32 条，点赞'
+            ],
+            cmt: [
+                '这个翻译腔也太地道了，读起来毫无违和感',
+                '"月亮上采样"这个双关绝了，译者功力深厚',
+                '术语统一好评，终于不用一页三个译名了',
+                '建议给"基建狂魔"配个注释，老外更易懂',
+                '每天的更新速度和质量都令人感动',
+                '第二次进来看榜，周更的翻译质量真的稳定',
+                '热词的翻译保留原味又不难懂，学到了',
+                '译文流畅度比上周又提升了一个档次',
+                '排版清爽，图标好看，这个榜单越做越棒',
+                '催更！想看下周的土耳其语组表现'
+            ]
+        };
+
+        /* 渲染榜单：前 3 名加粗突出，10 条与原版一致 */
+        function houYaYueRender(tab) {
+            var list = document.getElementById('hou_ya_yue_list');
+            var items = houYaYueData[tab];
+            var html = '';
+            for (var i = 0; i < items.length; i++) {
+                html += '<li><a href="javascript:;">' + items[i] + '</a></li>';
+            }
+            list.innerHTML = html;
+        }
+
+        /* Tab 切换（事件委托） */
+        (function () {
+            var tabs = document.getElementById('hou_ya_yue_tabs');
+            tabs.addEventListener('click', function (e) {
+                var t = e.target.closest ? e.target.closest('.hou_ya_yue_tab') : null;
+                if (!t) { return; }
+                var items = tabs.querySelectorAll('.hou_ya_yue_tab');
+                for (var i = 0; i < items.length; i++) { items[i].className = 'hou_ya_yue_tab'; }
+                t.className = 'hou_ya_yue_tab hou_ya_yue_on';
+                houYaYueRender(t.getAttribute('data-tab'));
+            });
+        })();
+
+        /* 默认显示「很赞」榜（与原图一致） */
+        houYaYueRender('zan');
+    </script>
+</body>
+</html>

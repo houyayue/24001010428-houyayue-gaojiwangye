@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-1 JavaScript 数组主要方法</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-10-29 14:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：JavaScript 数组主要方法可视化演示
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 960px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub {
+            text-align: center; color: #888; font-size: 14px; margin-bottom: 24px;
+        }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6;
+            border-left: 4px solid #1d5fa6; padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.6; }
+
+        /* ===== 数组可视化区 ===== */
+        .hou_ya_yue_arr-box {
+            background: #f7fafd; border: 2px dashed #a8c4e0; border-radius: 10px;
+            padding: 18px 16px 8px; min-height: 110px; position: relative; margin-bottom: 8px;
+        }
+
+        .hou_ya_yue_arr-label {
+            position: absolute; top: -11px; left: 14px; background: #1d5fa6; color: #fff;
+            font-size: 12px; padding: 2px 10px; border-radius: 10px;
+        }
+
+        .hou_ya_yue_arr { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; padding-bottom: 8px; }
+
+        .hou_ya_yue_cell {
+            width: 74px; height: 58px; border-radius: 8px; position: relative;
+            background: linear-gradient(180deg, #3d7eff, #2c66e0); color: #fff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold;
+            box-shadow: 0 3px 6px rgba(45, 100, 200, .25);
+            animation: hou_ya_yue_pop .35s ease;
+            word-break: break-all; padding: 2px; text-align: center;
+        }
+
+        .hou_ya_yue_cell i {
+            position: absolute; top: -20px; left: 0; right: 0; text-align: center;
+            font-style: normal; font-size: 11px; color: #8aa3bd;
+        }
+
+        .hou_ya_yue_cell.hou_ya_yue_new { background: linear-gradient(180deg, #ff8a00, #ff6600); animation: hou_ya_yue_drop .45s ease; }
+
+        .hou_ya_yue_cell.hou_ya_yue_mark { background: linear-gradient(180deg, #34c759, #22ac38); }
+
+        .hou_ya_yue_cell.hou_ya_yue_out {
+            background: linear-gradient(180deg, #ff5252, #e03131);
+            animation: hou_ya_yue_fly .4s ease forwards;
+        }
+
+        .hou_ya_yue_idx-label {
+            font-size: 12px; color: #98a8ba; text-align: center; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_empty-tip { color: #b6c2ce; font-size: 14px; text-align: center; line-height: 58px; }
+
+        /* ===== 按钮区 ===== */
+        .hou_ya_yue_btn-group { margin-bottom: 14px; }
+
+        .hou_ya_yue_btn-group h3 { font-size: 14px; color: #555; margin-bottom: 8px; }
+
+        .hou_ya_yue_btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .hou_ya_yue_btns button {
+            border: 0; border-radius: 20px; padding: 7px 14px; font-size: 13px;
+            cursor: pointer; font-family: inherit; color: #fff; transition: transform .15s, opacity .15s;
+        }
+
+        .hou_ya_yue_btns button:hover { transform: translateY(-2px); opacity: .9; }
+
+        .hou_ya_yue_btns button:active { transform: translateY(0); }
+
+        .hou_ya_yue_g-add { background: #ff6600; }
+        .hou_ya_yue_g-del { background: #e03131; }
+        .hou_ya_yue_g-sort { background: #722ed1; }
+        .hou_ya_yue_g-find { background: #0ca678; }
+        .hou_ya_yue_g-fn { background: #1d5fa6; }
+        .hou_ya_yue_g-join { background: #597eaa; }
+
+        .hou_ya_yue_reset {
+            border: 1px solid #ccd6e0; background: #fff; color: #666;
+            border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer;
+            margin-top: 6px; font-family: inherit;
+        }
+
+        .hou_ya_yue_reset:hover { border-color: #1d5fa6; color: #1d5fa6; }
+
+        /* ===== 代码与结果 ===== */
+        .hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #abb2bf; min-height: 90px;
+        }
+
+        .hou_ya_yue_out .hou_ya_yue_code { color: #98c379; }
+
+        .hou_ya_yue_out .hou_ya_yue-res { color: #e5c07b; }
+
+        .hou_ya_yue_out .hou_ya_yue-cmt { color: #5c6370; }
+
+        .hou_ya_yue_out .hou_ya_yue-return { color: #61afef; }
+
+        /* ===== 方法速查表 ===== */
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.5;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table code {
+            background: #eef3fa; color: #c2505a; border-radius: 4px;
+            padding: 1px 6px; font-family: Consolas, monospace; font-size: 12.5px;
+        }
+
+        .hou_ya_yue_table .hou_ya_yue-mut { color: #e03131; font-weight: bold; }
+
+        .hou_ya_yue_table .hou_ya_yue-safe { color: #0ca678; font-weight: bold; }
+
+        @keyframes hou_ya_yue_pop {
+            from { transform: scale(.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes hou_ya_yue_drop {
+            from { transform: translateY(-26px) scale(.6); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes hou_ya_yue_fly {
+            to { transform: translateY(30px) scale(.4); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">16-1 数组主要方法 · 可视化演示 —— 点击按钮看动画，代码与结果实时显示</p>
+
+        <!-- ===== 可视化区 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>当前数组（会动的哦）</h2>
+            <p>橙色块 = 新加入的元素，绿色块 = 被查找到/遍历到的元素，红色块 = 即将离开的元素。</p>
+            <div class="hou_ya_yue_arr-box">
+                <span class="hou_ya_yue_arr-label">let arr = [ ... ]</span>
+                <div class="hou_ya_yue_arr" id="hou_ya_yue_arr"></div>
+                <div class="hou_ya_yue_idx-label" id="hou_ya_yue_idx"></div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>① 增加元素</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-add" onclick="houYaYuePush()">push('宝马')</button>
+                    <button class="hou_ya_yue_g-add" onclick="houYaYueUnshift()">unshift('奔驰')</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>② 删除元素</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-del" onclick="houYaYuePop()">pop()</button>
+                    <button class="hou_ya_yue_g-del" onclick="houYaYueShift()">shift()</button>
+                    <button class="hou_ya_yue_g-del" onclick="houYaYueSplice()">splice(1, 2)</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>③ 排序与翻转</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-sort" onclick="houYaYueSort()">sort() 升序</button>
+                    <button class="hou_ya_yue_g-sort" onclick="houYaYueReverse()">reverse()</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>④ 查找与判断</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-find" onclick="houYaYueIndexOf()">indexOf('比亚迪')</button>
+                    <button class="hou_ya_yue_g-find" onclick="houYaYueIncludes()">includes('理想')</button>
+                    <button class="hou_ya_yue_g-find" onclick="houYaYueFind()">find(长度≥3)</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>⑤ 高阶函数（不改变原数组）</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueMap()">map(加★)</button>
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueFilter()">filter(长度&gt;2)</button>
+                    <button class="hou_ya_yue_g-fn" onclick="houYaYueForEach()">forEach(点亮)</button>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btn-group">
+                <h3>⑥ 合并与拼接</h3>
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-join" onclick="houYaYueConcat()">concat(['蔚来','小鹏'])</button>
+                    <button class="hou_ya_yue_g-join" onclick="houYaYueSlice()">slice(1, 3)</button>
+                    <button class="hou_ya_yue_g-join" onclick="houYaYueJoin()">join(' ❤ ')</button>
+                </div>
+            </div>
+
+            <button class="hou_ya_yue_reset" onclick="houYaYueReset()">↺ 重置数组</button>
+        </div>
+
+        <!-- ===== 代码输出区 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>代码与返回结果</h2>
+            <div class="hou_ya_yue_out" id="hou_ya_yue_out">
+                <span class="hou_ya_yue-cmt">// 点击上方任意按钮，这里会显示对应的代码和运行结果</span>
+            </div>
+        </div>
+
+        <!-- ===== 方法速查表 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>数组方法速查表</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>方法</th><th>作用</th><th>返回值</th><th>改变原数组</th></tr>
+                <tr><td><code>push(x)</code></td><td>尾部添加</td><td>新长度</td><td class="hou_ya_yue-mut">是</td></tr>
+                <tr><td><code>pop()</code></td><td>尾部删除</td><td>被删元素</td><td class="hou_ya_yue-mut">是</td></tr>
+                <tr><td><code>unshift(x)</code></td><td>头部添加</td><td>新长度</td><td class="hou_ya_yue-mut">是</td></tr>
+                <tr><td><code>shift()</code></td><td>头部删除</td><td>被删元素</td><td class="hou_ya_yue-mut">是</td></tr>
+                <tr><td><code>splice(i, n)</code></td><td>从 i 开始删 n 个</td><td>被删元素数组</td><td class="hou_ya_yue-mut">是</td></tr>
+                <tr><td><code>sort()</code></td><td>排序</td><td>排序后数组</td><td class="hou_ya_yue-mut">是</td></tr>
+                <tr><td><code>reverse()</code></td><td>翻转</td><td>翻转后数组</td><td class="hou_ya_yue-mut">是</td></tr>
+                <tr><td><code>indexOf(x)</code></td><td>找下标</td><td>下标，没有则 -1</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>includes(x)</code></td><td>判断是否包含</td><td>true / false</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>find(fn)</code></td><td>找第一个满足条件的</td><td>元素或 undefined</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>map(fn)</code></td><td>逐个加工成新数组</td><td>新数组</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>filter(fn)</code></td><td>筛选成新数组</td><td>新数组</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>forEach(fn)</code></td><td>逐个遍历执行</td><td>undefined</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>concat(b)</code></td><td>合并成新数组</td><td>新数组</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>slice(i, j)</code></td><td>截取 [i, j) 片段</td><td>新数组</td><td class="hou_ya_yue-safe">否</td></tr>
+                <tr><td><code>join(s)</code></td><td>用 s 连接成字符串</td><td>字符串</td><td class="hou_ya_yue-safe">否</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        /* 侯雅月：当前演示数组 */
+        var houYaYueArr = ['比亚迪', '理想', '特斯拉', '问界'];
+
+        /* 渲染数组：newIdxs 新元素（橙色），markIdxs 命中元素（绿色） */
+        function houYaYueRender(newIdxs, markIdxs) {
+            var box = document.getElementById('hou_ya_yue_arr');
+            var idxLine = document.getElementById('hou_ya_yue_idx');
+            box.innerHTML = '';
+            if (houYaYueArr.length === 0) {
+                box.innerHTML = '<div class="hou_ya_yue_empty-tip">数组空空如也～ 点「重置数组」或用 push/unshift 加点东西</div>';
+                idxLine.textContent = '';
+                return;
+            }
+            var idxTexts = [];
+            for (var i = 0; i < houYaYueArr.length; i++) {
+                var cell = document.createElement('div');
+                cell.className = 'hou_ya_yue_cell';
+                if (newIdxs && newIdxs.indexOf(i) >= 0) { cell.className += ' hou_ya_yue_new'; }
+                if (markIdxs && markIdxs.indexOf(i) >= 0) { cell.className += ' hou_ya_yue_mark'; }
+                cell.innerHTML = '<i>[' + i + ']</i>' + houYaYueArr[i];
+                box.appendChild(cell);
+                idxTexts.push('[' + i + ']');
+            }
+            idxLine.textContent = '下标：' + idxTexts.join('   ');
+        }
+
+        /* 输出代码与结果 */
+        function houYaYueShow(code, ret, extra) {
+            var html = '<span class="hou_ya_yue-code">' + code + '</span>\n'
+                + '<span class="hou_ya_yue-return">返回：</span><span class="hou_ya_yue-res">' + ret + '</span>';
+            if (extra) { html += '\n<span class="hou_ya_yue-cmt">' + extra + '</span>'; }
+            html += '\n<span class="hou_ya_yue-cmt">现在 arr = [' + houYaYueArr.join(', ') + ']</span>';
+            document.getElementById('hou_ya_yue_out').innerHTML = html;
+        }
+
+        /* ===== ① 增 ===== */
+        function houYaYuePush() {
+            var len = houYaYueArr.push('宝马');
+            houYaYueRender([houYaYueArr.length - 1]);
+            houYaYueShow("arr.push('宝马')", len, 'push 从【尾部】塞进一个元素，返回新长度');
+        }
+
+        function houYaYueUnshift() {
+            var len = houYaYueArr.unshift('奔驰');
+            houYaYueRender([0]);
+            houYaYueShow("arr.unshift('奔驰')", len, 'unshift 从【头部】塞进一个元素，其余元素下标整体后移');
+        }
+
+        /* ===== ② 删 ===== */
+        function houYaYuePop() {
+            if (houYaYueArr.length === 0) { houYaYueRender(); houYaYueShow('arr.pop()', 'undefined', '数组已空，没得删啦'); return; }
+            var cells = document.querySelectorAll('.hou_ya_yue_cell');
+            cells[cells.length - 1].classList.add('hou_ya_yue_out');
+            var removed = houYaYueArr.pop();
+            setTimeout(function () { houYaYueRender(); }, 380);
+            houYaYueShow('arr.pop()', "'" + removed + "'", 'pop 弹走【尾部】元素，返回被删的那个');
+        }
+
+        function houYaYueShift() {
+            if (houYaYueArr.length === 0) { houYaYueRender(); houYaYueShow('arr.shift()', 'undefined', '数组已空，没得删啦'); return; }
+            var cells = document.querySelectorAll('.hou_ya_yue_cell');
+            cells[0].classList.add('hou_ya_yue_out');
+            var removed = houYaYueArr.shift();
+            setTimeout(function () { houYaYueRender(); }, 380);
+            houYaYueShow('arr.shift()', "'" + removed + "'", 'shift 摘走【头部】元素，返回被删的那个');
+        }
+
+        function houYaYueSplice() {
+            if (houYaYueArr.length <= 1) { houYaYueRender(); houYaYueShow('arr.splice(1, 2)', '[]', '元素太少，先加点元素再试'); return; }
+            var n = Math.min(2, houYaYueArr.length - 1);
+            var cells = document.querySelectorAll('.hou_ya_yue_cell');
+            for (var i = 1; i <= n; i++) { cells[i].classList.add('hou_ya_yue_out'); }
+            var removed = houYaYueArr.splice(1, n);
+            setTimeout(function () { houYaYueRender(); }, 380);
+            houYaYueShow('arr.splice(1, ' + n + ')', '[' + removed.join(', ') + ']', 'splice 像「手术刀」：从下标 1 开始切掉 ' + n + ' 个元素，返回切掉的部分');
+        }
+
+        /* ===== ③ 排序翻转 ===== */
+        function houYaYueSort() {
+            if (houYaYueArr.length === 0) { houYaYueRender(); houYaYueShow('arr.sort()', '[]', '数组是空的'); return; }
+            houYaYueArr.sort(function (a, b) { return a.localeCompare(b, 'zh'); });
+            houYaYueRender();
+            houYaYueShow("arr.sort((a, b) => a.localeCompare(b, 'zh'))", '[' + houYaYueArr.join(', ') + ']', 'sort 按中文拼音升序重新排队，返回排好的数组（原数组也变了）');
+        }
+
+        function houYaYueReverse() {
+            houYaYueArr.reverse();
+            houYaYueRender();
+            houYaYueShow('arr.reverse()', '[' + houYaYueArr.join(', ') + ']', 'reverse 让整个数组「掉个头」，第一个变最后一个');
+        }
+
+        /* ===== ④ 查找判断 ===== */
+        function houYaYueIndexOf() {
+            var i = houYaYueArr.indexOf('比亚迪');
+            houYaYueRender(null, i >= 0 ? [i] : []);
+            houYaYueShow("arr.indexOf('比亚迪')", i, i >= 0 ? '找到了！在下标 ' + i + ' 处（绿块）' : '数组里没有「比亚迪」，返回 -1');
+        }
+
+        function houYaYueIncludes() {
+            var has = houYaYueArr.includes('理想');
+            var i = houYaYueArr.indexOf('理想');
+            houYaYueRender(null, has ? [i] : []);
+            houYaYueShow("arr.includes('理想')", has, has ? '包含！includes 返回布尔值，比 indexOf 更直观' : '不包含，返回 false');
+        }
+
+        function houYaYueFind() {
+            var found = houYaYueArr.find(function (x) { return x.length >= 3; });
+            var i = houYaYueArr.indexOf(found);
+            houYaYueRender(null, i >= 0 ? [i] : []);
+            houYaYueShow("arr.find(x => x.length >= 3)", found === undefined ? 'undefined' : "'" + found + "'", 'find 返回第一个满足条件的元素，找到就停，找不到返回 undefined');
+        }
+
+        /* ===== ⑤ 高阶函数 ===== */
+        function houYaYueMap() {
+            if (houYaYueArr.length === 0) { houYaYueRender(); houYaYueShow('arr.map(x => "★" + x)', '[]', '数组是空的'); return; }
+            var res = houYaYueArr.map(function (x) { return '★' + x; });
+            houYaYueRender();
+            houYaYueShow('arr.map(x => "★" + x)', '[' + res.join(', ') + ']', 'map 像「流水线加工」：每个元素都被加工一遍，产出等长的新数组，原数组不动');
+        }
+
+        function houYaYueFilter() {
+            var res = houYaYueArr.filter(function (x) { return x.length > 2; });
+            var markIdxs = [];
+            houYaYueArr.forEach(function (x, i) { if (x.length > 2) { markIdxs.push(i); } });
+            houYaYueRender(null, markIdxs);
+            houYaYueShow('arr.filter(x => x.length > 2)', '[' + res.join(', ') + ']', 'filter 像「安检」：合格的（绿块）留下组成新数组，原数组不动');
+        }
+
+        function houYaYueForEach() {
+            var all = [];
+            for (var i = 0; i < houYaYueArr.length; i++) { all.push(i); }
+            houYaYueRender(null, all);
+            var count = 0;
+            houYaYueArr.forEach(function () { count++; });
+            houYaYueShow('arr.forEach(x => ...)', count + ' 个元素被点亮', 'forEach 只是逐个「拜访」每个元素（绿块），本身没有返回值');
+        }
+
+        /* ===== ⑥ 合并拼接 ===== */
+        function houYaYueConcat() {
+            var old = houYaYueArr.length;
+            houYaYueArr = houYaYueArr.concat(['蔚来', '小鹏']);
+            houYaYueRender([old, old + 1]);
+            houYaYueShow("arr.concat(['蔚来', '小鹏'])", '[' + houYaYueArr.join(', ') + ']', 'concat 把两个数组「手拉手」拼成一个新数组（橙色是拼进来的）');
+        }
+
+        function houYaYueSlice() {
+            var res = houYaYueArr.slice(1, 3);
+            var markIdxs = [];
+            for (var i = 1; i < Math.min(3, houYaYueArr.length); i++) { markIdxs.push(i); }
+            houYaYueRender(null, markIdxs);
+            houYaYueShow('arr.slice(1, 3)', '[' + res.join(', ') + ']', 'slice 像「切蛋糕」：取下标 [1, 3) 左闭右开的一段，原数组不动');
+        }
+
+        function houYaYueJoin() {
+            houYaYueRender();
+            houYaYueShow("arr.join(' ❤ ')", houYaYueArr.join(' ❤ '), 'join 把所有元素用连接符串成一根「糖葫芦」（字符串）');
+        }
+
+        /* ===== 重置 ===== */
+        function houYaYueReset() {
+            houYaYueArr = ['比亚迪', '理想', '特斯拉', '问界'];
+            houYaYueRender();
+            houYaYueShow('arr = [\'比亚迪\', \'理想\', \'特斯拉\', \'问界\']', '已重置', '回到最初的四个品牌');
+        }
+
+        houYaYueRender();
+    </script>
+</body>
+</html>
