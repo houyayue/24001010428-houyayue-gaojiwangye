@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-1 JavaScript JSON</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-02 14:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：JavaScript JSON 序列化与解析可视化演示
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        a { text-decoration: none; color: inherit; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 980px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.6; }
+
+        /* ===== 转换实验室：左右对照 ===== */
+        .hou_ya_yue_lab { display: flex; flex-wrap: wrap; gap: 16px; }
+
+        .hou_ya_yue_pane { flex: 1 1 380px; min-width: 300px; }
+
+        .hou_ya_yue_pane-t {
+            font-size: 13px; color: #555; margin-bottom: 6px; font-weight: bold;
+        }
+
+        .hou_ya_yue_pane-t em { font-style: normal; color: #9aa4ae; font-weight: normal; }
+
+        textarea {
+            width: 100%; height: 220px; resize: vertical;
+            border: 2px solid #c9d8ea; border-radius: 10px; padding: 12px 14px;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px;
+            line-height: 1.7; color: #2c3e50; outline: none; background: #f9fbfe;
+        }
+
+        textarea:focus { border-color: #3d7eff; background: #fff; }
+
+        textarea.hou_ya_yue_bad { border-color: #e03131; background: #fff5f5; }
+
+        .hou_ya_yue_view {
+            height: 220px; overflow: auto; border: 2px solid #a8c4e0; border-radius: 10px;
+            padding: 12px 14px; background: #f7fafd;
+        }
+
+        /* 对象树 */
+        .hou_ya_yue_node {
+            font-family: Consolas, "Courier New", monospace; font-size: 13px;
+            line-height: 1.9; padding-left: 16px; border-left: 1px dashed #cddaeb;
+            margin-left: 4px;
+        }
+
+        .hou_ya_yue_k { color: #2f6fe4; }
+
+        .hou_ya_yue_str { color: #c2505a; }
+
+        .hou_ya_yue_num { color: #ff6600; }
+
+        .hou_ya_yue_bool { color: #722ed1; }
+
+        .hou_ya_yue_null { color: #8aa3bd; }
+
+        .hou_ya_yue_brace { color: #666; }
+
+        .hou_ya_yue_row { display: block; white-space: pre-wrap; word-break: break-all; }
+
+        /* ===== 按钮 ===== */
+        .hou_ya_yue_btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+
+        .hou_ya_yue_btns button {
+            border: 0; border-radius: 20px; padding: 8px 15px; font-size: 13px;
+            cursor: pointer; font-family: inherit; color: #fff;
+            transition: transform .15s, opacity .15s;
+        }
+
+        .hou_ya_yue_btns button:hover { transform: translateY(-2px); opacity: .92; }
+
+        .hou_ya_yue_btns button:active { transform: translateY(0); }
+
+        .hou_ya_yue_g-do { background: #1d5fa6; }
+        .hou_ya_yue_g-fmt { background: #722ed1; }
+        .hou_ya_yue_g-err { background: #e03131; }
+        .hou_ya_yue_g-ok { background: #0ca678; }
+
+        .hou_ya_yue_reset {
+            border: 1px solid #ccd6e0; background: #fff; color: #666; font-family: inherit;
+            border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; margin-top: 8px;
+        }
+
+        .hou_ya_yue_reset:hover { border-color: #1d5fa6; color: #1d5fa6; }
+
+        /* ===== 结果与报错 ===== */
+        .hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; margin-top: 12px;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px;
+            line-height: 1.7; color: #abb2bf; min-height: 60px; white-space: pre-wrap;
+        }
+
+        .hou_ya_yue_out .hou_ya_yue-code { color: #98c379; }
+
+        .hou_ya_yue_out .hou_ya_yue-res { color: #e5c07b; }
+
+        .hou_ya_yue_out .hou_ya_yue-err { color: #ff7b7b; }
+
+        .hou_ya_yue_out .hou_ya_yue-ok { color: #7ee08a; }
+
+        .hou_ya_yue_out .hou_ya_yue-cmt { color: #5c6370; }
+
+        /* ===== 代码块（静态示例） ===== */
+        pre.hou_ya_yue_demo {
+            background: #282c34; color: #98c379; border-radius: 8px;
+            padding: 12px 14px; font-size: 13px; line-height: 1.7; overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace; margin-bottom: 6px;
+        }
+
+        /* ===== 表格 ===== */
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.5;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table code {
+            background: #eef3fa; color: #c2505a; border-radius: 4px;
+            padding: 1px 6px; font-family: Consolas, monospace; font-size: 12.5px;
+        }
+
+        .hou_ya_yue_table .hou_ya_yue-drop { color: #e03131; font-weight: bold; }
+
+        .hou_ya_yue_table .hou_ya_yue-keep { color: #0ca678; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">17-1 JSON · 可视化演示 —— JSON 是「数据的快递包裹」：发出前打包成字符串，收到后拆包还原成对象</p>
+
+        <!-- ===== 转换实验室 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>JSON 转换实验室</h2>
+            <p>左边是 <b>JSON 字符串</b>（一段带双引号的文本），右边是它被 <b>JSON.parse()</b> 拆包后还原的 <b>JS 对象树</b>。你可以直接修改左边的文本，再点「拆包」看效果。</p>
+
+            <div class="hou_ya_yue_lab">
+                <div class="hou_ya_yue_pane">
+                    <div class="hou_ya_yue_pane-t">① JSON 字符串 <em>（text，可编辑）</em></div>
+                    <textarea id="hou_ya_yue_src"></textarea>
+                </div>
+                <div class="hou_ya_yue_pane">
+                    <div class="hou_ya_yue_pane-t">② JS 对象树 <em>（parse 拆包结果，按类型着色）</em></div>
+                    <div class="hou_ya_yue_view" id="hou_ya_yue_tree"></div>
+                </div>
+            </div>
+
+            <div class="hou_ya_yue_btns">
+                <button class="hou_ya_yue_g-do" onclick="houYaYueParse()">JSON.parse() 拆包：字符串 → 对象</button>
+                <button class="hou_ya_yue_g-do" onclick="houYaYueStringify()">JSON.stringify() 打包：对象 → 字符串</button>
+                <button class="hou_ya_yue_g-fmt" onclick="houYaYuePretty()">美化输出（缩进 4 空格）</button>
+                <button class="hou_ya_yue_g-ok" onclick="houYaYueFilter()">第二个参数：只保留部分键</button>
+                <button class="hou_ya_yue_g-ok" onclick="houYaYueReviver()">第二个参数：reviver 还原日期</button>
+                <button class="hou_ya_yue_g-err" onclick="houYaYueErr(0)">❌ 单引号</button>
+                <button class="hou_ya_yue_g-err" onclick="houYaYueErr(1)">❌ 末尾多余逗号</button>
+                <button class="hou_ya_yue_g-err" onclick="houYaYueErr(2)">❌ 写了注释 / key 没加引号</button>
+            </div>
+            <button class="hou_ya_yue_reset" onclick="houYaYueReset()">↺ 重置内容</button>
+
+            <div class="hou_ya_yue_out" id="hou_ya_yue_out">
+                <span class="hou_ya_yue-cmt">// 点击上方按钮，这里显示执行的代码、结果与报错信息</span>
+            </div>
+        </div>
+
+        <!-- ===== 语法规则 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>JSON 的四条硬规矩（写错就报错）</h2>
+            <p>JSON 比 JS 对象严格得多，下面这些是新手最常踩的坑：</p>
+            <pre class="hou_ya_yue_demo">{
+  "brand": "比亚迪",        // ✔ 键必须双引号包起来
+  "price": 24.98,           // ✔ 数字不加引号
+  "tags": ["新能源", "SUV"], // ✔ 数组用中括号
+  "onSale": true,           // ✔ 只有 true / false / null，不能用 True / None
+  "owner": { "name": "侯雅月" } // ✔ 可以嵌套
+}</pre>
+            <p><b>✘ 不允许：</b>单引号、末尾多余逗号、注释、undefined、函数、变量、键不加引号。</p>
+            <div class="hou_ya_yue_out">
+                <span class="hou_ya_yue-err">JSON.parse("{'a':1}")</span>  <span class="hou_ya_yue-cmt">→ 报错：Unexpected token</span>
+                <span class="hou_ya_yue-err">JSON.parse('{"a":1,}')</span>  <span class="hou_ya_yue-cmt">→ 报错：Unexpected token }</span>
+                <span class="hou_ya_yue-err">{"a": undefined}</span>        <span class="hou_ya_yue-cmt">→ 序列化时该键直接消失</span>
+            </div>
+        </div>
+
+        <!-- ===== 类型对照表 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>JS 值 → JSON 的「通关规则」</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>JS 里的值</th><th>stringify 之后</th><th>说明</th></tr>
+                <tr><td><code>字符串 / 数字 / 布尔</code></td><td class="hou_ya_yue-keep">原样保留</td><td>基本类型直接变身</td></tr>
+                <tr><td><code>数组</code></td><td class="hou_ya_yue-keep">[ ... ]</td><td>顺序保持不变</td></tr>
+                <tr><td><code>对象（不含函数）</code></td><td class="hou_ya_yue-keep">{ ... }</td><td>键会被自动加上双引号</td></tr>
+                <tr><td><code>undefined</code></td><td class="hou_ya_yue-drop">键被丢弃</td><td>对象里的 undefined 属性直接消失</td></tr>
+                <tr><td><code>函数 / Symbol</code></td><td class="hou_ya_yue-drop">键被丢弃</td><td>JSON 只装数据，不装代码</td></tr>
+                <tr><td><code>NaN / Infinity</code></td><td class="hou_ya_yue-drop">变成 null</td><td>JSON 没有这两个词</td></tr>
+                <tr><td><code>Date 日期对象</code></td><td class="hou_ya_yue-keep">"2026-11-02T..."</td><td>自动变成 ISO 格式字符串</td></tr>
+                <tr><td><code>null</code></td><td class="hou_ya_yue-keep">null</td><td>表示「空」用 null，不是 undefined</td></tr>
+            </table>
+        </div>
+
+        <!-- ===== 速查 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>方法速查</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>写法</th><th>作用</th></tr>
+                <tr><td><code>JSON.stringify(obj)</code></td><td>对象 → JSON 字符串（打包）</td></tr>
+                <tr><td><code>JSON.stringify(obj, null, 4)</code></td><td>带 4 空格缩进的美化输出</td></tr>
+                <tr><td><code>JSON.stringify(obj, ['brand','price'])</code></td><td>第二个参数传数组：只保留指定键（过滤）</td></tr>
+                <tr><td><code>JSON.parse(str)</code></td><td>JSON 字符串 → 对象（拆包）</td></tr>
+                <tr><td><code>JSON.parse(str, function(k,v){})</code></td><td>第二个参数 reviver：边拆边加工（如把日期串还原成 Date）</td></tr>
+                <tr><td><code>try { ... } catch(e) { ... }</code></td><td>解析外部数据时必须包起来，防止坏数据让页面崩掉</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        /* 侯雅月：默认演示数据（汽车对象，含嵌套与数组） */
+        var houYaYueDemo = {
+            brand: '比亚迪',
+            price: 24.98,
+            onSale: true,
+            colors: ['白色', '黑色', '灰色'],
+            owner: { name: '侯雅月', city: '大连' },
+            note: null
+        };
+
+        var houYaYueSrcBox = document.getElementById('hou_ya_yue_src');
+        var houYaYueTreeBox = document.getElementById('hou_ya_yue_tree');
+        var houYaYueOutBox = document.getElementById('hou_ya_yue_out');
+
+        /* 输出：code 代码、ret 结果、extra 说明、ok 是否为成功样式 */
+        function houYaYueShow(code, ret, extra, ok, isErr) {
+            var html = '<span class="hou_ya_yue-code">' + code + '</span>\n'
+                + '<span class="' + (isErr ? 'hou_ya_yue-err' : (ok ? 'hou_ya_yue-ok' : 'hou_ya_yue-res')) + '">'
+                + ret + '</span>';
+            if (extra) { html += '\n<span class="hou_ya_yue-cmt">' + extra + '</span>'; }
+            houYaYueOutBox.innerHTML = html;
+        }
+
+        /* 转义，防止把 HTML 当标签渲染 */
+        function houYaYueEsc(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        /* 按类型给值着色 */
+        function houYaYueVal(v) {
+            if (v === null) { return '<span class="hou_ya_yue_null">null</span>'; }
+            if (typeof v === 'string') { return '<span class="hou_ya_yue_str">"' + houYaYueEsc(v) + '"</span>'; }
+            if (typeof v === 'number') { return '<span class="hou_ya_yue_num">' + v + '</span>'; }
+            if (typeof v === 'boolean') { return '<span class="hou_ya_yue_bool">' + v + '</span>'; }
+            return houYaYueEsc(String(v));
+        }
+
+        /* 递归渲染对象树 */
+        function houYaYueTree(obj, depth) {
+            if (obj === null || typeof obj !== 'object') { return houYaYueVal(obj); }
+            var keys = Object.keys(obj);
+            var isArr = Object.prototype.toString.call(obj) === '[object Array]';
+            if (keys.length === 0) { return '<span class="hou_ya_yue_brace">' + (isArr ? '[]' : '{}') + '</span>'; }
+            var html = '<span class="hou_ya_yue_brace">' + (isArr ? '[' : '{') + '</span>\n<div class="hou_ya_yue_node">';
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var comma = i < keys.length - 1 ? ',' : '';
+                var label = isArr ? '<span class="hou_ya_yue_k">[' + k + ']</span>'
+                                  : '<span class="hou_ya_yue_k">"' + houYaYueEsc(k) + '"</span>: ';
+                html += '<span class="hou_ya_yue_row">' + label + houYaYueTree(obj[k], depth + 1) + comma + '</span>';
+            }
+            html += '</div><span class="hou_ya_yue_brace">' + (isArr ? ']' : '}') + '</span>';
+            return html;
+        }
+
+        /* ① 拆包：字符串 → 对象 */
+        function houYaYueParse() {
+            var src = houYaYueSrcBox.value;
+            try {
+                var obj = JSON.parse(src);
+                houYaYueTreeBox.innerHTML = houYaYueTree(obj, 0);
+                houYaYueSrcBox.className = '';
+                houYaYueShow('JSON.parse( 文本框内容 )',
+                    '✔ 拆包成功，类型：' + (obj instanceof Array ? '数组' : typeof obj),
+                    '右边就是还原出来的对象；JSON 里的数组会变成 JS 数组，对象变成 JS 对象。');
+            } catch (e) {
+                houYaYueSrcBox.className = 'hou_ya_yue_bad';
+                houYaYueShow('JSON.parse( 文本框内容 )', '✘ 解析失败：' + houYaYueEsc(e.message),
+                    'JSON 语法很严格：键要双引号、不能有多余逗号、不能有注释。改好再点一次。', false, true);
+            }
+        }
+
+        /* ② 打包：对象 → 字符串 */
+        function houYaYueStringify() {
+            var s = JSON.stringify(houYaYueDemo);
+            houYaYueSrcBox.value = s;
+            houYaYueSrcBox.className = '';
+            houYaYueTreeBox.innerHTML = houYaYueTree(houYaYueDemo, 0);
+            houYaYueShow('JSON.stringify(car)', houYaYueEsc(s),
+                '打包成一行字符串（压缩版），方便网络传输或存 localStorage；注意键被自动加了双引号。', true);
+        }
+
+        /* ③ 美化：第三个参数控制缩进 */
+        function houYaYuePretty() {
+            var s = JSON.stringify(houYaYueDemo, null, 4);
+            houYaYueSrcBox.value = s;
+            houYaYueSrcBox.className = '';
+            houYaYueShow('JSON.stringify(car, null, 4)', houYaYueEsc(s),
+                '第三个参数传数字 4 = 每层缩进 4 个空格；传 "\\t" 则用制表符。JSON 内容没变，只是更好读。', true);
+        }
+
+        /* ④ 第二个参数：过滤键 */
+        function houYaYueFilter() {
+            var s = JSON.stringify(houYaYueDemo, ['brand', 'price'], 2);
+            houYaYueSrcBox.value = s;
+            houYaYueSrcBox.className = '';
+            houYaYueShow("JSON.stringify(car, ['brand', 'price'], 2)", houYaYueEsc(s),
+                '第二个参数传数组 = 白名单，只保留写进去的键，其余（型号、颜色、车主…）全部丢掉。', true);
+        }
+
+        /* ⑤ 第二个参数：reviver 还原日期 */
+        function houYaYueReviver() {
+            var withDate = { brand: '比亚迪', buyDate: '2026-11-02T10:00:00.000Z' };
+            var obj = JSON.parse(JSON.stringify(withDate), function (k, v) {
+                if (k === 'buyDate') { return new Date(v); }
+                return v;
+            });
+            houYaYueSrcBox.value = JSON.stringify(withDate, null, 2);
+            houYaYueSrcBox.className = '';
+            houYaYueTreeBox.innerHTML = houYaYueTree({ brand: obj.brand, buyDate: obj.buyDate.getFullYear() + '年（Date 对象）' }, 0);
+            houYaYueShow("JSON.parse(str, function (k, v) { if (k === 'buyDate') return new Date(v); return v; })",
+                'buyDate 已还原为 Date 对象 → ' + obj.buyDate.getFullYear() + '年',
+                'JSON 不能存 Date，只能存字符串；reviver 让我们「边拆包边加工」，把日期串还原成真正的 Date。', true);
+        }
+
+        /* ⑥ 三种常见错误 */
+        var houYaYueBadDemo = [
+            { code: "{ 'brand': '比亚迪' }", tip: 'JSON 只允许双引号，单引号不合法' },
+            { code: '{ "brand": "比亚迪", }', tip: '最后一项后面不能有多余的逗号' },
+            { code: '{ brand: "比亚迪" } // 注释', tip: '键必须加引号，且 JSON 里不能写注释' }
+        ];
+
+        function houYaYueErr(i) {
+            var bad = houYaYueBadDemo[i];
+            houYaYueSrcBox.value = bad.code;
+            houYaYueSrcBox.className = 'hou_ya_yue_bad';
+            try {
+                JSON.parse(bad.code);
+                houYaYueTreeBox.innerHTML = '';
+            } catch (e) {
+                houYaYueTreeBox.innerHTML = '<div style="color:#e03131;font-size:13px;line-height:1.8;">'
+                    + '✘ 解析失败<br>' + houYaYueEsc(e.message) + '<br><br>原因：' + bad.tip + '</div>';
+                houYaYueShow('JSON.parse(' + houYaYueEsc(bad.code) + ')', '✘ ' + houYaYueEsc(e.message),
+                    bad.tip + ' —— 所以解析外部数据一定要用 try...catch 包起来。', false, true);
+            }
+        }
+
+        /* 重置 */
+        function houYaYueReset() {
+            houYaYueSrcBox.value = JSON.stringify(houYaYueDemo, null, 4);
+            houYaYueSrcBox.className = '';
+            houYaYueTreeBox.innerHTML = houYaYueTree(houYaYueDemo, 0);
+            houYaYueShow('// 初始状态', '已重置为示例对象（美化缩进 4 空格）',
+                '现在左边是 JSON 字符串，右边是它对应的对象树。', true);
+        }
+
+        houYaYueReset();
+    </script>
+</body>
+</html>

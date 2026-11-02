@@ -158,3 +158,34 @@ https://www.autohome.com.cn/dalian/仿照这个汽车之家的网页版，在我
 
 ## 2026-10-29 14:50:31 ｜ 模型：GLM-5.3-Flash
 用户要求：创建技能skill：提交到github，commit和push整个项目到`https://github.com/houyayue/24001010428-houyayue-gaojiwangye.git`。公钥已设置。（技能已存在，本次执行提交推送）
+
+## 2026-11-02 14:30:00 ｜ 模型：GLM-5.3-Flash
+用户要求：完成 17-1.html，展示 JSON。
+完成内容：新建 17-1.html——JSON 转换实验室（左侧可编辑 JSON 文本框 ↔ 右侧按类型着色的对象树），JSON.parse 拆包 / stringify 打包 / 缩进美化 / replacer 白名单过滤 / reviver 还原 Date；三种语法错误（单引号、尾逗号、注释）现场报错演示；JSON 四条硬规矩、JS 值→JSON 类型通关规则表（undefined/函数丢弃、NaN→null、Date→字符串等）与方法速查表；保持 hou_ya_yue_ 前缀与全站风格；无头浏览器验证渲染与交互链（stringify→parse）通过；已加入 index.html（计数 34）。
+
+## 2026-11-02 15:30:00 ｜ 模型：GLM-5.3-Flash
+用户要求：完成 17-2.html，获取 https://dog.ceo/api/breed/hound/images/random/3 接口数据并展示，接口可跨域，使用 fetch 和原生代码。
+完成内容：新建 17-2.html——fetch(async/await) 跨域请求 dog.ceo 随机猎犬接口，res.ok 状态判断 + res.json() 解析，展示 3 张图片卡片（含图片地址）、返回 JSON 语法高亮、加载骨架屏、请求耗时与状态码显示、try/catch 错误提示与重试；另提供 XMLHttpRequest 对照写法与 fetch 要点表；纯原生无 CDN，hou_ya_yue_ 前缀与全站风格一致。无头浏览器实测：HTTP 200、3 张图片、50ms、status=success，渲染正确。已加入 index.html（计数 35）。
+
+## 2026-11-02 16:40:00 ｜ 模型：GLM-5.3-Flash
+用户要求：完成 17-3.html 与 17-3-detail.html，列表 https://dummyjson.com/products?limit=8、详情 https://dummyjson.com/products/1，数据来自接口，用 fetch。
+完成内容：17-3.html（商品列表：fetch 取 8 件商品渲染四列卡片——缩略图/品牌分类/折后价+原价+折扣/评分库存，条数输入框、骨架屏、错误重试、返回 JSON 节选，点击跳 17-3-detail.html?id=xx）；17-3-detail.html（详情：URLSearchParams 取 ?id=，fetch 单商品，主图+多图切换、价格折扣、星级、规格参数表、标签、用户评价、返回列表，try/catch 提示 404）。纯原生无 CDN，hou_ya_yue_ 前缀。备注：本机网络策略拦截 dummyjson.com（403/超时），改用本地 mock + http 服务验证渲染逻辑通过（8 卡片/8 跳转链接、详情三星商品标题与评价渲染正确）。已加入 index.html（计数 37）。
+
+## 2026-11-02 17:35:00 ｜ 模型：GLM-5.3-Flash
+用户要求：完成 17-4.html，对远程数据接口进行测试，支持 get、post 等，显示返回的数据和错误提示信息，示例接口 https://jsonplaceholder.typicode.com/posts。
+完成内容：新建 17-4.html 接口测试工具——方法下拉（GET/POST/PUT/PATCH/DELETE）、地址输入、JSON 请求体（写操作时显示，提交前本地校验是否为合法 JSON）、8 个快捷示例、AbortController 8 秒超时中断；结果区含状态码徽章（2xx 绿/3xx-4xx 橙/5xx 红/失败红）、耗时与响应大小、美化 JSON（键蓝/字符串黄/数字橙高亮）、原始文本、响应头三种 Tab 视图；错误按 404/500/网络失败/超时分类提示并给排查建议；请求历史 6 条可点击回填；附 fetch GET/POST/超时代码与状态码说明表。纯原生无 CDN，hou_ya_yue_ 前缀。无头浏览器实测：GET 200（48ms/292B，返回真实数据）、POST 201 创建成功、GET /posts/9999 返回 404 橙色提示、错误域名显示“Failed to fetch”排查建议，四条历史均正确。已加入 index.html（计数 38）。
+
+## 2026-11-02 18:30:00 ｜ 模型：GLM-5.3-Flash
+用户要求：完成 17-5，展示 JavaScript 的两种定时器。
+完成内容：新建 17-5.html——setTimeout「定时炸弹」面板（可设延时、进度条倒读秒、到点执行一次、clearTimeout 取消按钮）与 setInterval「心跳」面板（可设间隔、执行次数、心跳点依次点亮、带时间戳日志、clearInterval 停止、满 20 次自动停）左右对照；实战区含 10 秒倒计时（到 0 自动 clearInterval）与递归 setTimeout 打字机；附核心代码与两者区别表（执行次数、停止方法、用途、递归替代、毫秒单位、必须保存 id、延时非准点、this 指向）。纯原生无 CDN，hou_ya_yue_ 前缀。无头浏览器实测：clearTimeout 取消生效、250ms 间隔 4 秒内执行 16 次、倒计时 10→6、打字机逐字输出，日志正确。已加入 index.html（计数 39）。
+
+## 2026-11-02 19:40:00 ｜ 模型：GLM-5.3-Flash
+用户要求：完成 17-6.html，用 Promise 和 async 完成异步操作演示包饺子流程：先买原料、取原料，之后同时和面、和馅，两者完成后包饺子，再吃饺子；用 setTimeout 模拟每个流程（买原料 6s），页面显示流程。
+完成内容：新建 17-6.html——把 setTimeout 封装成 Promise（resolve 兑现），流程为 买原料6s → 取原料2s → Promise.all([和面5s, 和馅4s]) 并行 → 包饺子4s → 吃饺子3s；每个节点卡片显示状态标签（等待/进行中/完成）、进度条与剩余秒数，并行区用虚线框标注并说明耗时取较长者；提供 async/await 与 Promise.then 链式两个按钮真实执行同一流程；顶部实时总耗时；黑色时间线日志打印每步开始/完成与最终「饺子出锅，开饭！」；附两种写法对照代码与知识点表（Promise.all/race、串行 vs 并行、24s→20s 对比）。纯原生无 CDN，hou_ya_yue_ 前缀。无头浏览器实测：第 9 秒时和面与和馅同时「进行中」，全流程 20.0 秒跑完六步均「完成」，日志正确。已加入 index.html（计数 40）。
+
+## 2026-11-02 14:43:35 ｜ 模型：GLM-5.3-Flash
+用户要求：把所有超链接放到index里面
+完成内容：核对项目内全部 41 个非首页 HTML 文件，为此前未收录的本地 iconfont Demo 补充 index.html 卡片入口；现有实践页面和新增入口的链接路径均有效，17-6.html 已有对应入口。
+
+## 2026-11-02 14:47:48 ｜ 模型：GLM-5.3-Flash
+用户要求：创建技能skill：提交到github，commit和push整个项目到`https://github.com/houyayue/24001010428-houyayue-gaojiwangye.git`。公钥已设置。（技能已存在，本次执行提交推送）

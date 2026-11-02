@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-4 远程数据接口测试工具</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-02 17:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：接口测试工具（GET/POST/PUT/PATCH/DELETE，展示返回数据与错误信息）
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; }
+
+        /* ===== 请求行 ===== */
+        .hou_ya_yue_line { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+
+        .hou_ya_yue_line select, .hou_ya_yue_line input {
+            height: 40px; border: 1px solid #ccd6e0; border-radius: 8px;
+            padding: 0 12px; font-size: 14px; font-family: inherit; outline: none;
+        }
+
+        .hou_ya_yue_line select { background: #f7fafd; color: #1d5fa6; font-weight: bold; }
+
+        .hou_ya_yue_line input { flex: 1; min-width: 240px; color: #2c3e50; }
+
+        .hou_ya_yue_line select:focus, .hou_ya_yue_line input:focus { border-color: #1d5fa6; }
+
+        .hou_ya_yue_send {
+            height: 40px; border: 0; border-radius: 8px; padding: 0 24px;
+            background: #1d5fa6; color: #fff; font-size: 15px; cursor: pointer;
+            font-family: inherit; transition: opacity .15s;
+        }
+
+        .hou_ya_yue_send:hover { opacity: .9; }
+
+        .hou_ya_yue_send:disabled { background: #b6c2ce; cursor: not-allowed; }
+
+        .hou_ya_yue_ghost {
+            height: 40px; border: 1px solid #ccd6e0; background: #fff; color: #666;
+            border-radius: 8px; padding: 0 16px; cursor: pointer; font-family: inherit; font-size: 14px;
+        }
+
+        .hou_ya_yue_ghost:hover { border-color: #1d5fa6; color: #1d5fa6; }
+
+        /* 快捷示例 */
+        .hou_ya_yue_quick { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+        .hou_ya_yue_quick button {
+            border: 1px dashed #a8c4e0; background: #f7fafd; color: #1d5fa6;
+            border-radius: 16px; padding: 5px 12px; font-size: 12.5px; cursor: pointer;
+            font-family: Consolas, monospace;
+        }
+
+        .hou_ya_yue_quick button:hover { background: #e8f1fd; border-style: solid; }
+
+        /* ===== 请求体 ===== */
+        .hou_ya_yue_lab-t { font-size: 13px; color: #555; font-weight: bold; margin-bottom: 6px; }
+
+        textarea {
+            width: 100%; height: 110px; resize: vertical; border: 2px solid #c9d8ea;
+            border-radius: 8px; padding: 10px 12px; font-family: Consolas, "Courier New", monospace;
+            font-size: 13px; line-height: 1.7; color: #2c3e50; outline: none; background: #f9fbfe;
+        }
+
+        textarea:focus { border-color: #3d7eff; background: #fff; }
+
+        .hou_ya_yue_hide { display: none; }
+
+        /* ===== 状态条 ===== */
+        .hou_ya_yue_stat {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 14px 0 10px;
+        }
+
+        .hou_ya_yue_badge {
+            border-radius: 6px; padding: 5px 12px; font-size: 14px; font-weight: bold; color: #fff;
+        }
+
+        .hou_ya_yue_badge.hou_ya_yue_ok { background: #0ca678; }
+        .hou_ya_yue_badge.hou_ya_yue_warn { background: #f08c00; }
+        .hou_ya_yue_badge.hou_ya_yue_bad { background: #e03131; }
+        .hou_ya_yue_badge.hou_ya_yue_idle { background: #b6c2ce; }
+
+        .hou_ya_yue_stat .hou_ya_yue_kv { font-size: 13px; color: #666; }
+
+        .hou_ya_yue_stat .hou_ya_yue_kv b { color: #1d5fa6; }
+
+        /* 加载条 */
+        .hou_ya_yue_load {
+            height: 3px; background: #e3eaf2; border-radius: 2px; overflow: hidden; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_load i {
+            display: block; width: 40%; height: 100%; background: #1d5fa6;
+            animation: hou_ya_yue_run 1s linear infinite;
+        }
+
+        @keyframes hou_ya_yue_run {
+            0% { margin-left: -40%; }
+            100% { margin-left: 100%; }
+        }
+
+        /* ===== 结果 Tab ===== */
+        .hou_ya_yue_tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+
+        .hou_ya_yue_tabs span {
+            border-radius: 16px; padding: 5px 14px; font-size: 13px; cursor: pointer;
+            background: #f0f4f8; color: #666;
+        }
+
+        .hou_ya_yue_tabs span.hou_ya_yue_on { background: #1d5fa6; color: #fff; }
+
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #98c379; min-height: 120px; max-height: 460px; margin: 0;
+            white-space: pre-wrap; word-break: break-all;
+        }
+
+        pre.hou_ya_yue_out .hou_ya_yue_key { color: #61afef; }
+        pre.hou_ya_yue_out .hou_ya_yue_str { color: #e5c07b; }
+        pre.hou_ya_yue_out .hou_ya_yue_num { color: #d19a66; }
+
+        .hou_ya_yue_err-box {
+            background: #fff5f5; border: 1px solid #ffc9c9; border-radius: 8px;
+            padding: 12px 14px; color: #e03131; font-size: 13px; line-height: 1.8; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_ok-box {
+            background: #f2fbf6; border: 1px solid #b7ebcb; border-radius: 8px;
+            padding: 12px 14px; color: #0ca678; font-size: 13px; line-height: 1.8; margin-bottom: 10px;
+        }
+
+        /* ===== 历史 ===== */
+        .hou_ya_yue_hist { font-size: 13px; }
+
+        .hou_ya_yue_hist div {
+            padding: 8px 10px; border-bottom: 1px dashed #e3eaf2; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+
+        .hou_ya_yue_hist div:hover { background: #f7fafd; }
+
+        .hou_ya_yue_hist em {
+            font-style: normal; background: #eef3fa; color: #1d5fa6; border-radius: 4px;
+            padding: 2px 8px; font-size: 12px; font-weight: bold;
+        }
+
+        .hou_ya_yue_hist s { text-decoration: none; color: #9aa4ae; font-size: 12px; }
+
+        .hou_ya_yue_hist code { color: #555; word-break: break-all; }
+
+        /* ===== 表格 ===== */
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table td code { color: #c2505a; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">17-4 远程数据接口测试工具 · 支持 GET / POST / PUT / PATCH / DELETE，原生 fetch 实现</p>
+
+        <!-- ===== 请求区 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>构造请求</h2>
+            <p>选择一个方法、填好地址，点「发送请求」。示例接口使用免费测试站 <code>jsonplaceholder.typicode.com</code>（支持跨域）。</p>
+
+            <div class="hou_ya_yue_line">
+                <select id="hou_ya_yue_method" onchange="houYaYueToggleBody()">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <input id="hou_ya_yue_url" type="text" value="https://jsonplaceholder.typicode.com/posts">
+                <button class="hou_ya_yue_send" id="hou_ya_yue_go" onclick="houYaYueSend()">发送请求</button>
+                <button class="hou_ya_yue_ghost" onclick="houYaYueClear()">清空结果</button>
+            </div>
+
+            <div class="hou_ya_yue_quick">
+                <button onclick="houYaYueQuick('GET','https://jsonplaceholder.typicode.com/posts')">GET /posts</button>
+                <button onclick="houYaYueQuick('GET','https://jsonplaceholder.typicode.com/posts/1')">GET /posts/1</button>
+                <button onclick="houYaYueQuick('GET','https://jsonplaceholder.typicode.com/comments?postId=1')">GET /comments?postId=1</button>
+                <button onclick="houYaYueQuick('GET','https://jsonplaceholder.typicode.com/posts/9999')">GET /posts/9999（404）</button>
+                <button onclick="houYaYueQuick('POST','https://jsonplaceholder.typicode.com/posts')">POST /posts</button>
+                <button onclick="houYaYueQuick('PUT','https://jsonplaceholder.typicode.com/posts/1')">PUT /posts/1</button>
+                <button onclick="houYaYueQuick('DELETE','https://jsonplaceholder.typicode.com/posts/1')">DELETE /posts/1</button>
+                <button onclick="houYaYueQuick('GET','https://abc.not-exist-xyz.com/api')">错误地址（网络失败）</button>
+            </div>
+
+            <div id="hou_ya_yue_body-wrap">
+                <div class="hou_ya_yue_lab-t">请求体（JSON，POST / PUT / PATCH 时发送）</div>
+                <textarea id="hou_ya_yue_body">{
+  "title": "侯雅月的接口测试",
+  "body": "用 fetch 发送 POST 请求",
+  "userId": 1
+}</textarea>
+            </div>
+        </div>
+
+        <!-- ===== 响应区 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>返回结果</h2>
+            <div class="hou_ya_yue_load hou_ya_yue_hide" id="hou_ya_yue_bar"><i></i></div>
+
+            <div class="hou_ya_yue_stat" id="hou_ya_yue_stat">
+                <span class="hou_ya_yue_badge hou_ya_yue_idle" id="hou_ya_yue_code">未发送</span>
+                <span class="hou_ya_yue_kv" id="hou_ya_yue_info">填好请求后点击「发送请求」</span>
+            </div>
+
+            <div id="hou_ya_yue_msg"></div>
+
+            <div class="hou_ya_yue_tabs" id="hou_ya_yue_tabs">
+                <span class="hou_ya_yue_on" data-t="pretty">美化 JSON</span>
+                <span data-t="raw">原始文本</span>
+                <span data-t="header">响应头</span>
+            </div>
+            <pre class="hou_ya_yue_out" id="hou_ya_yue_out">// 这里显示接口返回的数据</pre>
+        </div>
+
+        <!-- ===== 历史 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>请求历史（点击可回填）</h2>
+            <div class="hou_ya_yue_hist" id="hou_ya_yue_hist"><div style="color:#b6c2ce;">暂无记录</div></div>
+        </div>
+
+        <!-- ===== 代码 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>核心代码：fetch 发 GET / POST</h2>
+            <pre class="hou_ya_yue_out">// —— GET：地址里带参数即可 ——
+const res = await fetch('https://jsonplaceholder.typicode.com/posts/1');
+const data = await res.json();
+
+// —— POST：第二个参数配置 method / 请求头 / 请求体 ——
+const res2 = await fetch('https://jsonplaceholder.typicode.com/posts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },   // 告诉服务器我发的是 JSON
+  body: JSON.stringify({ title: 'foo', body: 'bar', userId: 1 })  // 对象必须转成字符串
+});
+const created = await res2.json();
+
+// —— 超时中断：AbortController ——
+const ctrl = new AbortController();
+setTimeout(() =&gt; ctrl.abort(), 8000);
+fetch(url, { signal: ctrl.signal });   // 超时后请求被取消，进入 catch</pre>
+        </div>
+
+        <!-- ===== 状态码说明 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>常见状态码与错误提示</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>状态码 / 情况</th><th>含义</th><th>本页提示</th></tr>
+                <tr><td><code>200 OK</code></td><td>请求成功</td><td>绿色徽章 + 数据</td></tr>
+                <tr><td><code>201 Created</code></td><td>创建成功（POST 常见）</td><td>绿色徽章 + 新建对象</td></tr>
+                <tr><td><code>404 Not Found</code></td><td>资源不存在</td><td>橙色徽章 + “资源不存在”</td></tr>
+                <tr><td><code>500 / 502</code></td><td>服务器出错</td><td>红色徽章 + “服务器错误”</td></tr>
+                <tr><td><code>TypeError: Failed to fetch</code></td><td>断网 / 域名不存在 / 被 CORS 拒绝</td><td>红色提示框 + 排查建议</td></tr>
+                <tr><td><code>AbortError</code></td><td>超过 8 秒被主动中断</td><td>“请求超时，已中断”</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var houYaYueMethod = document.getElementById('hou_ya_yue_method');
+        var houYaYueUrl = document.getElementById('hou_ya_yue_url');
+        var houYaYueBody = document.getElementById('hou_ya_yue_body');
+        var houYaYueBodyWrap = document.getElementById('hou_ya_yue_body-wrap');
+        var houYaYueBar = document.getElementById('hou_ya_yue_bar');
+        var houYaYueCode = document.getElementById('hou_ya_yue_code');
+        var houYaYueInfo = document.getElementById('hou_ya_yue_info');
+        var houYaYueMsg = document.getElementById('hou_ya_yue_msg');
+        var houYaYueOut = document.getElementById('hou_ya_yue_out');
+        var houYaYueHist = document.getElementById('hou_ya_yue_hist');
+        var houYaYueGo = document.getElementById('hou_ya_yue_go');
+
+        var houYaYueLast = { pretty: '', raw: '', header: '' };
+        var houYaYueHistory = [];
+
+        /* 只有写操作才显示请求体 */
+        function houYaYueToggleBody() {
+            var m = houYaYueMethod.value;
+            houYaYueBodyWrap.className = (m === 'GET' || m === 'DELETE') ? 'hou_ya_yue_hide' : '';
+        }
+
+        /* 快捷示例：回填方法与地址 */
+        function houYaYueQuick(m, url) {
+            houYaYueMethod.value = m;
+            houYaYueUrl.value = url;
+            houYaYueToggleBody();
+        }
+
+        /* 结果 Tab 切换 */
+        (function () {
+            var tabs = document.getElementById('hou_ya_yue_tabs');
+            tabs.addEventListener('click', function (e) {
+                var t = e.target.getAttribute && e.target.getAttribute('data-t');
+                if (!t) { return; }
+                var list = tabs.getElementsByTagName('span');
+                for (var i = 0; i < list.length; i++) { list[i].className = ''; }
+                e.target.className = 'hou_ya_yue_on';
+                houYaYueOut.innerHTML = houYaYueLast[t] || '（无内容）';
+            });
+        })();
+
+        /* JSON 语法高亮 */
+        function houYaYuePretty(text) {
+            var s = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            s = s.replace(/"([^"\\]*(\\.[^"\\]*)*)"(\s*:)/g, '<span class="hou_ya_yue_key">"$1"</span>$3');
+            s = s.replace(/:\s*"([^"\\]*(\\.[^"\\]*)*)"/g, ': <span class="hou_ya_yue_str">"$1"</span>');
+            s = s.replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="hou_ya_yue_num">$1</span>');
+            return s;
+        }
+
+        /* 状态码说明 */
+        function houYaYueCodeText(c) {
+            var map = {
+                200: '请求成功', 201: '创建成功', 204: '删除成功（无返回内容）',
+                400: '请求参数有误', 401: '未登录/未授权', 403: '禁止访问',
+                404: '资源不存在（地址或 id 写错了）', 405: '方法不被允许',
+                408: '请求超时', 500: '服务器内部错误', 502: '网关错误', 503: '服务不可用'
+            };
+            return map[c] || (c ? '状态码 ' + c : '');
+        }
+
+        function houYaYueBadge(code, ok) {
+            if (!ok) { return 'hou_ya_yue_bad'; }
+            if (code >= 200 && code < 300) { return 'hou_ya_yue_ok'; }
+            if (code >= 300 && code < 500) { return 'hou_ya_yue_warn'; }
+            return 'hou_ya_yue_bad';
+        }
+
+        /* 记录历史 */
+        function houYaYuePushHist(m, url, code, ms) {
+            houYaYueHistory.unshift({ m: m, url: url, code: code, ms: ms });
+            if (houYaYueHistory.length > 6) { houYaYueHistory.pop(); }
+            var html = '';
+            for (var i = 0; i < houYaYueHistory.length; i++) {
+                var h = houYaYueHistory[i];
+                html += '<div onclick="houYaYueQuick(\'' + h.m + '\',\'' + h.url + '\')">'
+                    + '<em>' + h.m + '</em><code>' + h.url + '</code>'
+                    + '<s>状态 ' + h.code + ' · ' + h.ms + 'ms</s></div>';
+            }
+            houYaYueHist.innerHTML = html || '<div style="color:#b6c2ce;">暂无记录</div>';
+        }
+
+        /* 发送 */
+        async function houYaYueSend() {
+            var m = houYaYueMethod.value;
+            var url = houYaYueUrl.value.trim();
+            if (!url) {
+                houYaYueMsg.innerHTML = '<div class="hou_ya_yue_err-box">✘ 请填写接口地址</div>';
+                return;
+            }
+
+            var opt = { method: m };
+            if (m !== 'GET' && m !== 'DELETE') {
+                opt.headers = { 'Content-Type': 'application/json' };
+                opt.body = houYaYueBody.value;
+                try { JSON.parse(houYaYueBody.value); }
+                catch (e) {
+                    houYaYueMsg.innerHTML = '<div class="hou_ya_yue_err-box">✘ 请求体不是合法 JSON：' + e.message
+                        + '<br>请检查是否用了单引号、末尾是否多了逗号。</div>';
+                    return;
+                }
+            }
+
+            /* 8 秒超时中断 */
+            var ctrl = new AbortController();
+            opt.signal = ctrl.signal;
+            var timer = setTimeout(function () { ctrl.abort(); }, 8000);
+
+            houYaYueBar.className = 'hou_ya_yue_load';
+            houYaYueGo.disabled = true;
+            houYaYueMsg.innerHTML = '';
+            houYaYueCode.className = 'hou_ya_yue_badge hou_ya_yue_idle';
+            houYaYueCode.textContent = '请求中…';
+            houYaYueInfo.textContent = m + ' ' + url;
+            houYaYueOut.textContent = '// 请求中…';
+
+            var t0 = Date.now();
+            try {
+                var res = await fetch(url, opt);
+                var ms = Date.now() - t0;
+                var text = await res.text();
+
+                /* 响应头 */
+                var hh = '';
+                res.headers.forEach(function (v, k) { hh += k + ': ' + v + '\n'; });
+                houYaYueLast.header = hh || '（无响应头信息）';
+                houYaYueLast.raw = text || '（返回内容为空）';
+                try {
+                    houYaYueLast.pretty = houYaYuePretty(JSON.stringify(JSON.parse(text), null, 4));
+                } catch (e2) {
+                    houYaYueLast.pretty = houYaYueLast.raw;
+                }
+
+                var size = text ? text.length : 0;
+                houYaYueCode.textContent = res.status + ' ' + (res.ok ? '' : '');
+                houYaYueCode.className = 'hou_ya_yue_badge ' + houYaYueBadge(res.status, true);
+                houYaYueInfo.innerHTML = '<b>' + houYaYueCodeText(res.status) + '</b> · 耗时 <b>' + ms
+                    + ' ms</b> · 大小 <b>' + size + '</b> 字节';
+                houYaYueOut.innerHTML = houYaYueLast.pretty;
+
+                if (res.ok) {
+                    houYaYueMsg.innerHTML = '<div class="hou_ya_yue_ok-box">✔ ' + m + ' 请求成功：'
+                        + houYaYueCodeText(res.status) + '（' + res.status + '）</div>';
+                } else {
+                    houYaYueMsg.innerHTML = '<div class="hou_ya_yue_err-box">✘ 请求未成功：HTTP '
+                        + res.status + ' —— ' + houYaYueCodeText(res.status)
+                        + '<br>fetch 对 4xx/5xx 不会报错，必须用 <b>res.ok</b> 自己判断。</div>';
+                }
+                houYaYuePushHist(m, url, res.status, ms);
+            } catch (err) {
+                var ms2 = Date.now() - t0;
+                houYaYueCode.textContent = '失败';
+                houYaYueCode.className = 'hou_ya_yue_badge hou_ya_yue_bad';
+                houYaYueInfo.innerHTML = '<b>' + m + '</b> ' + url + ' · 耗时 ' + ms2 + ' ms';
+                houYaYueLast.pretty = houYaYueLast.raw = houYaYueLast.header = '（本次请求没有拿到响应）';
+                houYaYueOut.innerHTML = houYaYueLast.raw;
+
+                var tip;
+                if (err.name === 'AbortError') {
+                    tip = '请求超时（超过 8 秒），已主动中断。';
+                } else {
+                    tip = '网络请求失败：' + err.message
+                        + '<br>常见原因：① 断网或地址写错；② 域名不存在；③ 接口未开放 CORS（浏览器跨域被拦）。';
+                }
+                houYaYueMsg.innerHTML = '<div class="hou_ya_yue_err-box">✘ ' + tip + '</div>';
+                houYaYuePushHist(m, url, '失败', ms2);
+            } finally {
+                clearTimeout(timer);
+                houYaYueBar.className = 'hou_ya_yue_load hou_ya_yue_hide';
+                houYaYueGo.disabled = false;
+            }
+        }
+
+        /* 清空 */
+        function houYaYueClear() {
+            houYaYueMsg.innerHTML = '';
+            houYaYueOut.textContent = '// 这里显示接口返回的数据';
+            houYaYueCode.className = 'hou_ya_yue_badge hou_ya_yue_idle';
+            houYaYueCode.textContent = '未发送';
+            houYaYueInfo.textContent = '填好请求后点击「发送请求」';
+            houYaYueLast = { pretty: '', raw: '', header: '' };
+        }
+
+        houYaYueToggleBody();
+    </script>
+</body>
+</html>

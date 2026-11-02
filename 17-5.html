@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-5 JavaScript 两种定时器</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-02 18:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：setTimeout 与 setInterval 两种定时器可视化演示
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card h2 span { font-size: 13px; color: #9aa4ae; font-weight: normal; margin-left: 8px; }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; }
+
+        /* ===== 两个定时器并排 ===== */
+        .hou_ya_yue_two { display: flex; flex-wrap: wrap; gap: 16px; }
+
+        .hou_ya_yue_box {
+            flex: 1 1 400px; min-width: 300px; border: 1px solid #e3eaf2;
+            border-radius: 10px; padding: 16px 18px; background: #fbfdff;
+        }
+
+        .hou_ya_yue_box h3 { font-size: 16px; color: #222; margin-bottom: 6px; }
+
+        .hou_ya_yue_box .hou_ya_yue_dsc { font-size: 12.5px; color: #8a94a0; margin-bottom: 12px; line-height: 1.6; }
+
+        .hou_ya_yue_row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+        .hou_ya_yue_row input {
+            width: 96px; height: 36px; border: 1px solid #ccd6e0; border-radius: 6px;
+            padding: 0 10px; font-size: 14px; font-family: inherit; outline: none;
+        }
+
+        .hou_ya_yue_row input:focus { border-color: #1d5fa6; }
+
+        .hou_ya_yue_row button {
+            height: 36px; border: 0; border-radius: 18px; padding: 0 16px; font-size: 13.5px;
+            color: #fff; cursor: pointer; font-family: inherit; transition: opacity .15s, transform .15s;
+        }
+
+        .hou_ya_yue_row button:hover { opacity: .9; transform: translateY(-1px); }
+
+        .hou_ya_yue_row button:disabled { background: #b6c2ce !important; cursor: not-allowed; transform: none; }
+
+        .hou_ya_yue_g-run { background: #1d5fa6; }
+        .hou_ya_yue_g-stop { background: #e03131; }
+        .hou_ya_yue_g-rst { background: #597eaa; }
+
+        /* 状态灯 */
+        .hou_ya_yue_state {
+            display: inline-block; border-radius: 14px; padding: 4px 12px;
+            font-size: 12.5px; background: #eef1f4; color: #8a94a0;
+        }
+
+        .hou_ya_yue_state.hou_ya_yue_wait { background: #fff4e0; color: #f08c00; }
+        .hou_ya_yue_state.hou_ya_yue_done { background: #e8f8f0; color: #0ca678; }
+        .hou_ya_yue_state.hou_ya_yue_cancel { background: #fff0f0; color: #e03131; }
+        .hou_ya_yue_state.hou_ya_yue_running { background: #e8f1fd; color: #1d5fa6; }
+
+        /* 进度条 */
+        .hou_ya_yue_track {
+            height: 10px; background: #e9eff6; border-radius: 5px; overflow: hidden; margin-bottom: 8px;
+        }
+
+        .hou_ya_yue_track i {
+            display: block; height: 100%; width: 0; border-radius: 5px;
+            background: linear-gradient(90deg, #1d5fa6, #4dabf7);
+        }
+
+        .hou_ya_yue_track.hou_ya_yue_g i { background: linear-gradient(90deg, #0ca678, #63e6be); }
+
+        /* 大数字 */
+        .hou_ya_yue_big {
+            font-size: 30px; font-weight: bold; color: #1d5fa6; text-align: center;
+            margin: 6px 0 10px; font-family: Consolas, monospace;
+        }
+
+        .hou_ya_yue_big.hou_ya_yue_g { color: #0ca678; }
+
+        /* 心跳点 */
+        .hou_ya_yue_dots { display: flex; gap: 6px; justify-content: center; margin: 8px 0 12px; }
+
+        .hou_ya_yue_dots b {
+            width: 12px; height: 12px; border-radius: 50%; background: #e9eff6; display: block;
+        }
+
+        .hou_ya_yue_dots b.hou_ya_yue_on { background: #1d5fa6; animation: hou_ya_yue_beat .4s ease; }
+
+        @keyframes hou_ya_yue_beat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.6); }
+            100% { transform: scale(1); }
+        }
+
+        /* 日志 */
+        .hou_ya_yue_log {
+            background: #282c34; border-radius: 8px; padding: 10px 12px; min-height: 96px;
+            max-height: 170px; overflow: auto; font-family: Consolas, "Courier New", monospace;
+            font-size: 12.5px; line-height: 1.8; color: #98c379; white-space: pre-wrap;
+        }
+
+        .hou_ya_yue_log .hou_ya_yue_t { color: #5c6370; }
+
+        .hou_ya_yue_log .hou_ya_yue_n { color: #e5c07b; }
+
+        /* 打字机 */
+        .hou_ya_yue_type {
+            border: 1px solid #e3eaf2; border-radius: 8px; padding: 14px 16px;
+            min-height: 56px; font-size: 16px; line-height: 1.8; color: #2c3e50; background: #fbfdff;
+        }
+
+        .hou_ya_yue_type i { color: #1d5fa6; font-style: normal; animation: hou_ya_yue_blink .7s step-end infinite; }
+
+        @keyframes hou_ya_yue_blink {
+            50% { opacity: 0; }
+        }
+
+        /* 代码与表格 */
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #98c379; margin: 0; white-space: pre-wrap; word-break: break-all;
+        }
+
+        pre.hou_ya_yue_out .hou_ya_yue_c { color: #5c6370; }
+
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table td code { color: #c2505a; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">17-5 两种定时器 · <code>setTimeout</code>（延时一次）与 <code>setInterval</code>（每隔一段重复）</p>
+
+        <!-- ===== 两种定时器对照 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>两种定时器对照实验 <span>左边只响一次，右边一直响</span></h2>
+            <p>打个比方：<b>setTimeout 像「定时炸弹」</b>——到点炸一次就结束；<b>setInterval 像「心跳」</b>——每隔一段时间跳一次，不叫停就一直跳。两者都会返回一个 <b>编号 id</b>，要停必须靠它。</p>
+
+            <div class="hou_ya_yue_two">
+                <!-- setTimeout -->
+                <div class="hou_ya_yue_box">
+                    <h3>① setTimeout —— 延时执行一次</h3>
+                    <div class="hou_ya_yue_dsc">语法：<code>let id = setTimeout(函数, 毫秒)</code>；取消：<code>clearTimeout(id)</code></div>
+
+                    <div class="hou_ya_yue_row">
+                        <span style="font-size:13px;color:#555;">延时</span>
+                        <input id="hou_ya_yue_t1" type="number" value="3000" min="500" step="500">
+                        <span style="font-size:13px;color:#555;">毫秒</span>
+                        <button class="hou_ya_yue_g-run" id="hou_ya_yue_b1" onclick="houYaYueTimeout()">启动延时</button>
+                        <button class="hou_ya_yue_g-stop" onclick="houYaYueCancelTimeout()">clearTimeout 取消</button>
+                    </div>
+
+                    <div class="hou_ya_yue_track"><i id="hou_ya_yue_bar1"></i></div>
+                    <div class="hou_ya_yue_big" id="hou_ya_yue_num1">0.0 s</div>
+                    <div class="hou_ya_yue_row"><span class="hou_ya_yue_state" id="hou_ya_yue_s1">未启动</span></div>
+                    <div class="hou_ya_yue_log" id="hou_ya_yue_log1">// setTimeout 的执行记录</div>
+                </div>
+
+                <!-- setInterval -->
+                <div class="hou_ya_yue_box">
+                    <h3>② setInterval —— 每隔一段重复执行</h3>
+                    <div class="hou_ya_yue_dsc">语法：<code>let id = setInterval(函数, 毫秒)</code>；取消：<code>clearInterval(id)</code></div>
+
+                    <div class="hou_ya_yue_row">
+                        <span style="font-size:13px;color:#555;">间隔</span>
+                        <input id="hou_ya_yue_t2" type="number" value="1000" min="200" step="200">
+                        <span style="font-size:13px;color:#555;">毫秒</span>
+                        <button class="hou_ya_yue_g-run" id="hou_ya_yue_b2" onclick="houYaYueInterval()">启动循环</button>
+                        <button class="hou_ya_yue_g-stop" onclick="houYaYueStopInterval()">clearInterval 停止</button>
+                    </div>
+
+                    <div class="hou_ya_yue_track hou_ya_yue_g"><i id="hou_ya_yue_bar2"></i></div>
+                    <div class="hou_ya_yue_big hou_ya_yue_g" id="hou_ya_yue_num2">0 次</div>
+                    <div class="hou_ya_yue_dots" id="hou_ya_yue_dots">
+                        <b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>
+                    </div>
+                    <div class="hou_ya_yue_log" id="hou_ya_yue_log2">// setInterval 的执行记录</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 实战 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>实战：定时器能做什么 <span>倒计时 / 打字机</span></h2>
+            <p><b>10 秒倒计时</b>用 <code>setInterval</code> 每秒减 1，到 0 时 <code>clearInterval</code> 自己停；<b>打字机</b>用 <code>setTimeout</code> 递归逐字输出，一个字一个字"打"出来。</p>
+            <div class="hou_ya_yue_row">
+                <button class="hou_ya_yue_g-run" onclick="houYaYueCountDown()">开始 10 秒倒计时</button>
+                <button class="hou_ya_yue_g-rst" onclick="houYaYueCountReset()">重置</button>
+                <span class="hou_ya_yue_big" id="hou_ya_yue_cd" style="margin:0;font-size:26px;">10</span>
+            </div>
+            <div class="hou_ya_yue_row">
+                <button class="hou_ya_yue_g-run" onclick="houYaYueType()">开始打字机</button>
+                <button class="hou_ya_yue_g-rst" onclick="houYaYueTypeReset()">清空</button>
+            </div>
+            <div class="hou_ya_yue_type" id="hou_ya_yue_typed">点「开始打字机」看效果</div>
+        </div>
+
+        <!-- ===== 代码 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>核心代码</h2>
+            <pre class="hou_ya_yue_out"><span class="hou_ya_yue_c">// ① setTimeout：3000 毫秒后执行一次，只执行一次</span>
+let timer1 = setTimeout(function () {
+  console.log('3 秒到了，我只执行一次');
+}, 3000);
+clearTimeout(timer1);   <span class="hou_ya_yue_c">// 时间没到就取消，函数不会执行</span>
+
+<span class="hou_ya_yue_c">// ② setInterval：每 1000 毫秒执行一次，不叫停就一直执行</span>
+let n = 0;
+let timer2 = setInterval(function () {
+  n++;
+  console.log('第 ' + n + ' 次');
+  if (n === 10) clearInterval(timer2);   <span class="hou_ya_yue_c">// 常用套路：满足条件时自己停</span>
+}, 1000);
+
+<span class="hou_ya_yue_c">// ③ setTimeout 递归：模拟打字机（比 setInterval 更可控）</span>
+function typeOne(i) {
+  if (i &gt;= text.length) return;          <span class="hou_ya_yue_c">// 结束条件</span>
+  box.textContent += text[i];
+  setTimeout(function () { typeOne(i + 1); }, 120);  <span class="hou_ya_yue_c">// 自己调用自己</span>
+}</pre>
+        </div>
+
+        <!-- ===== 对比表 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>两者区别与注意事项</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>对比项</th><th><code>setTimeout</code></th><th><code>setInterval</code></th></tr>
+                <tr><td>执行次数</td><td>延时后<b>只执行 1 次</b></td><td>每隔一段时间<b>反复执行</b></td></tr>
+                <tr><td>停止方法</td><td><code>clearTimeout(id)</code></td><td><code>clearInterval(id)</code></td></tr>
+                <tr><td>典型用途</td><td>延迟提示、防抖、动画开始</td><td>倒计时、轮播、心跳轮询</td></tr>
+                <tr><td>嵌套替代</td><td colspan="2">用 setTimeout 递归代替 setInterval，可避免"上一轮没跑完就开下一轮"的堆积问题</td></tr>
+                <tr><td>注意 ①</td><td colspan="2">时间单位是<b>毫秒</b>，1000 毫秒 = 1 秒</td></tr>
+                <tr><td>注意 ②</td><td colspan="2">必须先<b>保存返回的 id</b>，否则无法取消（页面关闭前不清理会一直占资源）</td></tr>
+                <tr><td>注意 ③</td><td colspan="2">延时是"最早时间"不是"准点"，JS 单线程忙时会延后</td></tr>
+                <tr><td>注意 ④</td><td colspan="2">回调函数里的 <code>this</code> 默认指向 window，用箭头函数可继承外层 this</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        /* ---------- 公共：时间格式化与日志 ---------- */
+        function houYaYueTime() {
+            var d = new Date();
+            function z(n) { return n < 10 ? '0' + n : '' + n; }
+            return z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds());
+        }
+
+        function houYaYueLog(box, txt) {
+            box.innerHTML = '<span class="hou_ya_yue_t">[' + houYaYueTime() + ']</span> '
+                + txt + '\n' + box.innerHTML;
+        }
+
+        /* ---------- ① setTimeout ---------- */
+        var houYaYueT1 = null;      // setTimeout 的 id
+        var houYaYueTick1 = null;   // 用于刷新倒计时的 interval
+        var houYaYueS1 = document.getElementById('hou_ya_yue_s1');
+        var houYaYueNum1 = document.getElementById('hou_ya_yue_num1');
+        var houYaYueBar1 = document.getElementById('hou_ya_yue_bar1');
+        var houYaYueLog1 = document.getElementById('hou_ya_yue_log1');
+
+        function houYaYueTimeout() {
+            var ms = parseInt(document.getElementById('hou_ya_yue_t1').value, 10) || 3000;
+            houYaYueClear1();
+
+            var start = Date.now();
+            houYaYueS1.className = 'hou_ya_yue_state hou_ya_yue_wait';
+            houYaYueS1.textContent = '等待中…（到点执行一次）';
+            houYaYueLog(houYaYueLog1, 'setTimeout 已启动，' + ms + ' 毫秒后执行');
+
+            /* 用 interval 只是为了把"剩余时间"画出来，定时器本身还是 setTimeout */
+            houYaYueTick1 = setInterval(function () {
+                var left = ms - (Date.now() - start);
+                if (left <= 0) { left = 0; }
+                houYaYueNum1.textContent = (left / 1000).toFixed(1) + ' s';
+                houYaYueBar1.style.width = Math.round((1 - left / ms) * 100) + '%';
+            }, 50);
+
+            /* 主角：setTimeout —— 到点只执行一次 */
+            houYaYueT1 = setTimeout(function () {
+                clearInterval(houYaYueTick1);
+                houYaYueTick1 = null;
+                houYaYueT1 = null;
+                houYaYueNum1.textContent = '0.0 s';
+                houYaYueBar1.style.width = '100%';
+                houYaYueS1.className = 'hou_ya_yue_state hou_ya_yue_done';
+                houYaYueS1.textContent = '✔ 已执行（只执行这一次）';
+                houYaYueLog(houYaYueLog1, '<span class="hou_ya_yue_n">时间到！</span>回调函数执行完毕，setTimeout 生命周期结束');
+            }, ms);
+        }
+
+        function houYaYueCancelTimeout() {
+            if (houYaYueT1 === null) {
+                houYaYueLog(houYaYueLog1, '当前没有正在等待的 setTimeout');
+                return;
+            }
+            clearTimeout(houYaYueT1);
+            houYaYueT1 = null;
+            clearInterval(houYaYueTick1);
+            houYaYueTick1 = null;
+            houYaYueS1.className = 'hou_ya_yue_state hou_ya_yue_cancel';
+            houYaYueS1.textContent = '✘ 已用 clearTimeout 取消，函数不会再执行';
+            houYaYueBar1.style.width = '0';
+            houYaYueNum1.textContent = '0.0 s';
+            houYaYueLog(houYaYueLog1, '<span class="hou_ya_yue_n">clearTimeout(id)</span> 取消成功');
+        }
+
+        function houYaYueClear1() {
+            clearTimeout(houYaYueT1);
+            clearInterval(houYaYueTick1);
+            houYaYueT1 = null;
+            houYaYueTick1 = null;
+        }
+
+        /* ---------- ② setInterval ---------- */
+        var houYaYueT2 = null;
+        var houYaYueCount = 0;
+        var houYaYueS2Tip = document.getElementById('hou_ya_yue_num2');
+        var houYaYueBar2 = document.getElementById('hou_ya_yue_bar2');
+        var houYaYueLog2 = document.getElementById('hou_ya_yue_log2');
+        var houYaYueDots = document.getElementById('hou_ya_yue_dots').getElementsByTagName('b');
+
+        function houYaYueInterval() {
+            var ms = parseInt(document.getElementById('hou_ya_yue_t2').value, 10) || 1000;
+            if (houYaYueT2 !== null) {
+                houYaYueLog(houYaYueLog2, '已经在运行了，无需重复启动（重复启动会叠加多个定时器）');
+                return;
+            }
+            houYaYueCount = 0;
+            houYaYueS2Tip.textContent = '0 次';
+            houYaYueLog(houYaYueLog2, 'setInterval 已启动，每 ' + ms + ' 毫秒执行一次');
+
+            houYaYueT2 = setInterval(function () {
+                houYaYueCount++;
+                houYaYueS2Tip.textContent = houYaYueCount + ' 次';
+                houYaYueBar2.style.width = (houYaYueCount % 10) * 10 + '%';
+
+                /* 心跳点依次点亮 */
+                var idx = (houYaYueCount - 1) % houYaYueDots.length;
+                for (var i = 0; i < houYaYueDots.length; i++) { houYaYueDots[i].className = ''; }
+                houYaYueDots[idx].className = 'hou_ya_yue_on';
+
+                houYaYueLog(houYaYueLog2, '第 <span class="hou_ya_yue_n">' + houYaYueCount + '</span> 次执行');
+
+                /* 常用套路：达到次数自己停 */
+                if (houYaYueCount >= 20) {
+                    houYaYueStopInterval('已执行 20 次，代码里自动 clearInterval 停止');
+                }
+            }, ms);
+        }
+
+        function houYaYueStopInterval(msg) {
+            if (houYaYueT2 === null) {
+                houYaYueLog(houYaYueLog2, '当前没有正在运行的 setInterval');
+                return;
+            }
+            clearInterval(houYaYueT2);
+            houYaYueT2 = null;
+            houYaYueBar2.style.width = '0';
+            for (var i = 0; i < houYaYueDots.length; i++) { houYaYueDots[i].className = ''; }
+            houYaYueLog(houYaYueLog2, '<span class="hou_ya_yue_n">clearInterval(id)</span> 已停止 —— ' + (msg || '手动停止'));
+        }
+
+        /* ---------- 实战 1：10 秒倒计时 ---------- */
+        var houYaYueCdTimer = null;
+        var houYaYueCd = document.getElementById('hou_ya_yue_cd');
+
+        function houYaYueCountDown() {
+            clearInterval(houYaYueCdTimer);
+            var left = 10;
+            houYaYueCd.textContent = left;
+            houYaYueCd.style.color = '#1d5fa6';
+            houYaYueCdTimer = setInterval(function () {
+                left--;
+                houYaYueCd.textContent = left;
+                if (left <= 3) { houYaYueCd.style.color = '#e03131'; }
+                if (left <= 0) {
+                    clearInterval(houYaYueCdTimer);   /* 到 0 自己停 */
+                    houYaYueCdTimer = null;
+                    houYaYueCd.textContent = '时间到！';
+                }
+            }, 1000);
+        }
+
+        function houYaYueCountReset() {
+            clearInterval(houYaYueCdTimer);
+            houYaYueCdTimer = null;
+            houYaYueCd.textContent = '10';
+            houYaYueCd.style.color = '#1d5fa6';
+        }
+
+        /* ---------- 实战 2：打字机（setTimeout 递归） ---------- */
+        var houYaYueTypeTimer = null;
+        var houYaYueTyped = document.getElementById('hou_ya_yue_typed');
+        var houYaYueText = '定时器让网页有了「时间感」：延时提示、轮播图、倒计时、打字机效果，背后都是 setTimeout 和 setInterval。';
+
+        function houYaYueType() {
+            clearTimeout(houYaYueTypeTimer);
+            houYaYueTyped.innerHTML = '<i>|</i>';
+            /* 递归：每次打一个字，再设定下一次 */
+            (function next(i) {
+                if (i >= houYaYueText.length) {
+                    houYaYueTyped.textContent = houYaYueText;
+                    return;
+                }
+                houYaYueTypeTimer = setTimeout(function () {
+                    houYaYueTyped.innerHTML = houYaYueText.slice(0, i + 1) + '<i>|</i>';
+                    next(i + 1);
+                }, 90);
+            })(0);
+        }
+
+        function houYaYueTypeReset() {
+            clearTimeout(houYaYueTypeTimer);
+            houYaYueTypeTimer = null;
+            houYaYueTyped.textContent = '点「开始打字机」看效果';
+        }
+    </script>
+</body>
+</html>

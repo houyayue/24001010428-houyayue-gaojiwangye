@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3 商品列表（fetch 接口数据）</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-02 16:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：使用 fetch 获取 dummyjson 商品列表并展示，点击跳详情页
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        a { text-decoration: none; color: inherit; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1100px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        /* ===== 接口条 ===== */
+        .hou_ya_yue_api {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+            background: #f7fafd; border: 1px dashed #a8c4e0; border-radius: 10px;
+            padding: 12px 14px; margin-bottom: 14px; word-break: break-all;
+        }
+
+        .hou_ya_yue_api .hou_ya_yue_m {
+            background: #0ca678; color: #fff; border-radius: 6px; padding: 3px 10px;
+            font-size: 12px; font-weight: bold;
+        }
+
+        .hou_ya_yue_api code { font-family: Consolas, monospace; font-size: 13px; color: #c2505a; }
+
+        /* ===== 工具栏 ===== */
+        .hou_ya_yue_bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+
+        .hou_ya_yue_bar button {
+            border: 0; border-radius: 20px; padding: 9px 18px; font-size: 14px;
+            cursor: pointer; font-family: inherit; color: #fff; background: #1d5fa6;
+            transition: transform .15s, opacity .15s;
+        }
+
+        .hou_ya_yue_bar button:hover { transform: translateY(-2px); opacity: .92; }
+
+        .hou_ya_yue_bar button:disabled { background: #b6c2ce; cursor: not-allowed; transform: none; }
+
+        .hou_ya_yue_bar input {
+            width: 90px; padding: 8px 10px; border: 1px solid #ccd6e0; border-radius: 6px;
+            font-size: 14px; outline: none; font-family: inherit;
+        }
+
+        .hou_ya_yue_bar input:focus { border-color: #1d5fa6; }
+
+        .hou_ya_yue_status { font-size: 13px; color: #666; }
+
+        .hou_ya_yue_status b { color: #0ca678; }
+
+        .hou_ya_yue_status .hou_ya_yue_err { color: #e03131; }
+
+        /* ===== 商品网格：一行四列，末列清边距 ===== */
+        .hou_ya_yue_grid { display: flex; flex-wrap: wrap; }
+
+        .hou_ya_yue_item {
+            width: calc(25% - 15px); margin: 0 20px 20px 0; background: #fff;
+            border: 1px solid #e3eaf2; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .05); display: block;
+            transition: transform .2s, box-shadow .2s; animation: hou_ya_yue_pop .3s ease;
+        }
+
+        .hou_ya_yue_item:nth-child(4n) { margin-right: 0; }
+
+        .hou_ya_yue_item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(45, 100, 200, .18); }
+
+        .hou_ya_yue_item .hou_ya_yue_pic {
+            width: 100%; height: 160px; object-fit: cover; background: #eef3fa; display: block;
+        }
+
+        .hou_ya_yue_item .hou_ya_yue_body { padding: 10px 12px 12px; }
+
+        .hou_ya_yue_item .hou_ya_yue_brand {
+            font-size: 12px; color: #9aa4ae; margin-bottom: 4px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .hou_ya_yue_item .hou_ya_yue_title {
+            font-size: 14px; font-weight: bold; color: #222; margin-bottom: 8px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .hou_ya_yue_item .hou_ya_yue_price { display: flex; align-items: baseline; gap: 8px; }
+
+        .hou_ya_yue_item .hou_ya_yue_price b { color: #e03131; font-size: 18px; }
+
+        .hou_ya_yue_item .hou_ya_yue_price s { color: #b6c2ce; font-size: 12px; }
+
+        .hou_ya_yue_item .hou_ya_yue_off {
+            background: #fff0e6; color: #ff6600; border-radius: 4px;
+            padding: 1px 6px; font-size: 12px;
+        }
+
+        .hou_ya_yue_item .hou_ya_yue_meta {
+            display: flex; justify-content: space-between; margin-top: 8px;
+            font-size: 12px; color: #8a94a0;
+        }
+
+        .hou_ya_yue_item .hou_ya_yue_meta .hou_ya_yue_star { color: #ffa500; }
+
+        /* 骨架屏 */
+        .hou_ya_yue_skeleton {
+            width: calc(25% - 15px); margin: 0 20px 20px 0; height: 268px; border-radius: 10px;
+            background: linear-gradient(90deg, #eef3fa 25%, #e2eaf5 37%, #eef3fa 63%);
+            background-size: 400% 100%; animation: hou_ya_yue_shine 1.2s ease infinite;
+        }
+
+        .hou_ya_yue_skeleton:nth-child(4n) { margin-right: 0; }
+
+        .hou_ya_yue_err-box {
+            background: #fff5f5; border: 1px solid #ffc9c9; border-radius: 8px;
+            padding: 12px 14px; color: #e03131; font-size: 13px; line-height: 1.7;
+        }
+
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #98c379; margin: 0; white-space: pre-wrap; word-break: break-all;
+        }
+
+        @keyframes hou_ya_yue_pop {
+            from { transform: translateY(14px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes hou_ya_yue_shine {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        @media (max-width: 900px) {
+            .hou_ya_yue_item, .hou_ya_yue_skeleton { width: calc(50% - 10px); margin-right: 20px; }
+            .hou_ya_yue_item:nth-child(4n), .hou_ya_yue_skeleton:nth-child(4n) { margin-right: 20px; }
+            .hou_ya_yue_item:nth-child(2n), .hou_ya_yue_skeleton:nth-child(2n) { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">17-3 商品列表 · 数据来自远程接口 dummyjson.com（fetch + 原生实现）</p>
+
+        <!-- ===== 列表 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>商品列表</h2>
+            <div class="hou_ya_yue_api">
+                <span class="hou_ya_yue_m">GET</span>
+                <code>https://dummyjson.com/products?limit=8</code>
+            </div>
+            <p>接口返回 <code style="color:#c2505a">{ products: [...], total, skip, limit }</code>，下面用 fetch 取回前 8 件商品渲染成卡片，点击任意卡片跳转到详情页 <b>17-3-detail.html?id=商品ID</b>。</p>
+
+            <div class="hou_ya_yue_bar">
+                <button id="hou_ya_yue_btn" onclick="houYaYueLoad()">加载 / 刷新列表</button>
+                <span class="hou_ya_yue_status">条数：</span>
+                <input id="hou_ya_yue_limit" type="number" value="8" min="1" max="30">
+                <span class="hou_ya_yue_status" id="hou_ya_yue_status">等待加载…</span>
+            </div>
+
+            <div class="hou_ya_yue_grid" id="hou_ya_yue_grid"></div>
+            <div id="hou_ya_yue_err"></div>
+        </div>
+
+        <!-- ===== 返回数据 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>接口返回数据（节选第一件商品）</h2>
+            <pre class="hou_ya_yue_out" id="hou_ya_yue_json">// 加载后显示接口返回的第一个商品对象</pre>
+        </div>
+
+        <!-- ===== 代码 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>核心代码</h2>
+            <pre class="hou_ya_yue_out">// ① 拼接口地址（limit 由输入框决定）
+const url = 'https://dummyjson.com/products?limit=' + limit;
+
+// ② fetch 是异步的，用 await 等到响应
+const res = await fetch(url);
+if (!res.ok) throw new Error('HTTP ' + res.status);   // ③ 404/500 要自己判断
+
+// ④ 解析 JSON，拿到商品数组
+const data = await res.json();
+
+// ⑤ 遍历数组，拼 HTML 一次性插入（比循环 appendChild 更高效）
+let html = '';
+data.products.forEach(function (p) {
+  html += '&lt;div&gt;'
+        +   '&lt;img src="' + p.thumbnail + '"&gt;'
+        +   '&lt;h3&gt;' + p.title + '&lt;/h3&gt;'
+        +   '&lt;b&gt;￥' + p.price + '&lt;/b&gt;'
+        + '&lt;/div&gt;';
+});
+grid.innerHTML = html;</pre>
+        </div>
+    </div>
+
+    <script>
+        var houYaYueGrid = document.getElementById('hou_ya_yue_grid');
+        var houYaYueStatus = document.getElementById('hou_ya_yue_status');
+        var houYaYueJson = document.getElementById('hou_ya_yue_json');
+        var houYaYueErr = document.getElementById('hou_ya_yue_err');
+        var houYaYueBtn = document.getElementById('hou_ya_yue_btn');
+        var houYaYueLimit = document.getElementById('hou_ya_yue_limit');
+
+        /* 骨架屏：请求中占位 */
+        function houYaYueLoading(n) {
+            var html = '';
+            for (var i = 0; i < n; i++) { html += '<div class="hou_ya_yue_skeleton"></div>'; }
+            houYaYueGrid.innerHTML = html;
+            houYaYueStatus.innerHTML = '请求中…';
+            houYaYueErr.innerHTML = '';
+            houYaYueBtn.disabled = true;
+        }
+
+        /* 原价：price 是折后价，反推原价用于划掉的对比 */
+        function houYaYueOrigin(p) {
+            return (p.price / (1 - p.discountPercentage / 100)).toFixed(2);
+        }
+
+        /* 渲染商品卡片 */
+        function houYaYueRender(list) {
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var p = list[i];
+                html += '<a class="hou_ya_yue_item" href="17-3-detail.html?id=' + p.id + '">'
+                    + '<img class="hou_ya_yue_pic" src="' + p.thumbnail + '" alt="' + p.title + '">'
+                    + '<div class="hou_ya_yue_body">'
+                    + '<div class="hou_ya_yue_brand">' + p.brand + ' · ' + p.category + '</div>'
+                    + '<div class="hou_ya_yue_title">' + p.title + '</div>'
+                    + '<div class="hou_ya_yue_price"><b>￥' + p.price + '</b>'
+                    + '<s>￥' + houYaYueOrigin(p) + '</s>'
+                    + '<span class="hou_ya_yue_off">-' + Math.round(p.discountPercentage) + '%</span></div>'
+                    + '<div class="hou_ya_yue_meta"><span class="hou_ya_yue_star">★ ' + p.rating + '</span>'
+                    + '<span>库存 ' + p.stock + '</span></div>'
+                    + '</div></a>';
+            }
+            houYaYueGrid.innerHTML = html;
+        }
+
+        /* fetch 获取列表 */
+        async function houYaYueLoad() {
+            var limit = parseInt(houYaYueLimit.value, 10) || 8;
+            houYaYueLoading(Math.min(limit, 8));
+            var t0 = Date.now();
+            try {
+                var res = await fetch('https://dummyjson.com/products?limit=' + limit);
+                if (!res.ok) { throw new Error('HTTP 状态码 ' + res.status); }
+                var data = await res.json();
+                var ms = Date.now() - t0;
+
+                houYaYueRender(data.products);
+                houYaYueJson.innerHTML = JSON.stringify(data.products[0], null, 4);
+                houYaYueStatus.innerHTML = '✔ 共 <b>' + data.total + '</b> 件，本次取回 <b>'
+                    + data.products.length + '</b> 件，耗时 <b>' + ms + ' ms</b>（点击卡片看详情）';
+            } catch (err) {
+                houYaYueGrid.innerHTML = '';
+                houYaYueErr.innerHTML = '<div class="hou_ya_yue_err-box">✘ 列表加载失败：' + err.message
+                    + '<br>请检查网络后点击「加载 / 刷新列表」重试。</div>';
+                houYaYueStatus.innerHTML = '<span class="hou_ya_yue_err">加载失败</span>';
+            } finally {
+                houYaYueBtn.disabled = false;
+            }
+        }
+
+        houYaYueLoad();
+    </script>
+</body>
+</html>

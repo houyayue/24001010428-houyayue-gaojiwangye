@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-6 Promise 与 async 异步流程演示（包饺子）</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-02 19:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：用 Promise + async/await 演示包饺子的异步流程（setTimeout 模拟耗时）
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; }
+
+        /* ===== 顶部状态 ===== */
+        .hou_ya_yue_bar {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
+        }
+
+        .hou_ya_yue_bar button {
+            height: 38px; border: 0; border-radius: 19px; padding: 0 18px; font-size: 14px;
+            color: #fff; cursor: pointer; font-family: inherit; transition: opacity .15s, transform .15s;
+        }
+
+        .hou_ya_yue_bar button:hover { opacity: .9; transform: translateY(-1px); }
+
+        .hou_ya_yue_bar button:disabled { background: #b6c2ce !important; cursor: not-allowed; transform: none; }
+
+        .hou_ya_yue_g-async { background: #1d5fa6; }
+        .hou_ya_yue_g-then { background: #722ed1; }
+        .hou_ya_yue_g-rst { background: #597eaa; }
+
+        .hou_ya_yue_total {
+            font-size: 13px; color: #666; padding: 8px 14px; background: #f7fafd;
+            border: 1px dashed #a8c4e0; border-radius: 18px;
+        }
+
+        .hou_ya_yue_total b { color: #e03131; font-size: 15px; }
+
+        /* ===== 步骤卡片 ===== */
+        .hou_ya_yue_step {
+            border: 1px solid #e3eaf2; border-radius: 10px; padding: 12px 14px;
+            margin-bottom: 12px; background: #fbfdff; transition: box-shadow .2s, border-color .2s;
+        }
+
+        .hou_ya_yue_step.hou_ya_yue_run {
+            border-color: #1d5fa6; box-shadow: 0 0 0 3px rgba(29, 95, 166, .08);
+        }
+
+        .hou_ya_yue_step.hou_ya_yue_ok {
+            border-color: #b7ebcb; background: #f6fdf9;
+        }
+
+        .hou_ya_yue_head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+        .hou_ya_yue_name { font-size: 15px; font-weight: bold; color: #222; }
+
+        .hou_ya_yue_name em {
+            font-style: normal; font-size: 12px; color: #9aa4ae; font-weight: normal; margin-left: 8px;
+        }
+
+        .hou_ya_yue_tag {
+            font-size: 12px; border-radius: 12px; padding: 3px 10px; background: #eef1f4; color: #8a94a0;
+        }
+
+        .hou_ya_yue_tag.hou_ya_yue_t-run { background: #e8f1fd; color: #1d5fa6; }
+        .hou_ya_yue_tag.hou_ya_yue_t-ok { background: #e8f8f0; color: #0ca678; }
+
+        .hou_ya_yue_track { height: 8px; background: #e9eff6; border-radius: 4px; overflow: hidden; }
+
+        .hou_ya_yue_track i {
+            display: block; height: 100%; width: 0; border-radius: 4px;
+            background: linear-gradient(90deg, #1d5fa6, #4dabf7);
+        }
+
+        .hou_ya_yue_step.hou_ya_yue_ok .hou_ya_yue_track i { background: linear-gradient(90deg, #0ca678, #63e6be); }
+
+        .hou_ya_yue_left { font-size: 12px; color: #9aa4ae; margin-top: 6px; }
+
+        /* ===== 并行区 ===== */
+        .hou_ya_yue_parallel {
+            border: 2px dashed #a8c4e0; border-radius: 10px; padding: 14px;
+            background: #f7fafd; margin-bottom: 12px;
+        }
+
+        .hou_ya_yue_parallel > .hou_ya_yue_pt {
+            font-size: 13px; color: #1d5fa6; font-weight: bold; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_parallel > .hou_ya_yue_pt span {
+            font-weight: normal; color: #8a94a0; margin-left: 8px;
+        }
+
+        .hou_ya_yue_parallel .hou_ya_yue_step { margin-bottom: 0; background: #fff; }
+
+        .hou_ya_yue_parallel .hou_ya_yue_step:first-of-type { margin-bottom: 10px; }
+
+        /* 连线箭头 */
+        .hou_ya_yue_arrow { text-align: center; color: #b6c2ce; font-size: 18px; line-height: 1; margin: -4px 0 8px; }
+
+        /* ===== 日志 ===== */
+        .hou_ya_yue_log {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; min-height: 120px;
+            max-height: 260px; overflow: auto; font-family: Consolas, "Courier New", monospace;
+            font-size: 13px; line-height: 1.9; color: #abb2bf; white-space: pre-wrap;
+        }
+
+        .hou_ya_yue_log .hou_ya_yue_t { color: #5c6370; }
+        .hou_ya_yue_log .hou_ya_yue_hi { color: #e5c07b; }
+        .hou_ya_yue_log .hou_ya_yue_ok { color: #98c379; }
+        .hou_ya_yue_log .hou_ya_yue_p { color: #c678dd; }
+
+        /* ===== 代码 / 表格 ===== */
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #98c379; margin: 0; white-space: pre-wrap; word-break: break-all;
+        }
+
+        pre.hou_ya_yue_out .hou_ya_yue_c { color: #5c6370; }
+        pre.hou_ya_yue_out .hou_ya_yue_k { color: #c678dd; }
+        pre.hou_ya_yue_out .hou_ya_yue_y { color: #e5c07b; }
+
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table td code { color: #c2505a; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">17-6 Promise 与 async/await 异步流程 · 包饺子（setTimeout 模拟每个环节耗时）</p>
+
+        <!-- ===== 流程 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>包饺子流程图</h2>
+            <p>顺序：<b>买原料(6s) → 取原料(2s) →【和面 5s 与 和馅 4s 同时进行】→ 包饺子(4s) → 吃饺子(3s)</b>。中间两个活儿互不依赖，用 <code>Promise.all</code> 一起做，总耗时只取较长的那个（5s）。</p>
+
+            <div class="hou_ya_yue_bar">
+                <button class="hou_ya_yue_g-async" id="hou_ya_yue_b1" onclick="houYaYueRun('async')">▶ async/await 版</button>
+                <button class="hou_ya_yue_g-then" id="hou_ya_yue_b2" onclick="houYaYueRun('then')">▶ Promise.then 链式版</button>
+                <button class="hou_ya_yue_g-rst" onclick="houYaYueReset()">重置</button>
+                <span class="hou_ya_yue_total">总耗时：<b id="hou_ya_yue_total">0.0</b> 秒（预计约 20 秒）</span>
+            </div>
+
+            <div class="hou_ya_yue_step" data-step="buy">
+                <div class="hou_ya_yue_head">
+                    <span class="hou_ya_yue_name">① 买原料<em>await buy() · 6 秒</em></span>
+                    <span class="hou_ya_yue_tag">等待</span>
+                </div>
+                <div class="hou_ya_yue_track"><i></i></div>
+                <div class="hou_ya_yue_left">未开始</div>
+            </div>
+            <div class="hou_ya_yue_arrow">↓</div>
+
+            <div class="hou_ya_yue_step" data-step="pick">
+                <div class="hou_ya_yue_head">
+                    <span class="hou_ya_yue_name">② 取原料<em>await pick() · 2 秒</em></span>
+                    <span class="hou_ya_yue_tag">等待</span>
+                </div>
+                <div class="hou_ya_yue_track"><i></i></div>
+                <div class="hou_ya_yue_left">未开始</div>
+            </div>
+            <div class="hou_ya_yue_arrow">↓</div>
+
+            <div class="hou_ya_yue_parallel">
+                <div class="hou_ya_yue_pt">③ Promise.all 同时进行<span>两个活儿一起干，耗时 = max(和面, 和馅)</span></div>
+                <div class="hou_ya_yue_step" data-step="dough">
+                    <div class="hou_ya_yue_head">
+                        <span class="hou_ya_yue_name">③-1 和面<em>5 秒</em></span>
+                        <span class="hou_ya_yue_tag">等待</span>
+                    </div>
+                    <div class="hou_ya_yue_track"><i></i></div>
+                    <div class="hou_ya_yue_left">未开始</div>
+                </div>
+                <div class="hou_ya_yue_step" data-step="filling">
+                    <div class="hou_ya_yue_head">
+                        <span class="hou_ya_yue_name">③-2 和馅<em>4 秒</em></span>
+                        <span class="hou_ya_yue_tag">等待</span>
+                    </div>
+                    <div class="hou_ya_yue_track"><i></i></div>
+                    <div class="hou_ya_yue_left">未开始</div>
+                </div>
+            </div>
+            <div class="hou_ya_yue_arrow">↓</div>
+
+            <div class="hou_ya_yue_step" data-step="wrap">
+                <div class="hou_ya_yue_head">
+                    <span class="hou_ya_yue_name">④ 包饺子<em>await wrap() · 4 秒</em></span>
+                    <span class="hou_ya_yue_tag">等待</span>
+                </div>
+                <div class="hou_ya_yue_track"><i></i></div>
+                <div class="hou_ya_yue_left">未开始</div>
+            </div>
+            <div class="hou_ya_yue_arrow">↓</div>
+
+            <div class="hou_ya_yue_step" data-step="eat">
+                <div class="hou_ya_yue_head">
+                    <span class="hou_ya_yue_name">⑤ 吃饺子<em>await eat() · 3 秒</em></span>
+                    <span class="hou_ya_yue_tag">等待</span>
+                </div>
+                <div class="hou_ya_yue_track"><i></i></div>
+                <div class="hou_ya_yue_left">未开始</div>
+            </div>
+        </div>
+
+        <!-- ===== 日志 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>执行时间线</h2>
+            <div class="hou_ya_yue_log" id="hou_ya_yue_log">// 点击上方按钮开始，这里会打印每一步的开始、结束与耗时</div>
+        </div>
+
+        <!-- ===== 代码对照 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>两种写法对照</h2>
+            <p>左边是 <b>async/await</b>（像写同步代码一样读），右边是 <b>Promise.then 链式</b>；两者逻辑完全一样，<code>Promise.all</code> 的用法也相同。</p>
+            <pre class="hou_ya_yue_out"><span class="hou_ya_yue_c">// ===== ① 把 setTimeout 包装成 Promise =====</span>
+<span class="hou_ya_yue_k">function</span> <span class="hou_ya_yue_y">task</span>(name, ms) {
+  <span class="hou_ya_yue_k">return new</span> Promise(<span class="hou_ya_yue_k">function</span> (resolve) {
+    setTimeout(<span class="hou_ya_yue_k">function</span> () {
+      console.log(name + ' 完成');
+      resolve(name);        <span class="hou_ya_yue_c">// 完成后"兑现"承诺</span>
+    }, ms);
+  });
+}
+
+<span class="hou_ya_yue_c">// ===== ② async/await 版：顺序读下来就是流程 =====</span>
+<span class="hou_ya_yue_k">async function</span> <span class="hou_ya_yue_y">makeDumplings</span>() {
+  <span class="hou_ya_yue_k">await</span> task('买原料', 6000);
+  <span class="hou_ya_yue_k">await</span> task('取原料', 2000);
+
+  <span class="hou_ya_yue_c">// 和面、和馅互不依赖 → 同时开始，等两个都完成</span>
+  <span class="hou_ya_yue_k">await</span> Promise.<span class="hou_ya_yue_y">all</span>([
+    task('和面', 5000),
+    task('和馅', 4000)
+  ]);
+
+  <span class="hou_ya_yue_k">await</span> task('包饺子', 4000);
+  <span class="hou_ya_yue_k">await</span> task('吃饺子', 3000);
+  console.log('开饭！');
+}
+
+<span class="hou_ya_yue_c">// ===== ③ Promise.then 链式版：同样的流程用回调串起来 =====</span>
+<span class="hou_ya_yue_y">task</span>('买原料', 6000)
+  .<span class="hou_ya_yue_y">then</span>(<span class="hou_ya_yue_k">function</span> () { <span class="hou_ya_yue_k">return</span> task('取原料', 2000); })
+  .<span class="hou_ya_yue_y">then</span>(<span class="hou_ya_yue_k">function</span> () {
+    <span class="hou_ya_yue_k">return</span> Promise.<span class="hou_ya_yue_y">all</span>([task('和面', 5000), task('和馅', 4000)]);
+  })
+  .<span class="hou_ya_yue_y">then</span>(<span class="hou_ya_yue_k">function</span> () { <span class="hou_ya_yue_k">return</span> task('包饺子', 4000); })
+  .<span class="hou_ya_yue_y">then</span>(<span class="hou_ya_yue_k">function</span> () { <span class="hou_ya_yue_k">return</span> task('吃饺子', 3000); })
+  .<span class="hou_ya_yue_y">then</span>(<span class="hou_ya_yue_k">function</span> () { console.log('开饭！'); });</pre>
+        </div>
+
+        <!-- ===== 要点 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>知识点</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>概念</th><th>说明</th></tr>
+                <tr><td><code>new Promise</code></td><td>把 setTimeout 这类"回调式"异步包成 Promise，才能用 await</td></tr>
+                <tr><td><code>resolve()</code></td><td>任务完成，通知 await 的地方可以往下走了</td></tr>
+                <tr><td><code>await</code></td><td>等 Promise 完成，代码写起来像同步一样；只能在 async 函数里用</td></tr>
+                <tr><td><code>Promise.all([a, b])</code></td><td>两个任务<b>同时开始</b>，全部完成才继续；总耗时取最长的那个</td></tr>
+                <tr><td><code>Promise.race([a, b])</code></td><td>谁先完成就取谁（本例没用到，与 all 对比记忆）</td></tr>
+                <tr><td>串行 vs 并行</td><td>买→取→包→吃必须排队（有依赖）；和面、和馅可以并行（无依赖）</td></tr>
+                <tr><td>耗时对比</td><td>全串行需 24 秒，和面/和馅并行后约 <b>20 秒</b>，省下较短任务的时间</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var houYaYueLog = document.getElementById('hou_ya_yue_log');
+        var houYaYueTotal = document.getElementById('hou_ya_yue_total');
+        var houYaYueTickTimers = {};
+        var houYaYueRunning = false;
+
+        /* 日志：新内容插到最上面 */
+        function houYaYuePrint(html) {
+            var d = new Date();
+            function z(n) { return n < 10 ? '0' + n : '' + n; }
+            var t = z(d.getMinutes()) + ':' + z(d.getSeconds());
+            houYaYueLog.innerHTML = '<span class="hou_ya_yue_t">[' + t + ']</span> ' + html + '\n' + houYaYueLog.innerHTML;
+        }
+
+        /* 取步骤节点 */
+        function houYaYueEl(key) {
+            return document.querySelector('[data-step="' + key + '"]');
+        }
+
+        /* 进度推进：每 100ms 更新一次宽度与剩余秒数 */
+        function houYaYueTick(key, ms) {
+            var box = houYaYueEl(key);
+            var bar = box.getElementsByTagName('i')[0];
+            var left = box.getElementsByClassName('hou_ya_yue_left')[0];
+            var start = Date.now();
+            houYaYueTickTimers[key] = setInterval(function () {
+                var pass = Date.now() - start;
+                var p = Math.min(pass / ms, 1);
+                bar.style.width = Math.round(p * 100) + '%';
+                left.textContent = '还剩 ' + Math.max(((ms - pass) / 1000), 0).toFixed(1) + ' 秒';
+                if (p >= 1) { clearInterval(houYaYueTickTimers[key]); }
+            }, 100);
+        }
+
+        /* 标记步骤开始 */
+        function houYaYueStart(key, name, ms) {
+            var box = houYaYueEl(key);
+            box.className = 'hou_ya_yue_step hou_ya_yue_run';
+            box.getElementsByClassName('hou_ya_yue_tag')[0].className = 'hou_ya_yue_tag hou_ya_yue_t-run';
+            box.getElementsByClassName('hou_ya_yue_tag')[0].textContent = '进行中…';
+            houYaYueTick(key, ms);
+            houYaYuePrint('▶ 开始 <span class="hou_ya_yue_hi">' + name + '</span>（预计 ' + (ms / 1000) + ' 秒）');
+        }
+
+        /* 标记步骤完成 */
+        function houYaYueDone(key, name) {
+            var box = houYaYueEl(key);
+            box.className = 'hou_ya_yue_step hou_ya_yue_ok';
+            var tag = box.getElementsByClassName('hou_ya_yue_tag')[0];
+            tag.className = 'hou_ya_yue_tag hou_ya_yue_t-ok';
+            tag.textContent = '✔ 完成';
+            box.getElementsByClassName('hou_ya_yue_left')[0].textContent = '已完成';
+            var bar = box.getElementsByTagName('i')[0];
+            bar.style.width = '100%';
+            clearInterval(houYaYueTickTimers[key]);
+            houYaYuePrint('✔ <span class="hou_ya_yue_ok">' + name + '</span> 完成');
+        }
+
+        /* 把 setTimeout 包装成 Promise */
+        function houYaYueTask(key, name, ms) {
+            return new Promise(function (resolve) {
+                houYaYueStart(key, name, ms);
+                setTimeout(function () {
+                    houYaYueDone(key, name);
+                    resolve(name);
+                }, ms);
+            });
+        }
+
+        /* ===== ① async/await 版 ===== */
+        async function houYaYueByAsync() {
+            await houYaYueTask('buy', '买原料', 6000);
+            await houYaYueTask('pick', '取原料', 2000);
+            houYaYuePrint('<span class="hou_ya_yue_p">Promise.all</span> 同时开始：和面 + 和馅');
+            await Promise.all([
+                houYaYueTask('dough', '和面', 5000),
+                houYaYueTask('filling', '和馅', 4000)
+            ]);
+            houYaYuePrint('两个都好了，继续下一步');
+            await houYaYueTask('wrap', '包饺子', 4000);
+            await houYaYueTask('eat', '吃饺子', 3000);
+        }
+
+        /* ===== ② Promise.then 链式版 ===== */
+        function houYaYueByThen() {
+            return houYaYueTask('buy', '买原料', 6000)
+                .then(function () { return houYaYueTask('pick', '取原料', 2000); })
+                .then(function () {
+                    houYaYuePrint('<span class="hou_ya_yue_p">Promise.all</span> 同时开始：和面 + 和馅');
+                    return Promise.all([
+                        houYaYueTask('dough', '和面', 5000),
+                        houYaYueTask('filling', '和馅', 4000)
+                    ]);
+                })
+                .then(function () {
+                    houYaYuePrint('两个都好了，继续下一步');
+                    return houYaYueTask('wrap', '包饺子', 4000);
+                })
+                .then(function () { return houYaYueTask('eat', '吃饺子', 3000); });
+        }
+
+        /* 开始 */
+        function houYaYueRun(mode) {
+            if (houYaYueRunning) { return; }
+            houYaYueReset();
+            houYaYueRunning = true;
+            document.getElementById('hou_ya_yue_b1').disabled = true;
+            document.getElementById('hou_ya_yue_b2').disabled = true;
+
+            var t0 = Date.now();
+            var timer = setInterval(function () {
+                houYaYueTotal.textContent = ((Date.now() - t0) / 1000).toFixed(1);
+            }, 100);
+
+            houYaYuePrint('===== 开始包饺子（' + (mode === 'async' ? 'async/await' : 'Promise.then') + ' 版）=====');
+
+            var flow = (mode === 'async') ? houYaYueByAsync() : houYaYueByThen();
+            flow.then(function () {
+                clearInterval(timer);
+                var sec = ((Date.now() - t0) / 1000).toFixed(1);
+                houYaYueTotal.textContent = sec;
+                houYaYuePrint('🎉 <span class="hou_ya_yue_hi">饺子出锅，开饭！</span> 总耗时 ' + sec + ' 秒');
+                houYaYueRunning = false;
+                document.getElementById('hou_ya_yue_b1').disabled = false;
+                document.getElementById('hou_ya_yue_b2').disabled = false;
+            });
+        }
+
+        /* 重置 */
+        function houYaYueReset() {
+            var keys = ['buy', 'pick', 'dough', 'filling', 'wrap', 'eat'];
+            for (var i = 0; i < keys.length; i++) {
+                clearInterval(houYaYueTickTimers[keys[i]]);
+                var box = houYaYueEl(keys[i]);
+                box.className = 'hou_ya_yue_step';
+                var tag = box.getElementsByClassName('hou_ya_yue_tag')[0];
+                tag.className = 'hou_ya_yue_tag';
+                tag.textContent = '等待';
+                box.getElementsByClassName('hou_ya_yue_left')[0].textContent = '未开始';
+                box.getElementsByTagName('i')[0].style.width = '0';
+            }
+            houYaYueTotal.textContent = '0.0';
+            houYaYueLog.innerHTML = '// 点击上方按钮开始，这里会打印每一步的开始、结束与耗时';
+            houYaYueRunning = false;
+            document.getElementById('hou_ya_yue_b1').disabled = false;
+            document.getElementById('hou_ya_yue_b2').disabled = false;
+        }
+    </script>
+</body>
+</html>

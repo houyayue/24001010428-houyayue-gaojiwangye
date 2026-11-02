@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3-detail 商品详情（fetch 接口数据）</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-02 16:25:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：使用 fetch 按 ID 获取单个商品详情并展示，ID 来自 URL 参数
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        a { text-decoration: none; color: inherit; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: ce nter; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        /* ===== 顶部：返回 + 接口条 ===== */
+        .hou_ya_yue_top { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+
+        .hou_ya_yue_back {
+            background: #1d5fa6; color: #fff; border-radius: 20px;
+            padding: 9px 18px; font-size: 14px; display: inline-block;
+        }
+
+        .hou_ya_yue_back:hover { opacity: .9; }
+
+        .hou_ya_yue_api {
+            flex: 1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            background: #f7fafd; border: 1px dashed #a8c4e0; border-radius: 10px;
+            padding: 10px 14px; word-break: break-all;
+        }
+
+        .hou_ya_yue_api .hou_ya_yue_m {
+            background: #0ca678; color: #fff; border-radius: 6px; padding: 3px 10px;
+            font-size: 12px; font-weight: bold;
+        }
+
+        .hou_ya_yue_api code, .hou_ya_yue_card code { font-family: Consolas, monospace; font-size: 13px; color: #c2505a; }
+
+        .hou_ya_yue_status { font-size: 13px; color: #666; }
+
+        .hou_ya_yue_status b { color: #0ca678; }
+
+        .hou_ya_yue_status .hou_ya_yue_err { color: #e03131; }
+
+        /* ===== 详情主体：左图右信息 ===== */
+        .hou_ya_yue_detail { display: flex; flex-wrap: wrap; gap: 24px; }
+
+        .hou_ya_yue_left { flex: 1 1 340px; min-width: 280px; }
+
+        .hou_ya_yue_right { flex: 1 1 340px; min-width: 280px; }
+
+        .hou_ya_yue_main-pic {
+            width: 100%; height: 320px; object-fit: contain; background: #f7fafd;
+            border: 1px solid #e3eaf2; border-radius: 10px; display: block; margin-bottom: 12px;
+        }
+
+        .hou_ya_yue_thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .hou_ya_yue_thumbs img {
+            width: 78px; height: 62px; object-fit: cover; border-radius: 6px; cursor: pointer;
+            border: 2px solid #e3eaf2; background: #eef3fa; transition: border-color .15s;
+        }
+
+        .hou_ya_yue_thumbs img:hover, .hou_ya_yue_thumbs img.hou_ya_yue_on { border-color: #1d5fa6; }
+
+        /* 信息区 */
+        .hou_ya_yue_title { font-size: 22px; font-weight: bold; color: #222; margin-bottom: 8px; }
+
+        .hou_ya_yue_brand { font-size: 13px; color: #9aa4ae; margin-bottom: 14px; }
+
+        .hou_ya_yue_price-box {
+            background: #fff7f2; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
+        }
+
+        .hou_ya_yue_price-box .hou_ya_yue_now { color: #e03131; font-size: 28px; font-weight: bold; }
+
+        .hou_ya_yue_price-box s { color: #b6c2ce; margin-left: 10px; }
+
+        .hou_ya_yue_price-box .hou_ya_yue_off {
+            background: #ff6600; color: #fff; border-radius: 4px; padding: 2px 8px;
+            font-size: 12px; margin-left: 10px;
+        }
+
+        .hou_ya_yue_desc { font-size: 14px; color: #555; line-height: 1.9; margin-bottom: 14px; }
+
+        .hou_ya_yue_tags { margin-bottom: 14px; }
+
+        .hou_ya_yue_tags i {
+            font-style: normal; background: #eef3fa; color: #1d5fa6; border-radius: 12px;
+            padding: 3px 12px; font-size: 12px; margin: 0 6px 6px 0; display: inline-block;
+        }
+
+        .hou_ya_yue_info { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; }
+
+        .hou_ya_yue_info th, .hou_ya_yue_info td {
+            border: 1px solid #e3eaf2; padding: 8px 12px; text-align: left;
+        }
+
+        .hou_ya_yue_info th { background: #f0f6ff; color: #1d5fa6; width: 90px; }
+
+        .hou_ya_yue_star { color: #ffa500; font-size: 16px; }
+
+        /* 评价 */
+        .hou_ya_yue_review {
+            border-top: 1px dashed #e3eaf2; padding: 10px 0; font-size: 13px; line-height: 1.8;
+        }
+
+        .hou_ya_yue_review b { color: #1d5fa6; }
+
+        .hou_ya_yue_review span { color: #9aa4ae; font-size: 12px; margin-left: 8px; }
+
+        /* 骨架屏 */
+        .hou_ya_yue_skeleton {
+            flex: 1 1 340px; min-width: 280px; height: 320px; border-radius: 10px;
+            background: linear-gradient(90deg, #eef3fa 25%, #e2eaf5 37%, #eef3fa 63%);
+            background-size: 400% 100%; animation: hou_ya_yue_shine 1.2s ease infinite;
+        }
+
+        .hou_ya_yue_err-box {
+            background: #fff5f5; border: 1px solid #ffc9c9; border-radius: 8px;
+            padding: 12px 14px; color: #e03131; font-size: 13px; line-height: 1.7;
+        }
+
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #98c379; margin: 0; white-space: pre-wrap; word-break: break-all;
+        }
+
+        @keyframes hou_ya_yue_shine {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">17-3-detail 商品详情 · 按 ID 从接口获取单个商品（fetch + 原生实现）</p>
+
+        <div class="hou_ya_yue_card">
+            <div class="hou_ya_yue_top">
+                <a class="hou_ya_yue_back" href="17-3.html">← 返回列表</a>
+                <div class="hou_ya_yue_api">
+                    <span class="hou_ya_yue_m">GET</span>
+                    <code id="hou_ya_yue_api">https://dummyjson.com/products/1</code>
+                </div>
+            </div>
+            <p>详情页的 ID 来自地址栏参数 <code>?id=</code>（例如 <code>17-3-detail.html?id=3</code>），页面用 <code>URLSearchParams</code> 取出后拼进接口地址，再 fetch 单个商品。没有传 id 时默认取 1 号商品。</p>
+            <div class="hou_ya_yue_status" id="hou_ya_yue_status">等待加载…</div>
+        </div>
+
+        <!-- ===== 详情主体 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>商品详情</h2>
+            <div class="hou_ya_yue_detail" id="hou_ya_yue_detail">
+                <div class="hou_ya_yue_skeleton"></div>
+                <div class="hou_ya_yue_skeleton"></div>
+            </div>
+            <div id="hou_ya_yue_err"></div>
+        </div>
+
+        <!-- ===== 返回数据 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>接口返回的原始数据</h2>
+            <pre class="hou_ya_yue_out" id="hou_ya_yue_json">// 加载后显示接口返回的完整商品对象</pre>
+        </div>
+
+        <!-- ===== 代码 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>核心代码：怎么拿到 URL 里的 ID</h2>
+            <pre class="hou_ya_yue_out">// ① 从地址栏 ?id=3 里取出参数
+const params = new URLSearchParams(location.search);
+const id = params.get('id') || '1';           // 没传就默认 1
+
+// ② 把 ID 拼进接口地址（模板字符串更清爽）
+const url = `https://dummyjson.com/products/${id}`;
+
+// ③ fetch + await，注意 404（商品不存在）也要自己判断
+const res = await fetch(url);
+if (!res.ok) throw new Error('HTTP ' + res.status);
+
+// ④ 拿到单个商品对象，直接取值渲染
+const p = await res.json();
+document.title = p.title;</pre>
+        </div>
+    </div>
+
+    <script>
+        var houYaYueDetail = document.getElementById('hou_ya_yue_detail');
+        var houYaYueStatus = document.getElementById('hou_ya_yue_status');
+        var houYaYueJson = document.getElementById('hou_ya_yue_json');
+        var houYaYueErr = document.getElementById('hou_ya_yue_err');
+        var houYaYueApi = document.getElementById('hou_ya_yue_api');
+
+        /* 取 URL 参数 id */
+        function houYaYueGetId() {
+            var params = new URLSearchParams(location.search);
+            var id = params.get('id');
+            return (id === null || id === '') ? '1' : id;
+        }
+
+        /* 切换大图 */
+        function houYaYueSwitch(url, el) {
+            var main = document.getElementById('hou_ya_yue_main');
+            main.src = url;
+            var list = document.querySelectorAll('.hou_ya_yue_thumbs img');
+            for (var i = 0; i < list.length; i++) { list[i].className = ''; }
+            el.className = 'hou_ya_yue_on';
+        }
+
+        /* 星级 */
+        function houYaYueStars(r) {
+            var n = Math.round(r);
+            var s = '';
+            for (var i = 1; i <= 5; i++) { s += i <= n ? '★' : '☆'; }
+            return s;
+        }
+
+        /* 渲染详情 */
+        function houYaYueRender(p) {
+            var origin = (p.price / (1 - p.discountPercentage / 100)).toFixed(2);
+            var thumbs = '';
+            var imgs = p.images && p.images.length ? p.images : [p.thumbnail];
+            for (var i = 0; i < imgs.length; i++) {
+                thumbs += '<img src="' + imgs[i] + '" alt="图片 ' + (i + 1) + '"'
+                    + (i === 0 ? ' class="hou_ya_yue_on"' : '')
+                    + ' onclick="houYaYueSwitch(\'' + imgs[i] + '\', this)">';
+            }
+            var tags = '';
+            if (p.tags) {
+                for (var j = 0; j < p.tags.length; j++) {
+                    tags += '<i>' + p.tags[j] + '</i>';
+                }
+            }
+            var reviews = '';
+            if (p.reviews && p.reviews.length) {
+                for (var k = 0; k < p.reviews.length; k++) {
+                    var rv = p.reviews[k];
+                    reviews += '<div class="hou_ya_yue_review"><b>' + rv.reviewerName + '</b>'
+                        + '<span class="hou_ya_yue_star">' + houYaYueStars(rv.rating) + '</span>'
+                        + '<span>' + (rv.date + '').slice(0, 10) + '</span><br>' + rv.comment + '</div>';
+                }
+            }
+
+            houYaYueDetail.innerHTML =
+                '<div class="hou_ya_yue_left">'
+                + '<img class="hou_ya_yue_main-pic" id="hou_ya_yue_main" src="' + p.thumbnail + '" alt="' + p.title + '">'
+                + '<div class="hou_ya_yue_thumbs">' + thumbs + '</div>'
+                + '</div>'
+                + '<div class="hou_ya_yue_right">'
+                + '<div class="hou_ya_yue_title">' + p.title + '</div>'
+                + '<div class="hou_ya_yue_brand">品牌：' + p.brand + ' ｜ 分类：' + p.category + ' ｜ 商品编号：' + p.id + '</div>'
+                + '<div class="hou_ya_yue_price-box"><span class="hou_ya_yue_now">￥' + p.price + '</span>'
+                + '<s>￥' + origin + '</s><span class="hou_ya_yue_off">-' + Math.round(p.discountPercentage) + '%</span></div>'
+                + '<div class="hou_ya_yue_desc">' + p.description + '</div>'
+                + '<div class="hou_ya_yue_tags">' + tags + '</div>'
+                + '<table class="hou_ya_yue_info">'
+                + '<tr><th>评分</th><td><span class="hou_ya_yue_star">' + houYaYueStars(p.rating) + '</span> ' + p.rating + ' 分</td></tr>'
+                + '<tr><th>库存</th><td>' + p.stock + ' 件（' + p.availabilityStatus + '）</td></tr>'
+                + '<tr><th>重量</th><td>' + p.weight + ' ｜ 尺寸 ' + p.dimensions.width + '×' + p.dimensions.height + '×' + p.dimensions.depth + '</td></tr>'
+                + '<tr><th>保修</th><td>' + p.warrantyInformation + '</td></tr>'
+                + '<tr><th>配送</th><td>' + p.shippingInformation + '</td></tr>'
+                + '<tr><th>退换</th><td>' + p.returnPolicy + '</td></tr>'
+                + '</table>'
+                + '<h2 style="font-size:15px;">用户评价（' + (p.reviews ? p.reviews.length : 0) + ' 条）</h2>'
+                + reviews
+                + '</div>';
+        }
+
+        /* fetch 单个商品 */
+        async function houYaYueLoad() {
+            var id = houYaYueGetId();
+            var url = 'https://dummyjson.com/products/' + id;
+            houYaYueApi.textContent = url;
+            var t0 = Date.now();
+            try {
+                var res = await fetch(url);
+                if (!res.ok) { throw new Error('HTTP 状态码 ' + res.status + '（该商品可能不存在）'); }
+                var p = await res.json();
+                var ms = Date.now() - t0;
+
+                document.title = p.title + ' - 商品详情';
+                houYaYueRender(p);
+                houYaYueJson.innerHTML = JSON.stringify(p, null, 4);
+                houYaYueStatus.innerHTML = '✔ 已加载商品 ID <b>' + p.id + '</b>：' + p.title
+                    + '，耗时 <b>' + ms + ' ms</b>';
+                houYaYueErr.innerHTML = '';
+            } catch (err) {
+                houYaYueDetail.innerHTML = '';
+                houYaYueErr.innerHTML = '<div class="hou_ya_yue_err-box">✘ 详情加载失败：' + err.message
+                    + '<br>可以点「返回列表」换个商品，或检查 ?id= 参数是否正确。</div>';
+                houYaYueStatus.innerHTML = '<span class="hou_ya_yue_err">加载失败</span>';
+            }
+        }
+
+        houYaYueLoad();
+    </script>
+</body>
+</html>

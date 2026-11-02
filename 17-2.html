@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-2 fetch 获取远程接口数据</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-02 15:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：使用 fetch 跨域获取 dog.ceo 狗狗图片接口并展示
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 980px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        /* ===== 接口地址条 ===== */
+        .hou_ya_yue_api {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+            background: #f7fafd; border: 1px dashed #a8c4e0; border-radius: 10px;
+            padding: 12px 14px; margin-bottom: 14px; word-break: break-all;
+        }
+
+        .hou_ya_yue_api .hou_ya_yue_method {
+            background: #0ca678; color: #fff; border-radius: 6px;
+            padding: 3px 10px; font-size: 12px; font-weight: bold;
+        }
+
+        .hou_ya_yue_api code {
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; color: #c2505a;
+        }
+
+        /* ===== 按钮与状态 ===== */
+        .hou_ya_yue_bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+
+        .hou_ya_yue_btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .hou_ya_yue_btns button {
+            border: 0; border-radius: 20px; padding: 9px 18px; font-size: 14px;
+            cursor: pointer; font-family: inherit; color: #fff;
+            transition: transform .15s, opacity .15s;
+        }
+
+        .hou_ya_yue_btns button:hover { transform: translateY(-2px); opacity: .92; }
+
+        .hou_ya_yue_btns button:active { transform: translateY(0); }
+
+        .hou_ya_yue_btns button:disabled { background: #b6c2ce !important; cursor: not-allowed; transform: none; }
+
+        .hou_ya_yue_g-get { background: #1d5fa6; }
+        .hou_ya_yue_g-clear { background: #597eaa; }
+        .hou_ya_yue_g-xhr { background: #722ed1; }
+
+        .hou_ya_yue_status { font-size: 13px; color: #666; }
+
+        .hou_ya_yue_status b { color: #0ca678; }
+
+        .hou_ya_yue_status .hou_ya_yue_err { color: #e03131; }
+
+        /* ===== 图片区：骨架屏 + 网格 ===== */
+        .hou_ya_yue_grid {
+            display: flex; flex-wrap: wrap; gap: 16px; min-height: 60px;
+        }
+
+        .hou_ya_yue_img-card {
+            flex: 1 1 260px; max-width: 300px; background: #fff;
+            border: 1px solid #e3eaf2; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .05); animation: hou_ya_yue_pop .35s ease;
+        }
+
+        .hou_ya_yue_img-card .hou_ya_yue_pic { display: block; width: 100%; height: 200px; object-fit: cover; background: #eef3fa; }
+
+        .hou_ya_yue_img-card .hou_ya_yue_meta {
+            padding: 8px 12px; font-size: 12px; color: #9aa4ae;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .hou_ya_yue_img-card .hou_ya_yue_meta b { color: #1d5fa6; margin-right: 6px; }
+
+        .hou_ya_yue_skeleton {
+            flex: 1 1 260px; max-width: 300px; height: 240px; border-radius: 10px;
+            background: linear-gradient(90deg, #eef3fa 25%, #e2eaf5 37%, #eef3fa 63%);
+            background-size: 400% 100%; animation: hou_ya_yue_shine 1.2s ease infinite;
+        }
+
+        .hou_ya_yue_empty { color: #b6c2ce; font-size: 14px; line-height: 60px; text-align: center; }
+
+        /* ===== 返回数据 / 代码 ===== */
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px;
+            line-height: 1.7; color: #98c379; min-height: 80px; margin: 0;
+            white-space: pre-wrap; word-break: break-all;
+        }
+
+        pre.hou_ya_yue_out .hou_ya_yue_key { color: #61afef; }
+
+        pre.hou_ya_yue_out .hou_ya_yue_str { color: #e5c07b; }
+
+        .hou_ya_yue_err-box {
+            background: #fff5f5; border: 1px solid #ffc9c9; border-radius: 8px;
+            padding: 12px 14px; color: #e03131; font-size: 13px; line-height: 1.7; margin-top: 12px;
+        }
+
+        @keyframes hou_ya_yue_pop {
+            from { transform: translateY(14px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes hou_ya_yue_shine {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">17-2 使用 fetch 跨域获取远程接口数据 —— dog.ceo 随机猎犬图片接口</p>
+
+        <!-- ===== 接口说明 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>接口信息</h2>
+            <div class="hou_ya_yue_api">
+                <span class="hou_ya_yue_method">GET</span>
+                <code>https://dog.ceo/api/breed/hound/images/random/3</code>
+            </div>
+            <p>该接口返回 <b>JSON</b>：<code style="color:#c2505a">{ "message": ["图片地址1", "图片地址2", "图片地址3"], "status": "success" }</code>。服务端已开放 <b>CORS（跨域资源共享）</b>，所以浏览器允许我们用 <b>fetch</b> 直接请求，无需后端代理。</p>
+
+            <div class="hou_ya_yue_bar">
+                <div class="hou_ya_yue_btns">
+                    <button class="hou_ya_yue_g-get" id="hou_ya_yue_btn" onclick="houYaYueFetchData()">获取 3 张随机狗狗图</button>
+                    <button class="hou_ya_yue_g-xhr" onclick="houYaYueByXhr()">改用 XMLHttpRequest 对照</button>
+                    <button class="hou_ya_yue_g-clear" onclick="houYaYueClear()">清空</button>
+                </div>
+                <span class="hou_ya_yue_status" id="hou_ya_yue_status">等待请求…</span>
+            </div>
+
+            <!-- 图片展示区 -->
+            <div class="hou_ya_yue_grid" id="hou_ya_yue_grid">
+                <div class="hou_ya_yue_empty">点击上方按钮，从远程接口取回 3 张图片</div>
+            </div>
+
+            <div id="hou_ya_yue_err"></div>
+        </div>
+
+        <!-- ===== 返回数据 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>接口返回的原始数据（JSON）</h2>
+            <p>fetch 拿到的是响应对象，必须先 <code style="color:#c2505a">response.json()</code> 才能变成 JS 对象，这一步也是异步的。</p>
+            <pre class="hou_ya_yue_out" id="hou_ya_yue_json">// 请求后会显示接口返回的 JSON 原文</pre>
+        </div>
+
+        <!-- ===== 核心代码 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>核心代码（fetch + async/await）</h2>
+            <pre class="hou_ya_yue_out">// ① async 函数里用 await 等待异步结果，代码像同步一样好读
+async function getDogs() {
+  try {
+    // ② fetch 发起请求，返回 Promise
+    const res = await fetch('https://dog.ceo/api/breed/hound/images/random/3');
+
+    // ③ fetch 只在网络故障时 reject，404 / 500 也算"成功"，要手动判断
+    if (!res.ok) throw new Error('HTTP 状态码：' + res.status);
+
+    // ④ response.json() 把响应体解析成 JS 对象（同样是异步）
+    const data = await res.json();
+
+    // ⑤ 拿到 data.message 里的图片地址数组，动态创建 img 显示
+    data.message.forEach(function (url) {
+      const img = document.createElement('img');
+      img.src = url;
+      document.body.appendChild(img);
+    });
+  } catch (err) {
+    // ⑥ 断网、接口挂了都在这里兜住，页面不会崩
+    console.error('请求失败：', err);
+  }
+}</pre>
+        </div>
+
+        <!-- ===== 知识点 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>fetch 使用要点</h2>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <tr>
+                    <th style="border:1px solid #e3eaf2;padding:7px 10px;background:#f0f6ff;color:#1d5fa6;text-align:left;">要点</th>
+                    <th style="border:1px solid #e3eaf2;padding:7px 10px;background:#f0f6ff;color:#1d5fa6;text-align:left;">说明</th>
+                </tr>
+                <tr><td style="border:1px solid #e3eaf2;padding:7px 10px;">返回 Promise</td><td style="border:1px solid #e3eaf2;padding:7px 10px;">必须 <code>await</code> 或 <code>.then()</code> 才能拿到结果</td></tr>
+                <tr><td style="border:1px solid #e3eaf2;padding:7px 10px;"><code>res.ok</code> 才代表成功</td><td style="border:1px solid #e3eaf2;padding:7px 10px;">404/500 时 fetch 不报错，要自己判断状态码</td></tr>
+                <tr><td style="border:1px solid #e3eaf2;padding:7px 10px;"><code>res.json()</code> 也是异步</td><td style="border:1px solid #e3eaf2;padding:7px 10px;">它返回 Promise，别忘加 await</td></tr>
+                <tr><td style="border:1px solid #e3eaf2;padding:7px 10px;">跨域靠服务端 CORS</td><td style="border:1px solid #e3eaf2;padding:7px 10px;">dog.ceo 响应头带 <code>Access-Control-Allow-Origin</code>，前端可直接请求</td></tr>
+                <tr><td style="border:1px solid #e3eaf2;padding:7px 10px;">一定要 try...catch</td><td style="border:1px solid #e3eaf2;padding:7px 10px;">断网、超时、解析失败都在这里兜底，页面不会白屏</td></tr>
+                <tr><td style="border:1px solid #e3eaf2;padding:7px 10px;">loading 与错误态</td><td style="border:1px solid #e3eaf2;padding:7px 10px;">请求中显示骨架屏，失败给提示和重试入口，体验才完整</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var houYaYueApi = 'https://dog.ceo/api/breed/hound/images/random/3';
+        var houYaYueGrid = document.getElementById('hou_ya_yue_grid');
+        var houYaYueStatus = document.getElementById('hou_ya_yue_status');
+        var houYaYueJson = document.getElementById('hou_ya_yue_json');
+        var houYaYueErr = document.getElementById('hou_ya_yue_err');
+        var houYaYueBtn = document.getElementById('hou_ya_yue_btn');
+
+        /* 显示骨架屏（请求中） */
+        function houYaYueLoading() {
+            houYaYueGrid.innerHTML = '<div class="hou_ya_yue_skeleton"></div>'
+                + '<div class="hou_ya_yue_skeleton"></div>'
+                + '<div class="hou_ya_yue_skeleton"></div>';
+            houYaYueStatus.innerHTML = '请求中…';
+            houYaYueErr.innerHTML = '';
+            houYaYueBtn.disabled = true;
+        }
+
+        /* 展示图片列表 */
+        function houYaYueShowImages(urls) {
+            var html = '';
+            for (var i = 0; i < urls.length; i++) {
+                html += '<div class="hou_ya_yue_img-card">'
+                    + '<img class="hou_ya_yue_pic" src="' + urls[i] + '" alt="随机猎犬图片 ' + (i + 1) + '">'
+                    + '<div class="hou_ya_yue_meta"><b>图片 ' + (i + 1) + '</b>' + urls[i] + '</div>'
+                    + '</div>';
+            }
+            houYaYueGrid.innerHTML = html;
+        }
+
+        /* 语法高亮：把 JSON 里的键和字符串染色 */
+        function houYaYueHighlight(obj) {
+            var s = JSON.stringify(obj, null, 4);
+            s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            s = s.replace(/"([^"]+)":/g, '<span class="hou_ya_yue_key">"$1"</span>:');
+            s = s.replace(/: "([^"]*)"/g, ': <span class="hou_ya_yue_str">"$1"</span>');
+            return s;
+        }
+
+        /* 出错提示（带重试按钮） */
+        function houYaYueFail(msg) {
+            houYaYueErr.innerHTML = '<div class="hou_ya_yue_err-box">✘ ' + msg
+                + '<br>常见原因：断网 / 接口临时不可用 / 被浏览器插件拦截。请检查网络后点击按钮重试。</div>';
+            houYaYueStatus.innerHTML = '<span class="hou_ya_yue_err">请求失败</span>';
+        }
+
+        /* ① fetch + async/await 获取远程数据 */
+        async function houYaYueFetchData() {
+            houYaYueLoading();
+            var t0 = Date.now();
+            try {
+                var res = await fetch(houYaYueApi);
+                if (!res.ok) { throw new Error('HTTP 状态码 ' + res.status); }
+                var data = await res.json();
+                var ms = Date.now() - t0;
+
+                houYaYueJson.innerHTML = houYaYueHighlight(data);
+                if (data && data.message && data.message.length) {
+                    houYaYueShowImages(data.message);
+                    houYaYueStatus.innerHTML = '✔ 请求成功：HTTP <b>' + res.status + '</b>，'
+                        + data.message.length + ' 张图片，耗时 <b>' + ms + ' ms</b>，status 字段：<b>' + data.status + '</b>';
+                } else {
+                    houYaYueGrid.innerHTML = '<div class="hou_ya_yue_empty">接口返回成功，但 message 里没有图片地址</div>';
+                    houYaYueStatus.innerHTML = '接口无数据';
+                }
+            } catch (err) {
+                houYaYueGrid.innerHTML = '';
+                houYaYueFail('fetch 失败：' + err.message);
+                houYaYueJson.innerHTML = '// 本次请求没有拿到数据';
+            } finally {
+                houYaYueBtn.disabled = false;
+            }
+        }
+
+        /* ② 对照：XMLHttpRequest 传统写法 */
+        function houYaYueByXhr() {
+            houYaYueLoading();
+            var t0 = Date.now();
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', houYaYueApi, true);
+            xhr.onload = function () {
+                try {
+                    if (xhr.status !== 200) { throw new Error('HTTP 状态码 ' + xhr.status); }
+                    var data = JSON.parse(xhr.responseText);
+                    houYaYueJson.innerHTML = houYaYueHighlight(data);
+                    houYaYueShowImages(data.message);
+                    houYaYueStatus.innerHTML = '✔ XMLHttpRequest 成功：HTTP <b>' + xhr.status + '</b>，'
+                        + data.message.length + ' 张图片，耗时 <b>' + (Date.now() - t0) + ' ms</b>';
+                } catch (e) {
+                    houYaYueGrid.innerHTML = '';
+                    houYaYueFail('XMLHttpRequest 失败：' + e.message);
+                }
+                houYaYueBtn.disabled = false;
+            };
+            xhr.onerror = function () {
+                houYaYueGrid.innerHTML = '';
+                houYaYueFail('XMLHttpRequest 网络错误');
+                houYaYueBtn.disabled = false;
+            };
+            xhr.send();
+        }
+
+        /* 清空 */
+        function houYaYueClear() {
+            houYaYueGrid.innerHTML = '<div class="hou_ya_yue_empty">点击上方按钮，从远程接口取回 3 张图片</div>';
+            houYaYueStatus.innerHTML = '等待请求…';
+            houYaYueErr.innerHTML = '';
+            houYaYueJson.innerHTML = '// 请求后会显示接口返回的 JSON 原文';
+        }
+    </script>
+</body>
+</html>
