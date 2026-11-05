@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-2 Canvas 系统架构图（汽车之家）</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-05 10:40:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：用 Canvas 绘制汽车之家网站系统架构图（分层 + 动画数据流 + 悬停说明）
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; }
+
+        canvas {
+            display: block; width: 100%; border-radius: 10px;
+            background: #fbfdff; border: 1px solid #e3eaf2;
+            cursor: default;
+        }
+
+        /* 说明面板 */
+        .hou_ya_yue_info {
+            margin-top: 12px; border: 1px solid #e3eaf2; border-left: 4px solid #1d5fa6;
+            border-radius: 8px; padding: 10px 14px; background: #f7fafd;
+            font-size: 13.5px; line-height: 1.8; color: #444; min-height: 52px;
+        }
+
+        .hou_ya_yue_info b { color: #1d5fa6; }
+
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #98c379; margin: 0; white-space: pre-wrap; word-break: break-all;
+        }
+
+        pre.hou_ya_yue_out .hou_ya_yue_c { color: #5c6370; }
+        pre.hou_ya_yue_out .hou_ya_yue_k { color: #c678dd; }
+        pre.hou_ya_yue_out .hou_ya_yue_y { color: #e5c07b; }
+
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table td code { color: #c2505a; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">18-2 基于 Canvas 的系统架构图 · 汽车之家网站（分层绘制 + 动画数据流 + 悬停查看说明）</p>
+
+        <!-- ===== 架构图 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>系统架构图（Canvas 绘制）</h2>
+            <p>整张架构图全部用 Canvas 2D 逐帧绘制：<b>5 层架构</b>（用户层 → 接入层 → Web 服务层 → 应用服务层 → 数据层），蓝色光点表示<b>请求下行</b>、绿色光点表示<b>数据返回</b>。<b>把鼠标移到任意节点上</b>可查看该组件的说明。</p>
+
+            <canvas id="hou_ya_yue_cv" width="960" height="640"></canvas>
+
+            <div class="hou_ya_yue_info" id="hou_ya_yue_info">
+                <b>使用提示：</b>把鼠标移到任意节点上，这里会显示该组件在汽车之家系统中的作用。
+            </div>
+        </div>
+
+        <!-- ===== 代码 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>核心代码</h2>
+            <pre class="hou_ya_yue_out"><span class="hou_ya_yue_c">// ① 画节点：圆角矩形 + 标题 + 副标题</span>
+<span class="hou_ya_yue_k">function</span> <span class="hou_ya_yue_y">box</span>(x, y, w, h, title, sub, color, bg) {
+  ctx.fillStyle = bg;                       <span class="hou_ya_yue_c">// 底色（浅色调）</span>
+  roundRect(x, y, w, h, 8); ctx.fill();
+  ctx.strokeStyle = color; ctx.lineWidth = 1.5; roundRect(x, y, w, h, 8); ctx.stroke();
+  ctx.fillStyle = '#222'; ctx.font = 'bold 14px "Microsoft YaHei"';
+  ctx.fillText(title, x + w/2, y + 22);     <span class="hou_ya_yue_c">// 组件名</span>
+  ctx.fillStyle = '#8a94a0'; ctx.font = '11px Consolas';
+  ctx.fillText(sub, x + w/2, y + 42);       <span class="hou_ya_yue_c">// 技术栈说明</span>
+}
+
+<span class="hou_ya_yue_c">// ② 画箭头：主干线 + 三角形箭头</span>
+<span class="hou_ya_yue_k">function</span> <span class="hou_ya_yue_y">arrow</span>(x1, y1, x2, y2) {
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  const ang = Math.atan2(y2 - y1, x2 - x1);       <span class="hou_ya_yue_c">// 箭头方向角</span>
+  ctx.beginPath();                                <span class="hou_ya_yue_c">// 三角形箭头</span>
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - 9*Math.cos(ang-0.4), y2 - 9*Math.sin(ang-0.4));
+  ctx.lineTo(x2 - 9*Math.cos(ang+0.4), y2 - 9*Math.sin(ang+0.4));
+  ctx.fill();
+}
+
+<span class="hou_ya_yue_c">// ③ 数据流动画：光点在箭头线段上按 t ∈ [0,1] 插值移动</span>
+packet = { seg: arrowIndex, t: 0, spd: 0.006, up: false };
+packet.t += packet.spd;
+const p = seg.a + (seg.b - seg.a) * packet.t;   <span class="hou_ya_yue_c">// 线性插值算出当前坐标</span>
+ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill(); <span class="hou_ya_yue_c">// 蓝色=请求下行，绿色=返回上行</span>
+
+<span class="hou_ya_yue_c">// ④ 交互：mousemove 命中检测，悬停高亮 + 显示说明</span>
+cv.addEventListener('mousemove', e =&gt; {
+  const r = cv.getBoundingClientRect();
+  hover = hit(e.clientX - r.left, e.clientY - r.top);   <span class="hou_ya_yue_c">// 判断点在哪个矩形内</span>
+});</pre>
+        </div>
+
+        <!-- ===== 分层说明 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>架构分层说明</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>层</th><th>组件</th><th>作用</th></tr>
+                <tr><td>用户层</td><td>PC 浏览器 / 移动 App</td><td>用户入口，浏览车型库、报价、经销商、社区</td></tr>
+                <tr><td>接入层</td><td>CDN + 负载均衡 Nginx</td><td>静态资源就近加速；请求按权重分发、故障自动摘除</td></tr>
+                <tr><td>Web 服务层</td><td>Web 应用集群 + API 网关</td><td>页面渲染与业务逻辑；统一鉴权、限流、路由</td></tr>
+                <tr><td>应用服务层</td><td>车型库 / 报价 / 经销商 / 社区 / 用户中心</td><td>按业务拆分的微服务，可独立扩容</td></tr>
+                <tr><td>数据层</td><td>Redis / MySQL 主从 / Elasticsearch / OSS</td><td>缓存热点数据、持久化存储、全文搜索、图片文件</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var houYaYueCv = document.getElementById('hou_ya_yue_cv');
+        var houYaYueCtx = houYaYueCv.getContext('2d');
+        var houYaYueInfo = document.getElementById('hou_ya_yue_info');
+        var houYaYueW = houYaYueCv.width;
+        var houYaYueH = houYaYueCv.height;
+        var houYaYueHover = -1;
+        var houYaYueT = 0;
+
+        /* ============ 数据：5 层架构 ============ */
+        var houYaYueLayers = [
+            { tag: '用户层', y: 46, color: '#1d5fa6', bg: '#e8f1fd', nodes: [
+                { t: 'PC 浏览器', s: 'www.autohome.com.cn', w: 260,
+                  d: '【PC 浏览器】用户通过浏览器访问汽车之家网站，浏览车型库、报价、经销商与社区资讯。' },
+                { t: '移动 App', s: 'iOS / Android', w: 260,
+                  d: '【移动 App】原生客户端通过 HTTPS 调用后端 API 获取数据，图片走 CDN 加载。' } ] },
+            { tag: '接入层', y: 156, color: '#0ca678', bg: '#e8f8f0', nodes: [
+                { t: 'CDN 内容分发', s: '静态资源加速', w: 260,
+                  d: '【CDN】车型图片、JS、CSS 等静态资源分发到全国边缘节点，用户就近访问，减轻源站压力。' },
+                { t: '负载均衡 Nginx', s: '反向代理 / 健康检查', w: 260,
+                  d: '【负载均衡】把请求按权重分发到多台 Web 服务器；某台宕机时健康检查自动把它摘除。' } ] },
+            { tag: 'Web 服务层', y: 266, color: '#f08c00', bg: '#fff7ec', nodes: [
+                { t: 'Web 应用集群', s: 'Tomcat / PHP-FPM × N', w: 260,
+                  d: '【Web 应用集群】负责页面渲染与业务逻辑处理，高峰期可横向加机器扩容。' },
+                { t: 'API 网关', s: '鉴权 · 限流 · 路由', w: 260,
+                  d: '【API 网关】微服务统一入口：登录鉴权、接口限流，并按路径把请求转发到各应用服务。' } ] },
+            { tag: '应用服务层', y: 376, color: '#722ed1', bg: '#f5effd', nodes: [
+                { t: '车型库服务', s: '车型参数配置', w: 164,
+                  d: '【车型库服务】汽车之家核心数据：品牌、车系、车型参数配置，数据量大、更新频繁。' },
+                { t: '报价服务', s: '各地实时价格', w: 164,
+                  d: '【报价服务】汇总经销商实时报价与优惠信息，读多写少，重度依赖 Redis 缓存。' },
+                { t: '经销商服务', s: '门店 · 促销', w: 164,
+                  d: '【经销商服务】经销商门店信息、促销活动管理与询价线索分发。' },
+                { t: '社区论坛', s: '帖子 · 评论', w: 164,
+                  d: '【社区论坛】用户发帖、评论、点赞，写入量大，使用消息队列削峰。' },
+                { t: '用户中心', s: '登录 · 收藏', w: 164,
+                  d: '【用户中心】注册登录、个人资料、收藏与关注关系，采用 Token 会话。' } ] },
+            { tag: '数据层', y: 486, color: '#e03131', bg: '#fff0f0', nodes: [
+                { t: 'Redis 缓存集群', s: '热点数据缓存', w: 200,
+                  d: '【Redis】缓存车型、报价等热点数据，把大部分读请求挡在数据库之前。' },
+                { t: 'MySQL 主从', s: '读写分离', w: 200,
+                  d: '【MySQL】核心业务数据持久化，主库写、从库读，主从复制保证数据一致。' },
+                { t: 'Elasticsearch', s: '全文搜索引擎', w: 200,
+                  d: '【Elasticsearch】车型搜索、帖子搜索的全文检索，支持分词与相关性排序。' },
+                { t: 'OSS 对象存储', s: '图片 · 文件', w: 200,
+                  d: '【OSS】海量车型图片与用户上传文件的对象存储，配合 CDN 分发。' } ] }
+        ];
+
+        /* 预计算每层盒子的位置 */
+        var houYaYueRects = [];      /* 命中检测用 */
+        (function () {
+            for (var l = 0; l < houYaYueLayers.length; l++) {
+                var lay = houYaYueLayers[l];
+                var gap = lay.nodes.length > 3 ? 14 : 30;
+                var total = 0, i;
+                for (i = 0; i < lay.nodes.length; i++) { total += lay.nodes[i].w; }
+                total += gap * (lay.nodes.length - 1);
+                var x = (houYaYueW - total) / 2;
+                for (i = 0; i < lay.nodes.length; i++) {
+                    lay.nodes[i].x = x;
+                    lay.nodes[i].y = lay.y;
+                    lay.nodes[i].h = 58;
+                    houYaYueRects.push({ x: x, y: lay.y, w: lay.nodes[i].w, h: 58, li: l, ni: i });
+                    x += lay.nodes[i].w + gap;
+                }
+            }
+        })();
+
+        /* ============ 连线（箭头段） ============ */
+        var houYaYueSegs = [];
+        (function () {
+            function L(l, i) { return houYaYueLayers[l].nodes[i]; }
+            function seg(x1, y1, x2, y2) { houYaYueSegs.push({ x1: x1, y1: y1, x2: x2, y2: y2 }); }
+
+            /* 用户层 → 接入层 */
+            for (var i = 0; i < 2; i++) {
+                seg(L(0, i).x + L(0, i).w / 2, L(0, i).y + 58, L(1, i).x + L(1, i).w / 2, L(1, i).y);
+            }
+            /* 接入层 → Web 服务层 */
+            for (i = 0; i < 2; i++) {
+                seg(L(1, i).x + L(1, i).w / 2, L(1, i).y + 58, L(2, i).x + L(2, i).w / 2, L(2, i).y);
+            }
+            /* Web 集群 → API 网关（横向） */
+            seg(L(2, 0).x + L(2, 0).w, L(2, 0).y + 29, L(2, 1).x, L(2, 1).y + 29);
+            /* API 网关 → 5 个应用服务（扇出） */
+            var gx = L(2, 1).x + L(2, 1).w / 2, gy = L(2, 1).y + 58;
+            for (i = 0; i < 5; i++) {
+                seg(gx, gy, L(3, i).x + L(3, i).w / 2, L(3, i).y);
+            }
+            /* 应用服务 → 数据总线 → 数据层 */
+            var busY = 456;
+            var busX1 = L(3, 0).x + L(3, 0).w / 2;
+            var busX2 = L(3, 4).x + L(3, 4).w / 2;
+            houYaYueBus = { y: busY, x1: busX1, x2: busX2 };
+            for (i = 0; i < 5; i++) {
+                seg(L(3, i).x + L(3, i).w / 2, L(3, i).y + 58, L(3, i).x + L(3, i).w / 2, busY);
+            }
+            for (i = 0; i < 4; i++) {
+                seg(L(4, i).x + L(4, i).w / 2, busY, L(4, i).x + L(4, i).w / 2, L(4, i).y);
+            }
+        })();
+        var houYaYueBus = null;
+
+        /* ============ 流动数据包 ============ */
+        var houYaYuePackets = [];
+        (function () {
+            var downs = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+            for (var i = 0; i < downs.length; i++) {
+                if (downs[i] >= houYaYueSegs.length) { continue; }
+                houYaYuePackets.push({ seg: downs[i], t: Math.random(), spd: 0.004 + Math.random() * 0.004, up: false });
+            }
+            /* 返回数据：挑几条线上行 */
+            var ups = [2, 3, 10, 12, 16];
+            for (i = 0; i < ups.length; i++) {
+                if (ups[i] >= houYaYueSegs.length) { continue; }
+                houYaYuePackets.push({ seg: ups[i], t: Math.random(), spd: 0.004 + Math.random() * 0.003, up: true });
+            }
+        })();
+
+        /* ============ 绘制工具 ============ */
+        function houYaYueRound(x, y, w, h, r) {
+            houYaYueCtx.beginPath();
+            houYaYueCtx.moveTo(x + r, y);
+            houYaYueCtx.arcTo(x + w, y, x + w, y + h, r);
+            houYaYueCtx.arcTo(x + w, y + h, x, y + h, r);
+            houYaYueCtx.arcTo(x, y + h, x, y, r);
+            houYaYueCtx.arcTo(x, y, x + w, y, r);
+            houYaYueCtx.closePath();
+        }
+
+        function houYaYueArrow(x1, y1, x2, y2) {
+            houYaYueCtx.beginPath();
+            houYaYueCtx.moveTo(x1, y1);
+            houYaYueCtx.lineTo(x2, y2);
+            houYaYueCtx.stroke();
+            var ang = Math.atan2(y2 - y1, x2 - x1);
+            houYaYueCtx.beginPath();
+            houYaYueCtx.moveTo(x2, y2);
+            houYaYueCtx.lineTo(x2 - 8 * Math.cos(ang - 0.42), y2 - 8 * Math.sin(ang - 0.42));
+            houYaYueCtx.lineTo(x2 - 8 * Math.cos(ang + 0.42), y2 - 8 * Math.sin(ang + 0.42));
+            houYaYueCtx.closePath();
+            houYaYueCtx.fill();
+        }
+
+        /* ============ 主绘制 ============ */
+        function houYaYueDraw() {
+            var c = houYaYueCtx;
+            c.clearRect(0, 0, houYaYueW, houYaYueH);
+
+            /* 标题 */
+            c.fillStyle = '#1d5fa6';
+            c.font = 'bold 20px "Microsoft YaHei"';
+            c.textAlign = 'center';
+            c.fillText('汽车之家 · 系统架构图', houYaYueW / 2, 26);
+
+            /* 层标签（画在该层上方，避免被宽盒子遮挡） */
+            c.textAlign = 'left';
+            for (var l = 0; l < houYaYueLayers.length; l++) {
+                var lay = houYaYueLayers[l];
+                c.fillStyle = lay.color;
+                c.font = 'bold 13px "Microsoft YaHei"';
+                c.fillText('『' + lay.tag + '』', 12, lay.y - 10);
+            }
+
+            /* 连线 */
+            c.strokeStyle = '#b6c2ce';
+            c.fillStyle = '#b6c2ce';
+            c.lineWidth = 1.4;
+            for (var i = 0; i < houYaYueSegs.length; i++) {
+                var s = houYaYueSegs[i];
+                houYaYueArrow(s.x1, s.y1, s.x2, s.y2);
+            }
+            /* 数据总线 */
+            if (houYaYueBus) {
+                c.strokeStyle = '#d3a4a4';
+                c.lineWidth = 3;
+                c.beginPath();
+                c.moveTo(houYaYueBus.x1, houYaYueBus.y);
+                c.lineTo(houYaYueBus.x2, houYaYueBus.y);
+                c.stroke();
+                c.lineWidth = 1.4;
+            }
+
+            /* 节点 */
+            for (var r = 0; r < houYaYueRects.length; r++) {
+                var rc = houYaYueRects[r];
+                var n = houYaYueLayers[rc.li].nodes[rc.ni];
+                var lay2 = houYaYueLayers[rc.li];
+                var isHover = (r === houYaYueHover);
+                c.fillStyle = isHover ? lay2.color : lay2.bg;
+                houYaYueRound(rc.x, rc.y, rc.w, rc.h, 8);
+                c.fill();
+                c.strokeStyle = isHover ? '#e03131' : lay2.color;
+                c.lineWidth = isHover ? 2.5 : 1.5;
+                houYaYueRound(rc.x, rc.y, rc.w, rc.h, 8);
+                c.stroke();
+                /* 悬停时白字，平时深字 */
+                c.textAlign = 'center';
+                c.fillStyle = isHover ? '#fff' : '#222';
+                c.font = 'bold 14px "Microsoft YaHei"';
+                c.fillText(n.t, rc.x + rc.w / 2, rc.y + 24);
+                c.fillStyle = isHover ? 'rgba(255,255,255,0.85)' : '#8a94a0';
+                c.font = '11px Consolas, monospace';
+                c.fillText(n.s, rc.x + rc.w / 2, rc.y + 44);
+            }
+
+            /* 流动数据包 */
+            for (var p = 0; p < houYaYuePackets.length; p++) {
+                var pk = houYaYuePackets[p];
+                var sg = houYaYueSegs[pk.seg];
+                var t = pk.up ? 1 - pk.t : pk.t;
+                var px = sg.x1 + (sg.x2 - sg.x1) * t;
+                var py = sg.y1 + (sg.y2 - sg.y1) * t;
+                c.fillStyle = pk.up ? 'rgba(12, 166, 104, 0.95)' : 'rgba(29, 95, 166, 0.95)';
+                c.shadowColor = pk.up ? '#0ca678' : '#1d5fa6';
+                c.shadowBlur = 8;
+                c.beginPath();
+                c.arc(px, py, 3.6, 0, Math.PI * 2);
+                c.fill();
+                c.shadowBlur = 0;
+            }
+
+            /* 图例 */
+            c.textAlign = 'left';
+            c.font = '12px "Microsoft YaHei"';
+            c.fillStyle = '#1d5fa6';
+            c.beginPath(); c.arc(340, 618, 4, 0, Math.PI * 2); c.fill();
+            c.fillStyle = '#555'; c.fillText('蓝色光点 = 请求下行', 350, 622);
+            c.fillStyle = '#0ca678';
+            c.beginPath(); c.arc(500, 618, 4, 0, Math.PI * 2); c.fill();
+            c.fillStyle = '#555'; c.fillText('绿色光点 = 数据返回', 510, 622);
+            c.fillStyle = '#9aa4ae';
+            c.fillText('悬停节点查看说明', 650, 622);
+        }
+
+        /* ============ 动画循环 ============ */
+        function houYaYueLoop() {
+            houYaYueT++;
+            for (var i = 0; i < houYaYuePackets.length; i++) {
+                houYaYuePackets[i].t += houYaYuePackets[i].spd;
+                if (houYaYuePackets[i].t > 1) { houYaYuePackets[i].t = 0; }
+            }
+            houYaYueDraw();
+            requestAnimationFrame(houYaYueLoop);
+        }
+
+        /* ============ 悬停交互 ============ */
+        houYaYueCv.addEventListener('mousemove', function (e) {
+            var rect = houYaYueCv.getBoundingClientRect();
+            var x = (e.clientX - rect.left) * (houYaYueW / rect.width);
+            var y = (e.clientY - rect.top) * (houYaYueH / rect.height);
+            var hit = -1;
+            for (var i = 0; i < houYaYueRects.length; i++) {
+                var rc = houYaYueRects[i];
+                if (x >= rc.x && x <= rc.x + rc.w && y >= rc.y && y <= rc.y + rc.h) { hit = i; break; }
+            }
+            if (hit !== houYaYueHover) {
+                houYaYueHover = hit;
+                houYaYueCv.style.cursor = hit >= 0 ? 'pointer' : 'default';
+                if (hit >= 0) {
+                    var n = houYaYueLayers[houYaYueRects[hit].li].nodes[houYaYueRects[hit].ni];
+                    houYaYueInfo.innerHTML = '<b>' + n.t + '</b>（' + n.s + '）—— ' + n.d;
+                } else {
+                    houYaYueInfo.innerHTML = '<b>使用提示：</b>把鼠标移到任意节点上，这里会显示该组件在汽车之家系统中的作用。';
+                }
+            }
+        });
+
+        houYaYueLoop();
+    </script>
+</body>
+</html>

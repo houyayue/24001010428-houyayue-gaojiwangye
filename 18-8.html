@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-8 数据大屏：全国运营监控（ECharts）</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-05 20:10:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：汽车之家全国运营数据大屏——三列布局，中间上方为中国地图（geo + 飞线 + 涟漪散点）
+      说明：echarts.min.js 与中国地图 GeoJSON（cdn/china.json、cdn/china.js）已下载到本地 cdn 目录，无需外网
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #04080f; color: #cfe9ff; overflow: hidden;
+        }
+
+        /* 背景：径向光晕 + 细网格 */
+        .hou_ya_yue_screen {
+            height: 100vh; min-height: 880px; padding: 12px 16px 16px;
+            display: flex; flex-direction: column; gap: 10px;
+            background:
+                radial-gradient(circle at 50% -10%, rgba(0, 120, 255, .28), transparent 55%),
+                radial-gradient(circle at 90% 110%, rgba(0, 229, 255, .14), transparent 50%),
+                repeating-linear-gradient(0deg, rgba(64, 158, 255, .045) 0 1px, transparent 1px 36px),
+                repeating-linear-gradient(90deg, rgba(64, 158, 255, .045) 0 1px, transparent 1px 36px),
+                #04080f;
+        }
+
+        /* ===== 顶栏 ===== */
+        .hou_ya_yue_head {
+            flex: none; height: 62px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 18px; position: relative;
+            background: linear-gradient(90deg, rgba(6, 26, 54, .2), rgba(10, 44, 86, .85), rgba(6, 26, 54, .2));
+            border: 1px solid rgba(64, 158, 255, .28); border-radius: 6px;
+        }
+
+        .hou_ya_yue_head::before,
+        .hou_ya_yue_head::after {
+            content: ''; position: absolute; bottom: -1px; width: 120px; height: 2px;
+            background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+        }
+
+        .hou_ya_yue_head::before { left: 12px; }
+        .hou_ya_yue_head::after { right: 12px; }
+
+        .hou_ya_yue_head h1 {
+            font-size: 26px; letter-spacing: 4px; font-weight: 700;
+            background: linear-gradient(180deg, #ffffff, #5fc8ff 65%, #2d9cf5);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            text-shadow: 0 0 22px rgba(0, 180, 255, .35);
+        }
+
+        .hou_ya_yue_head_side { font-size: 12.5px; color: #7fb6e0; line-height: 1.7; min-width: 190px; }
+
+        .hou_ya_yue_head_side.right { text-align: right; }
+
+        .hou_ya_yue_head_side b { color: #00e5ff; font-size: 15px; letter-spacing: 1px; }
+
+        /* ===== 三列布局 ===== */
+        .hou_ya_yue_grid {
+            flex: 1; min-height: 0; display: grid;
+            grid-template-columns: 1.02fr 1.62fr 1.02fr; gap: 12px;
+        }
+
+        .hou_ya_yue_col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+
+        /* ===== 面板 ===== */
+        .hou_ya_yue_panel {
+            flex: 1; min-height: 0; display: flex; flex-direction: column;
+            background: linear-gradient(180deg, rgba(9, 30, 60, .78), rgba(6, 18, 38, .82));
+            border: 1px solid rgba(64, 158, 255, .22); border-radius: 6px;
+            padding: 8px 10px 4px; position: relative;
+            box-shadow: inset 0 0 34px rgba(0, 110, 255, .10);
+        }
+
+        /* 四角装饰 */
+        .hou_ya_yue_panel::before,
+        .hou_ya_yue_panel::after {
+            content: ''; position: absolute; width: 12px; height: 12px; pointer-events: none;
+            border: 1px solid rgba(0, 229, 255, .8);
+        }
+
+        .hou_ya_yue_panel::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+        .hou_ya_yue_panel::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+        .hou_ya_yue_panel h3 {
+            flex: none; font-size: 13.5px; font-weight: 600; color: #d6ecff;
+            letter-spacing: 1px; padding-left: 12px; margin-bottom: 3px; position: relative;
+        }
+
+        .hou_ya_yue_panel h3::before {
+            content: ''; position: absolute; left: 0; top: 2px; width: 3px; height: 13px;
+            background: linear-gradient(180deg, #00e5ff, #2d9cf5); border-radius: 2px;
+        }
+
+        .hou_ya_yue_panel h3 span { float: right; font-weight: 400; font-size: 11.5px; color: #6f9cc4; }
+
+        .hou_ya_yue_chart { flex: 1; min-height: 0; width: 100%; }
+
+        /* 中间列：地图占上半部分 */
+        .hou_ya_yue_col.center .hou_ya_yue_panel:nth-child(1) { flex: 1.55; }
+        .hou_ya_yue_col.center .hou_ya_yue_panel:nth-child(2) { flex: 1; }
+
+        /* ===== KPI 卡片 ===== */
+        .hou_ya_yue_kpis { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .hou_ya_yue_kpi {
+            padding: 9px 11px; border-radius: 6px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(0, 140, 255, .18), rgba(0, 229, 255, .05));
+            border: 1px solid rgba(0, 229, 255, .28);
+        }
+
+        .hou_ya_yue_kpi span { display: block; font-size: 12px; color: #8fc4e8; margin-bottom: 2px; }
+
+        .hou_ya_yue_kpi b {
+            font-family: Consolas, "Courier New", monospace; font-size: 21px;
+            color: #00e5ff; text-shadow: 0 0 14px rgba(0, 229, 255, .55);
+        }
+
+        .hou_ya_yue_kpi i { font-style: normal; font-size: 11px; color: #6f9cc4; margin-left: 3px; }
+
+        .hou_ya_yue_kpi em {
+            font-style: normal; position: absolute; right: 8px; top: 8px;
+            font-size: 11px; color: #34d399;
+        }
+
+        .hou_ya_yue_kpi em.down { color: #f87171; }
+
+        /* ===== 实时播报 ===== */
+        .hou_ya_yue_col.right .hou_ya_yue_panel:nth-child(3) { flex: none; height: 178px; }
+
+        .hou_ya_yue_feed { list-style: none; flex: 1; min-height: 0; overflow: hidden; padding-top: 2px; }
+
+        .hou_ya_yue_feed li {
+            display: flex; justify-content: space-between; gap: 8px; align-items: center;
+            font-size: 12px; color: #a9cde9; padding: 5px 6px; border-radius: 4px;
+            background: rgba(0, 140, 255, .07); margin-bottom: 4px;
+            animation: houYaYueSlide .45s ease both;
+        }
+
+        .hou_ya_yue_feed li b { color: #00e5ff; font-weight: 600; }
+
+        .hou_ya_yue_feed li i { font-style: normal; color: #f7b84f; font-family: Consolas, monospace; }
+
+        @keyframes houYaYueSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 小屏降级 ===== */
+        @media (max-width: 1100px) {
+            body { overflow: auto; }
+            .hou_ya_yue_screen { height: auto; min-height: auto; }
+            .hou_ya_yue_grid { grid-template-columns: 1fr; }
+            .hou_ya_yue_panel { min-height: 300px; }
+            .hou_ya_yue_col.center .hou_ya_yue_panel:nth-child(1) { min-height: 420px; }
+            .hou_ya_yue_col.right .hou_ya_yue_panel:nth-child(3) { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_screen">
+        <!-- 顶栏 -->
+        <header class="hou_ya_yue_head">
+            <div class="hou_ya_yue_head_side">
+                <div id="hou_ya_yue_date">2026年11月05日</div>
+                <div>数据周期：近 30 天</div>
+            </div>
+            <h1>汽车之家 · 全国运营数据大屏</h1>
+            <div class="hou_ya_yue_head_side right">
+                <div>实时时间 <b id="hou_ya_yue_clock">--:--:--</b></div>
+                <div>数据源：本地 cdn / ECharts 5.5.1</div>
+            </div>
+        </header>
+
+        <!-- 三列主体 -->
+        <main class="hou_ya_yue_grid">
+            <!-- ============ 左列 ============ -->
+            <section class="hou_ya_yue_col left">
+                <div class="hou_ya_yue_kpis">
+                    <div class="hou_ya_yue_kpi">
+                        <span>日活跃用户</span>
+                        <b class="hou_ya_yue_kpi_num" data-target="128.6" data-decimal="1">0</b><i>万</i>
+                        <em>▲ 12.4%</em>
+                    </div>
+                    <div class="hou_ya_yue_kpi">
+                        <span>今日订单</span>
+                        <b class="hou_ya_yue_kpi_num" data-target="3862" data-comma="1">0</b><i>单</i>
+                        <em>▲ 8.1%</em>
+                    </div>
+                    <div class="hou_ya_yue_kpi">
+                        <span>今日成交额</span>
+                        <b class="hou_ya_yue_kpi_num" data-target="4.28" data-decimal="2">0</b><i>亿</i>
+                        <em class="down">▼ 2.3%</em>
+                    </div>
+                    <div class="hou_ya_yue_kpi">
+                        <span>服务满意度</span>
+                        <b class="hou_ya_yue_kpi_num" data-target="98.2" data-decimal="1">0</b><i>%</i>
+                        <em>▲ 0.6%</em>
+                    </div>
+                </div>
+
+                <div class="hou_ya_yue_panel">
+                    <h3>省份用户数 TOP 8<span>单位：万</span></h3>
+                    <div id="hou_ya_yue_bar" class="hou_ya_yue_chart"></div>
+                </div>
+
+                <div class="hou_ya_yue_panel">
+                    <h3>车型结构占比</h3>
+                    <div id="hou_ya_yue_pie" class="hou_ya_yue_chart"></div>
+                </div>
+            </section>
+
+            <!-- ============ 中列 ============ -->
+            <section class="hou_ya_yue_col center">
+                <div class="hou_ya_yue_panel">
+                    <h3>全国用户分布 · 热门城市与订单流向<span>geo 地图 + 飞线 + 涟漪散点</span></h3>
+                    <div id="hou_ya_yue_map" class="hou_ya_yue_chart"></div>
+                </div>
+
+                <div class="hou_ya_yue_panel">
+                    <h3>24 小时访问趋势<span>PV / UV</span></h3>
+                    <div id="hou_ya_yue_trend" class="hou_ya_yue_chart"></div>
+                </div>
+            </section>
+
+            <!-- ============ 右列 ============ -->
+            <section class="hou_ya_yue_col right">
+                <div class="hou_ya_yue_panel">
+                    <h3>服务能力评估</h3>
+                    <div id="hou_ya_yue_radar" class="hou_ya_yue_chart"></div>
+                </div>
+
+                <div class="hou_ya_yue_panel">
+                    <h3>线索转化漏斗</h3>
+                    <div id="hou_ya_yue_funnel" class="hou_ya_yue_chart"></div>
+                </div>
+
+                <div class="hou_ya_yue_panel">
+                    <h3>实时成交播报</h3>
+                    <ul id="hou_ya_yue_feed" class="hou_ya_yue_feed"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="cdn/echarts.min.js"></script>
+    <script src="cdn/china.js"></script>
+    <script>
+        (function () {
+            var houYaYueCharts = [];
+
+            function houYaYueInit(id, option) {
+                var el = document.getElementById(id);
+                if (!el) return null;
+                var chart = echarts.init(el);
+                chart.setOption(option);
+                houYaYueCharts.push(chart);
+                return chart;
+            }
+
+            /* 深色通用文本样式 */
+            var AXIS_LABEL = { color: '#7fa9c9', fontSize: 10.5 };
+            var SPLIT_LINE = { lineStyle: { color: 'rgba(64,158,255,.12)', type: 'dashed' } };
+
+            /* ===== 顶栏时间 ===== */
+            function houYaYueTick() {
+                var d = new Date();
+                function p(n) { return ('0' + n).slice(-2); }
+                document.getElementById('hou_ya_yue_clock').textContent =
+                    p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+                var wk = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
+                document.getElementById('hou_ya_yue_date').textContent =
+                    d.getFullYear() + '年' + p(d.getMonth() + 1) + '月' + p(d.getDate()) + '日 星期' + wk;
+            }
+            houYaYueTick();
+            setInterval(houYaYueTick, 1000);
+
+            /* ===== KPI 数字滚动 ===== */
+            var nums = document.querySelectorAll('.hou_ya_yue_kpi_num');
+            for (var n = 0; n < nums.length; n++) {
+                (function (el) {
+                    var target = parseFloat(el.getAttribute('data-target'));
+                    var decimal = parseInt(el.getAttribute('data-decimal') || '0', 10);
+                    var needComma = el.getAttribute('data-comma') === '1';
+                    var t0 = null, DUR = 1300;
+                    function step(ts) {
+                        if (!t0) t0 = ts;
+                        var k = Math.min((ts - t0) / DUR, 1);
+                        var e = 1 - Math.pow(1 - k, 3); /* easeOutCubic */
+                        var v = target * e;
+                        var str = decimal ? v.toFixed(decimal) : Math.round(v).toString();
+                        if (needComma) str = str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                        el.textContent = str;
+                        if (k < 1) requestAnimationFrame(step);
+                    }
+                    requestAnimationFrame(step);
+                })(nums[n]);
+            }
+
+            /* ===== 1. 省份用户数 TOP8 横向柱状图 ===== */
+            houYaYueInit('hou_ya_yue_bar', {
+                grid: { left: 46, right: 44, top: 10, bottom: 4 },
+                tooltip: {
+                    trigger: 'axis', axisPointer: { type: 'shadow' },
+                    backgroundColor: 'rgba(6,22,44,.92)', borderColor: 'rgba(0,229,255,.4)',
+                    textStyle: { color: '#d6ecff', fontSize: 12 },
+                    formatter: function (ps) { return ps[0].name + '：<b style="color:#00e5ff">' + ps[0].value + '</b> 万用户'; }
+                },
+                xAxis: { type: 'value', axisLabel: AXIS_LABEL, splitLine: SPLIT_LINE, axisLine: { show: false } },
+                yAxis: {
+                    type: 'category', inverse: true,
+                    data: ['广东省', '江苏省', '浙江省', '山东省', '河南省', '四川省', '河北省', '湖北省'],
+                    axisLabel: { color: '#a9cde9', fontSize: 11 },
+                    axisLine: { lineStyle: { color: 'rgba(64,158,255,.3)' } },
+                    axisTick: { show: false }
+                },
+                series: [{
+                    type: 'bar', barWidth: 11,
+                    data: [386, 302, 288, 256, 231, 214, 198, 176],
+                    showBackground: true,
+                    backgroundStyle: { color: 'rgba(64,158,255,.08)', borderRadius: 6 },
+                    itemStyle: {
+                        borderRadius: [0, 6, 6, 0],
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: 'rgba(0,140,255,.35)' },
+                            { offset: 1, color: '#00e5ff' }
+                        ])
+                    },
+                    label: { show: true, position: 'right', color: '#bfe9ff', fontSize: 10.5 }
+                }]
+            });
+
+            /* ===== 2. 车型结构占比 环形饼图 ===== */
+            houYaYueInit('hou_ya_yue_pie', {
+                tooltip: {
+                    trigger: 'item', backgroundColor: 'rgba(6,22,44,.92)',
+                    borderColor: 'rgba(0,229,255,.4)', textStyle: { color: '#d6ecff', fontSize: 12 },
+                    formatter: '{b}<br/>{c} 万辆（{d}%）'
+                },
+                legend: {
+                    orient: 'vertical', right: 6, top: 'center', itemWidth: 9, itemHeight: 9,
+                    textStyle: { color: '#a9cde9', fontSize: 11 },
+                    data: ['轿车', 'SUV', '新能源', 'MPV', '二手车']
+                },
+                graphic: [{
+                    type: 'text', left: '27%', top: '46%',
+                    style: { text: '2680\n万辆', textAlign: 'center', fill: '#00e5ff', fontSize: 13, lineHeight: 17, fontWeight: 'bold' }
+                }],
+                series: [{
+                    type: 'pie', radius: ['46%', '68%'], center: ['32%', '52%'],
+                    avoidLabelOverlap: true,
+                    itemStyle: { borderColor: '#061225', borderWidth: 2 },
+                    label: { show: false },
+                    emphasis: { scale: true, scaleSize: 6, itemStyle: { shadowBlur: 16, shadowColor: 'rgba(0,229,255,.6)' } },
+                    data: [
+                        { value: 1080, name: '轿车', itemStyle: { color: '#2d9cf5' } },
+                        { value: 860, name: 'SUV', itemStyle: { color: '#00e5ff' } },
+                        { value: 430, name: '新能源', itemStyle: { color: '#34d399' } },
+                        { value: 190, name: 'MPV', itemStyle: { color: '#f7b84f' } },
+                        { value: 120, name: '二手车', itemStyle: { color: '#7b61ff' } }
+                    ]
+                }]
+            });
+
+            /* ===== 3. 中国地图（geo + map + 飞线 + 涟漪散点） ===== */
+            (function () {
+                var geo = window.HOU_YA_YUE_CHINA_GEO;
+                var mapEl = document.getElementById('hou_ya_yue_map');
+                if (!geo) {
+                    mapEl.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;' +
+                        'color:#f87171;font-size:13px">地图数据 cdn/china.js 未加载成功，请检查文件是否存在</div>';
+                    return;
+                }
+                echarts.registerMap('hou_ya_yue_china', geo);
+
+                var province = [
+                    ['广东省', 386], ['江苏省', 302], ['浙江省', 288], ['山东省', 256], ['河南省', 231],
+                    ['四川省', 214], ['河北省', 198], ['湖北省', 176], ['湖南省', 168], ['安徽省', 152],
+                    ['福建省', 148], ['北京市', 143], ['上海市', 138], ['辽宁省', 120], ['陕西省', 112],
+                    ['江西省', 98], ['重庆市', 96], ['广西壮族自治区', 92], ['山西省', 82], ['云南省', 78],
+                    ['贵州省', 66], ['黑龙江省', 62], ['天津市', 60], ['吉林省', 52], ['内蒙古自治区', 48],
+                    ['新疆维吾尔自治区', 42], ['甘肃省', 38], ['海南省', 30], ['台湾省', 22], ['宁夏回族自治区', 18],
+                    ['香港特别行政区', 16], ['青海省', 14], ['西藏自治区', 8], ['澳门特别行政区', 5]
+                ].map(function (p) { return { name: p[0], value: p[1] }; });
+
+                var cities = [
+                    { name: '北京', value: [116.40, 39.90, 143] },
+                    { name: '上海', value: [121.47, 31.23, 138] },
+                    { name: '广州', value: [113.26, 23.13, 120] },
+                    { name: '深圳', value: [114.06, 22.55, 112] },
+                    { name: '成都', value: [104.07, 30.57, 96] },
+                    { name: '杭州', value: [120.15, 30.28, 88] },
+                    { name: '武汉', value: [114.30, 30.59, 76] },
+                    { name: '西安', value: [108.94, 34.34, 68] },
+                    { name: '重庆', value: [106.55, 29.56, 66] },
+                    { name: '沈阳', value: [123.43, 41.80, 52] }
+                ];
+
+                var routes = [['北京', '上海'], ['北京', '广州'], ['北京', '成都'],
+                              ['北京', '西安'], ['上海', '深圳'], ['北京', '武汉']].map(function (r, i) {
+                    var a = cities.filter(function (c) { return c.name === r[0]; })[0].value;
+                    var b = cities.filter(function (c) { return c.name === r[1]; })[0].value;
+                    return { fromName: r[0], toName: r[1], coords: [[a[0], a[1]], [b[0], b[1]]], value: (i + 1) * 100 };
+                });
+
+                houYaYueInit('hou_ya_yue_map', {
+                    tooltip: {
+                        trigger: 'item', backgroundColor: 'rgba(6,22,44,.92)',
+                        borderColor: 'rgba(0,229,255,.4)', textStyle: { color: '#d6ecff', fontSize: 12 },
+                        formatter: function (p) {
+                            if (p.seriesType === 'lines') return p.data.fromName + ' → ' + p.data.toName + ' 订单流向';
+                            if (p.seriesType === 'effectScatter') return p.name + '：' + p.value[2] + ' 万用户';
+                            return p.name + '：' + (p.value || 0) + ' 万用户';
+                        }
+                    },
+                    geo: {
+                        map: 'hou_ya_yue_china', roam: false, zoom: 1.18,
+                        layoutCenter: ['50%', '52%'], layoutSize: '104%',
+                        itemStyle: {
+                            areaColor: '#0a2242', borderColor: 'rgba(64,158,255,.42)', borderWidth: 1,
+                            shadowColor: 'rgba(0,140,255,.55)', shadowBlur: 16, shadowOffsetY: 4
+                        },
+                        emphasis: {
+                            itemStyle: { areaColor: '#1a5f9e' },
+                            label: { show: true, color: '#ffffff', fontSize: 11 }
+                        },
+                        select: { disabled: true }
+                    },
+                    visualMap: {
+                        min: 0, max: 400, left: 12, bottom: 16, orient: 'vertical',
+                        itemWidth: 10, itemHeight: 76,
+                        text: ['高', '低'], textStyle: { color: '#8fc4f0', fontSize: 10 },
+                        inRange: { color: ['#0b2b52', '#12559b', '#2d9cf5', '#00e5ff'] },
+                        calculable: false
+                    },
+                    series: [{
+                        /* 省级行政区着色：map 系列通过 geoIndex 复用 geo 布局，保证与散点/飞线对齐 */
+                        type: 'map', geoIndex: 0, map: 'hou_ya_yue_china',
+                        data: province, selectedMode: false
+                    }, {
+                        type: 'effectScatter', coordinateSystem: 'geo', zlevel: 2,
+                        data: cities,
+                        symbolSize: function (v) { return 5 + v[2] / 24; },
+                        rippleEffect: { brushType: 'stroke', scale: 3.2, period: 4 },
+                        itemStyle: { color: '#00e5ff', shadowBlur: 10, shadowColor: '#00e5ff' },
+                        label: {
+                            show: true, position: 'right', formatter: '{b}',
+                            color: '#9fd8ff', fontSize: 10
+                        }
+                    }, {
+                        type: 'lines', coordinateSystem: 'geo', zlevel: 1,
+                        effect: {
+                            show: true, period: 5, trailLength: 0.18,
+                            symbol: 'arrow', symbolSize: 5, color: '#7ef0ff'
+                        },
+                        lineStyle: { color: 'rgba(0,229,255,.42)', width: 1, curveness: 0.24 },
+                        data: routes
+                    }]
+                });
+            })();
+
+            /* ===== 4. 24 小时访问趋势 ===== */
+            var hours = [];
+            for (var h = 0; h < 24; h++) hours.push(('0' + h).slice(-2) + ':00');
+            houYaYueInit('hou_ya_yue_trend', {
+                grid: { left: 46, right: 16, top: 30, bottom: 22 },
+                tooltip: {
+                    trigger: 'axis', backgroundColor: 'rgba(6,22,44,.92)',
+                    borderColor: 'rgba(0,229,255,.4)', textStyle: { color: '#d6ecff', fontSize: 12 },
+                    axisPointer: { type: 'line', lineStyle: { color: 'rgba(0,229,255,.5)' } }
+                },
+                legend: {
+                    data: ['PV', 'UV'], top: 2, right: 8, itemWidth: 10, itemHeight: 8,
+                    textStyle: { color: '#9fd8ff', fontSize: 11 }
+                },
+                xAxis: {
+                    type: 'category', boundaryGap: false, data: hours,
+                    axisLabel: { color: '#7fa9c9', fontSize: 10, interval: 2 },
+                    axisLine: { lineStyle: { color: 'rgba(64,158,255,.3)' } },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value', name: '万次', nameTextStyle: { color: '#7fa9c9', fontSize: 10 },
+                    axisLabel: AXIS_LABEL, splitLine: SPLIT_LINE, axisLine: { show: false }
+                },
+                series: [{
+                    name: 'PV', type: 'line', smooth: true, symbol: 'none',
+                    lineStyle: { width: 2, color: '#00e5ff' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(0,229,255,.45)' },
+                            { offset: 1, color: 'rgba(0,229,255,0)' }
+                        ])
+                    },
+                    data: [18, 12, 9, 7, 8, 14, 26, 46, 72, 88, 96, 104, 112, 108, 116, 122, 130, 142, 156, 168, 152, 124, 86, 46]
+                }, {
+                    name: 'UV', type: 'line', smooth: true, symbol: 'none',
+                    lineStyle: { width: 2, color: '#7b61ff' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(123,97,255,.38)' },
+                            { offset: 1, color: 'rgba(123,97,255,0)' }
+                        ])
+                    },
+                    data: [9, 6, 4, 3, 4, 7, 13, 24, 38, 46, 52, 58, 62, 60, 64, 68, 72, 79, 86, 92, 84, 68, 46, 24]
+                }]
+            });
+
+            /* ===== 5. 服务能力雷达图 ===== */
+            houYaYueInit('hou_ya_yue_radar', {
+                tooltip: {
+                    backgroundColor: 'rgba(6,22,44,.92)', borderColor: 'rgba(0,229,255,.4)',
+                    textStyle: { color: '#d6ecff', fontSize: 12 }
+                },
+                legend: {
+                    data: ['本月', '上月'], top: 0, right: 6, itemWidth: 10, itemHeight: 8,
+                    textStyle: { color: '#9fd8ff', fontSize: 11 }
+                },
+                radar: {
+                    center: ['50%', '56%'], radius: '62%',
+                    indicator: [
+                        { name: '响应速度', max: 100 },
+                        { name: '解决率', max: 100 },
+                        { name: '满意度', max: 100 },
+                        { name: '专业度', max: 100 },
+                        { name: '耐心度', max: 100 }
+                    ],
+                    axisName: { color: '#9fd8ff', fontSize: 10.5 },
+                    splitLine: { lineStyle: { color: 'rgba(64,158,255,.22)' } },
+                    splitArea: { areaStyle: { color: ['rgba(0,140,255,.04)', 'rgba(0,140,255,.08)'] } },
+                    axisLine: { lineStyle: { color: 'rgba(64,158,255,.22)' } }
+                },
+                series: [{
+                    type: 'radar', symbolSize: 4,
+                    data: [
+                        {
+                            name: '本月', value: [92, 88, 95, 86, 93],
+                            lineStyle: { color: '#00e5ff', width: 2 },
+                            itemStyle: { color: '#00e5ff' },
+                            areaStyle: { color: 'rgba(0,229,255,.28)' }
+                        },
+                        {
+                            name: '上月', value: [84, 79, 89, 80, 88],
+                            lineStyle: { color: '#f7b84f', width: 1.5, type: 'dashed' },
+                            itemStyle: { color: '#f7b84f' },
+                            areaStyle: { color: 'rgba(247,184,79,.16)' }
+                        }
+                    ]
+                }]
+            });
+
+            /* ===== 6. 线索转化漏斗 ===== */
+            houYaYueInit('hou_ya_yue_funnel', {
+                tooltip: {
+                    trigger: 'item', backgroundColor: 'rgba(6,22,44,.92)',
+                    borderColor: 'rgba(0,229,255,.4)', textStyle: { color: '#d6ecff', fontSize: 12 },
+                    formatter: '{b}：{c} 人'
+                },
+                series: [{
+                    type: 'funnel', left: '8%', right: '8%', top: 12, bottom: 6,
+                    minSize: '22%', gap: 3, sort: 'descending',
+                    label: { color: '#dff3ff', fontSize: 11, position: 'inside' },
+                    labelLine: { show: false },
+                    itemStyle: { borderWidth: 0 },
+                    emphasis: { label: { fontSize: 12, fontWeight: 'bold' } },
+                    data: [
+                        { value: 100000, name: '广告曝光', itemStyle: { color: '#1d6fc4' } },
+                        { value: 46800, name: '点击进入', itemStyle: { color: '#2d9cf5' } },
+                        { value: 21600, name: '提交线索', itemStyle: { color: '#00b8e6' } },
+                        { value: 9300, name: '到店看车', itemStyle: { color: '#00e5ff' } },
+                        { value: 3862, name: '成交订单', itemStyle: { color: '#34d399' } }
+                    ]
+                }]
+            });
+
+            /* ===== 7. 实时成交播报（滚动） ===== */
+            (function () {
+                var feed = document.getElementById('hou_ya_yue_feed');
+                var cityList = ['广州', '上海', '成都', '杭州', '武汉', '西安', '北京', '深圳', '南京', '重庆', '长沙', '郑州'];
+                var carList = ['汉 EV', 'Model Y', '朗逸', '思域', '宋 PLUS', '凯美瑞', '轩逸', '帕萨特', 'CR-V'];
+                var idx = 0;
+
+                function pad(n) { return ('0' + n).slice(-2); }
+
+                function push() {
+                    var d = new Date();
+                    var li = document.createElement('li');
+                    var amount = (8 + Math.random() * 30).toFixed(1);
+                    li.innerHTML = '<span><b>' + cityList[idx % cityList.length] + '</b> 用户下单 ' +
+                        carList[(idx * 3 + 1) % carList.length] + '</span>' +
+                        '<i>￥' + amount + '万</i>';
+                    feed.insertBefore(li, feed.firstChild);
+                    idx++;
+                    while (feed.children.length > 6) feed.removeChild(feed.lastChild);
+
+                    var head = document.createElement('li');
+                    head.style.display = 'none';
+                    var stamp = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+                    head.innerHTML = stamp;
+                }
+
+                /* 先铺 6 条历史，再定时插入 */
+                for (var i = 0; i < 6; i++) push();
+                setInterval(push, 2200);
+            })();
+
+            /* ===== 自适应 ===== */
+            var rt = null;
+            window.addEventListener('resize', function () {
+                clearTimeout(rt);
+                rt = setTimeout(function () {
+                    for (var i = 0; i < houYaYueCharts.length; i++) houYaYueCharts[i].resize();
+                }, 120);
+            });
+        })();
+    </script>
+</body>
+</html>

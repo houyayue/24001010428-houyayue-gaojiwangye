@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-1 Canvas 动画（侯雅月）</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-05 10:00:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：Canvas 动画演示——星空粒子 + 流星 + 环绕光点，中央动态发光文字"侯雅月"
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 960px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; }
+
+        /* ===== 画布区 ===== */
+        .hou_ya_yue_stage { position: relative; }
+
+        canvas {
+            display: block; width: 100%; border-radius: 10px;
+            background: #0b1026; box-shadow: 0 4px 16px rgba(11, 16, 38, .35);
+        }
+
+        .hou_ya_yue_ctrl {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px;
+        }
+
+        .hou_ya_yue_ctrl button {
+            height: 36px; border: 0; border-radius: 18px; padding: 0 18px; font-size: 13.5px;
+            color: #fff; cursor: pointer; font-family: inherit; transition: opacity .15s;
+        }
+
+        .hou_ya_yue_ctrl button:hover { opacity: .88; }
+
+        .hou_ya_yue_g-p { background: #1d5fa6; }
+        .hou_ya_yue_g-s { background: #597eaa; }
+        .hou_ya_yue_g-m { background: #722ed1; }
+
+        .hou_ya_yue_fps { font-size: 13px; color: #666; }
+
+        .hou_ya_yue_fps b { color: #1d5fa6; }
+
+        pre.hou_ya_yue_out {
+            background: #282c34; border-radius: 10px; padding: 14px 16px; overflow: auto;
+            font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.7;
+            color: #98c379; margin: 0; white-space: pre-wrap; word-break: break-all;
+        }
+
+        pre.hou_ya_yue_out .hou_ya_yue_c { color: #5c6370; }
+        pre.hou_ya_yue_out .hou_ya_yue_k { color: #c678dd; }
+        pre.hou_ya_yue_out .hou_ya_yue_y { color: #e5c07b; }
+
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #f0f6ff; color: #1d5fa6; }
+
+        .hou_ya_yue_table td code { color: #c2505a; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">18-1 Canvas 动画 · 星空粒子 + 流星 + 环绕光点，中央动态发光文字「侯雅月」</p>
+
+        <!-- ===== 动画 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>动画画布</h2>
+            <p>全部由 Canvas 2D 逐帧绘制：背景星空闪烁、粒子间自动连线成星座、随机划过的流星、两圈环绕光点，以及中央<b>渐变发光 + 缓慢浮动</b>的文字「侯雅月」。用 <code>requestAnimationFrame</code> 驱动，帧率约 60fps。</p>
+
+            <div class="hou_ya_yue_stage">
+                <canvas id="hou_ya_yue_cv" width="900" height="500"></canvas>
+            </div>
+
+            <div class="hou_ya_yue_ctrl">
+                <button class="hou_ya_yue_g-p" id="hou_ya_yue_b1" onclick="houYaYuePause()">⏸ 暂停 / 继续</button>
+                <button class="hou_ya_yue_g-s" onclick="houYaYueMakeStars()">重铺星空</button>
+                <button class="hou_ya_yue_g-m" onclick="houYaYueShoot()">来一颗流星</button>
+                <span class="hou_ya_yue_fps">当前帧率：<b id="hou_ya_yue_fps">--</b> fps ｜ 粒子数：<b id="hou_ya_yue_n">--</b></span>
+            </div>
+        </div>
+
+        <!-- ===== 代码 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>核心代码</h2>
+            <pre class="hou_ya_yue_out"><span class="hou_ya_yue_c">// ① 拿到画笔：getContext('2d') 返回 2D 绘图上下文</span>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+<span class="hou_ya_yue_c">// ② 动画循环：requestAnimationFrame 在下一帧自动回调，比 setInterval 更流畅省电</span>
+<span class="hou_ya_yue_k">function</span> <span class="hou_ya_yue_y">loop</span>() {
+  ctx.clearRect(0, 0, W, H);          <span class="hou_ya_yue_c">// 清屏（否则上一帧会残留叠影）</span>
+  drawStars();                        <span class="hou_ya_yue_c">// 星空：fillStyle + arc + globalAlpha 闪烁</span>
+  drawLinks();                        <span class="hou_ya_yue_c">// 星座：距离小于 90px 的粒子之间画细线</span>
+  drawMeteors();                      <span class="hou_ya_yue_c">// 流星：moveTo/lineTo + 渐变拖尾</span>
+  drawText();                         <span class="hou_ya_yue_c">// 文字：渐变填充 + shadowBlur 发光 + sin 浮动</span>
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+<span class="hou_ya_yue_c">// ③ 发光文字的关键三行</span>
+ctx.font = 'bold 100px "Microsoft YaHei"';
+ctx.shadowColor = 'hsl(' + hue + ', 90%, 60%)';   <span class="hou_ya_yue_c">// 光晕颜色随时间流转</span>
+ctx.shadowBlur = 30;
+ctx.fillStyle = grad;                              <span class="hou_ya_yue_c">// createLinearGradient 双色渐变</span>
+ctx.fillText('侯雅月', x, y + Math.sin(t) * 8);    <span class="hou_ya_yue_c">// sin 让文字上下浮动</span></pre>
+        </div>
+
+        <!-- ===== 要点 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>Canvas 动画要点</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>技术点</th><th>本页用法</th></tr>
+                <tr><td><code>getContext('2d')</code></td><td>获取 2D 绘图上下文，所有绘制都通过它</td></tr>
+                <tr><td><code>requestAnimationFrame</code></td><td>动画循环，浏览器按刷新率回调（约 60fps），页面隐藏时自动暂停</td></tr>
+                <tr><td><code>clearRect</code></td><td>每帧先清屏再重画，避免叠影</td></tr>
+                <tr><td><code>arc + fill</code></td><td>画星星与环绕光点（圆）</td></tr>
+                <tr><td><code>createLinearGradient</code></td><td>文字渐变色、流星拖尾渐变</td></tr>
+                <tr><td><code>shadowBlur</code></td><td>文字霓虹发光效果</td></tr>
+                <tr><td><code>Math.sin/cos</code></td><td>文字上下浮动、光点环绕、星星闪烁（相位差）</td></tr>
+                <tr><td>随机数</td><td>星空重铺、流星随机出现位置与角度</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var houYaYueCv = document.getElementById('hou_ya_yue_cv');
+        var houYaYueCtx = houYaYueCv.getContext('2d');
+        var houYaYueW = houYaYueCv.width;
+        var houYaYueH = houYaYueCv.height;
+        var houYaYuePaused = false;
+        var houYaYueT = 0;
+        var houYaYueStars = [];
+        var houYaYueMeteors = [];
+        var houYaYueFrames = 0;
+        var houYaYueFpsT = Date.now();
+
+        /* ---------- 星空 ---------- */
+        function houYaYueMakeStars() {
+            houYaYueStars = [];
+            for (var i = 0; i < 110; i++) {
+                houYaYueStars.push({
+                    x: Math.random() * houYaYueW,
+                    y: Math.random() * houYaYueH,
+                    r: Math.random() * 1.6 + 0.6,
+                    vx: (Math.random() - 0.5) * 0.25,
+                    vy: (Math.random() - 0.5) * 0.25,
+                    ph: Math.random() * Math.PI * 2       /* 闪烁相位 */
+                });
+            }
+            document.getElementById('hou_ya_yue_n').textContent = houYaYueStars.length;
+        }
+
+        /* ---------- 流星 ---------- */
+        function houYaYueShoot() {
+            var x = Math.random() * houYaYueW * 0.7;
+            var y = Math.random() * houYaYueH * 0.3;
+            houYaYueMeteors.push({ x: x, y: y, vx: 7 + Math.random() * 4, vy: 3 + Math.random() * 2, len: 130 });
+        }
+
+        /* ---------- 画星空 ---------- */
+        function houYaYueDrawStars() {
+            for (var i = 0; i < houYaYueStars.length; i++) {
+                var s = houYaYueStars[i];
+                s.x += s.vx; s.y += s.vy;
+                if (s.x < 0) { s.x = houYaYueW; } if (s.x > houYaYueW) { s.x = 0; }
+                if (s.y < 0) { s.y = houYaYueH; } if (s.y > houYaYueH) { s.y = 0; }
+                var a = 0.35 + 0.55 * Math.abs(Math.sin(houYaYueT * 0.02 + s.ph));
+                houYaYueCtx.globalAlpha = a;
+                houYaYueCtx.fillStyle = '#dfe9ff';
+                houYaYueCtx.beginPath();
+                houYaYueCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                houYaYueCtx.fill();
+            }
+            houYaYueCtx.globalAlpha = 1;
+        }
+
+        /* ---------- 星座连线 ---------- */
+        function houYaYueDrawLinks() {
+            houYaYueCtx.strokeStyle = 'rgba(90, 140, 255, 0.16)';
+            houYaYueCtx.lineWidth = 1;
+            for (var i = 0; i < houYaYueStars.length; i++) {
+                for (var j = i + 1; j < houYaYueStars.length; j++) {
+                    var dx = houYaYueStars[i].x - houYaYueStars[j].x;
+                    var dy = houYaYueStars[i].y - houYaYueStars[j].y;
+                    if (dx * dx + dy * dy < 8100) {
+                        houYaYueCtx.beginPath();
+                        houYaYueCtx.moveTo(houYaYueStars[i].x, houYaYueStars[i].y);
+                        houYaYueCtx.lineTo(houYaYueStars[j].x, houYaYueStars[j].y);
+                        houYaYueCtx.stroke();
+                    }
+                }
+            }
+        }
+
+        /* ---------- 流星 ---------- */
+        function houYaYueDrawMeteors() {
+            for (var i = houYaYueMeteors.length - 1; i >= 0; i--) {
+                var m = houYaYueMeteors[i];
+                m.x += m.vx; m.y += m.vy;
+                var g = houYaYueCtx.createLinearGradient(m.x, m.y, m.x - m.len, m.y - m.len * m.vy / m.vx);
+                g.addColorStop(0, 'rgba(255,255,255,0.95)');
+                g.addColorStop(1, 'rgba(255,255,255,0)');
+                houYaYueCtx.strokeStyle = g;
+                houYaYueCtx.lineWidth = 2;
+                houYaYueCtx.beginPath();
+                houYaYueCtx.moveTo(m.x, m.y);
+                houYaYueCtx.lineTo(m.x - m.len, m.y - m.len * m.vy / m.vx);
+                houYaYueCtx.stroke();
+                if (m.x > houYaYueW + 150 || m.y > houYaYueH + 150) { houYaYueMeteors.splice(i, 1); }
+            }
+        }
+
+        /* ---------- 环绕光点 ---------- */
+        function houYaYueDrawOrbits(cx, cy) {
+            var rings = [
+                { r: 150, n: 8, spd: 0.012, hue: 210 },
+                { r: 190, n: 12, spd: -0.008, hue: 330 }
+            ];
+            for (var k = 0; k < rings.length; k++) {
+                var ring = rings[k];
+                /* 轨道虚线圈 */
+                houYaYueCtx.strokeStyle = 'hsla(' + ring.hue + ', 80%, 65%, 0.22)';
+                houYaYueCtx.setLineDash([4, 7]);
+                houYaYueCtx.beginPath();
+                houYaYueCtx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+                houYaYueCtx.stroke();
+                houYaYueCtx.setLineDash([]);
+                /* 光点 */
+                for (var i = 0; i < ring.n; i++) {
+                    var ang = houYaYueT * ring.spd + i * Math.PI * 2 / ring.n;
+                    var px = cx + Math.cos(ang) * ring.r;
+                    var py = cy + Math.sin(ang) * ring.r * 0.42;   /* 压扁成椭圆轨道，更有空间感 */
+                    houYaYueCtx.fillStyle = 'hsl(' + ring.hue + ', 90%, 70%)';
+                    houYaYueCtx.shadowColor = 'hsl(' + ring.hue + ', 90%, 60%)';
+                    houYaYueCtx.shadowBlur = 10;
+                    houYaYueCtx.beginPath();
+                    houYaYueCtx.arc(px, py, 3.2, 0, Math.PI * 2);
+                    houYaYueCtx.fill();
+                    houYaYueCtx.shadowBlur = 0;
+                }
+            }
+        }
+
+        /* ---------- 中央文字 ---------- */
+        function houYaYueDrawText(cx, cy) {
+            var hue = (houYaYueT * 0.6) % 360;          /* 颜色随时间流转 */
+            var fy = cy + Math.sin(houYaYueT * 0.02) * 9;   /* sin 浮动 */
+            var txt = '侯雅月';
+            houYaYueCtx.font = 'bold 100px "Microsoft YaHei", sans-serif';
+            houYaYueCtx.textAlign = 'center';
+            houYaYueCtx.textBaseline = 'middle';
+
+            var w = houYaYueCtx.measureText(txt).width;
+            var g = houYaYueCtx.createLinearGradient(cx - w / 2, 0, cx + w / 2, 0);
+            g.addColorStop(0, 'hsl(' + hue + ', 95%, 72%)');
+            g.addColorStop(0.5, 'hsl(' + ((hue + 60) % 360) + ', 95%, 78%)');
+            g.addColorStop(1, 'hsl(' + ((hue + 120) % 360) + ', 95%, 72%)');
+
+            houYaYueCtx.shadowColor = 'hsl(' + hue + ', 90%, 60%)';
+            houYaYueCtx.shadowBlur = 32;
+            houYaYueCtx.fillStyle = g;
+            houYaYueCtx.fillText(txt, cx, fy);
+
+            /* 双层光晕：再来一次低透明度描边 */
+            houYaYueCtx.shadowBlur = 60;
+            houYaYueCtx.globalAlpha = 0.35;
+            houYaYueCtx.fillText(txt, cx, fy);
+            houYaYueCtx.globalAlpha = 1;
+            houYaYueCtx.shadowBlur = 0;
+
+            /* 英文小字 */
+            houYaYueCtx.font = '16px Consolas, monospace';
+            houYaYueCtx.fillStyle = 'rgba(190, 210, 255, 0.75)';
+            houYaYueCtx.fillText('H O U   Y A Y U E   ·   C A N V A S   A N I M A T I O N', cx, fy + 82);
+        }
+
+        /* ---------- 主循环 ---------- */
+        function houYaYueLoop() {
+            if (!houYaYuePaused) {
+                houYaYueT++;
+                houYaYueCtx.clearRect(0, 0, houYaYueW, houYaYueH);
+
+                /* 背景垂直渐变 */
+                var bg = houYaYueCtx.createLinearGradient(0, 0, 0, houYaYueH);
+                bg.addColorStop(0, '#0b1026');
+                bg.addColorStop(1, '#101a3e');
+                houYaYueCtx.fillStyle = bg;
+                houYaYueCtx.fillRect(0, 0, houYaYueW, houYaYueH);
+
+                houYaYueDrawStars();
+                houYaYueDrawLinks();
+                houYaYueDrawMeteors();
+
+                var cx = houYaYueW / 2, cy = houYaYueH / 2 - 10;
+                houYaYueDrawOrbits(cx, cy);
+                houYaYueDrawText(cx, cy);
+
+                /* 帧率统计：每 500ms 更新一次 */
+                houYaYueFrames++;
+                if (Date.now() - houYaYueFpsT > 500) {
+                    document.getElementById('hou_ya_yue_fps').textContent =
+                        Math.round(houYaYueFrames * 1000 / (Date.now() - houYaYueFpsT));
+                    houYaYueFrames = 0;
+                    houYaYueFpsT = Date.now();
+                }
+            }
+            requestAnimationFrame(houYaYueLoop);
+        }
+
+        /* 暂停 / 继续 */
+        function houYaYuePause() {
+            houYaYuePaused = !houYaYuePaused;
+            document.getElementById('hou_ya_yue_b1').textContent =
+                houYaYuePaused ? '▶ 继续' : '⏸ 暂停 / 继续';
+        }
+
+        /* 随机流星：每 2.5~5 秒自动来一颗 */
+        function houYaYueAuto() {
+            if (!houYaYuePaused && Math.random() < 0.55) { houYaYueShoot(); }
+            setTimeout(houYaYueAuto, 2500 + Math.random() * 2500);
+        }
+
+        houYaYueMakeStars();
+        houYaYueLoop();
+        houYaYueAuto();
+        setTimeout(houYaYueShoot, 600);
+    </script>
+</body>
+</html>

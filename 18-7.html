@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-7 Three.js：3D 柱状图与 3D 饼图</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-05 18:40:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：基于 Three.js 的两个 3D 图表——月份×产品线 3D 柱状图（悬停提示）与 3D 饼图（悬停弹出）
+      说明：three.min.js（v0.147.0 UMD）与 OrbitControls.js 已下载到本地 cdn 目录，无需外网
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #7c3aed; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #7c3aed; border-left: 4px solid #7c3aed;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; color: #c2505a; }
+
+        .hou_ya_yue_stage {
+            position: relative; width: 100%; height: 460px;
+            border: 1px solid #e6e0f5; border-radius: 8px; overflow: hidden;
+            background: linear-gradient(180deg, #17172e, #101020);
+        }
+
+        .hou_ya_yue_stage canvas { display: block; }
+
+        .hou_ya_yue_tip {
+            position: absolute; pointer-events: none; display: none;
+            background: rgba(20, 20, 40, .88); color: #fff; font-size: 12.5px;
+            padding: 6px 10px; border-radius: 6px; white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, .25); z-index: 5;
+        }
+
+        .hou_ya_yue_bar {
+            display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+        }
+
+        .hou_ya_yue_btn {
+            padding: 7px 16px; border: 1px solid #7c3aed; background: #f4effd; color: #7c3aed;
+            border-radius: 6px; cursor: pointer; font-size: 13.5px; font-family: inherit;
+        }
+
+        .hou_ya_yue_btn:hover { background: #7c3aed; color: #fff; }
+
+        .hou_ya_yue_status { font-size: 13px; color: #666; }
+
+        .hou_ya_yue_status b { color: #7c3aed; }
+
+        .hou_ya_yue_legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: #555; }
+
+        .hou_ya_yue_legend i {
+            display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+            margin-right: 4px; vertical-align: -1px;
+        }
+
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e6e0f5; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #f2eefd; color: #7c3aed; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">18-7 Three.js 3D 图表：柱状图（月份×产品线销量）与饼图（销量占比）</p>
+
+        <!-- ===== 图一：3D 柱状图 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>图一：月份 × 产品线 销量 3D 柱状图</h2>
+            <p>用 <code>THREE.BoxGeometry</code> 逐根生成 12 个月 × 3 条产品线的立体柱，高度即销量，按产品线配色；<code>Raycaster</code> 悬停高亮 + 跟随鼠标的数据提示；<code>OrbitControls</code> 支持拖动旋转、滚轮缩放，可开关自动旋转。</p>
+            <div class="hou_ya_yue_legend" style="margin-bottom:8px">
+                <span><i style="background:#4f8ef7"></i>手机</span>
+                <span><i style="background:#34c38f"></i>电脑</span>
+                <span><i style="background:#f7b84f"></i>智能配件</span>
+            </div>
+            <div id="hou_ya_yue_bar_stage" class="hou_ya_yue_stage">
+                <div id="hou_ya_yue_bar_tip" class="hou_ya_yue_tip"></div>
+            </div>
+            <div class="hou_ya_yue_bar">
+                <button class="hou_ya_yue_btn" id="hou_ya_yue_bar_spin">⏸ 暂停自动旋转</button>
+                <button class="hou_ya_yue_btn" id="hou_ya_yue_bar_reset">↺ 复位视角</button>
+                <span class="hou_ya_yue_status">鼠标拖动旋转 · 滚轮缩放 · 悬停柱子查看销量</span>
+            </div>
+        </div>
+
+        <!-- ===== 图二：3D 饼图 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>图二：年度销量占比 3D 饼图</h2>
+            <p>用带 <code>thetaStart / thetaLength</code> 的 <code>CylinderGeometry</code> 生成扇形柱段拼成 3D 饼图，顶面贴 canvas 文字标签（Sprite），悬停扇区<b>向外弹出</b>并显示占比，离开复位，同样支持拖动旋转与缩放。</p>
+            <div id="hou_ya_yue_pie_stage" class="hou_ya_yue_stage">
+                <div id="hou_ya_yue_pie_tip" class="hou_ya_yue_tip"></div>
+            </div>
+            <div class="hou_ya_yue_bar">
+                <button class="hou_ya_yue_btn" id="hou_ya_yue_pie_spin">⏸ 暂停自动旋转</button>
+                <span class="hou_ya_yue_status" id="hou_ya_yue_pie_status">悬停扇区查看占比</span>
+            </div>
+        </div>
+
+        <!-- ===== 知识点 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>Three.js 绘制 3D 图表的要素</h2>
+            <table class="hou_ya_yue_table">
+                <tr><th>要素</th><th>作用</th><th>本页用法</th></tr>
+                <tr><td><code>Scene / PerspectiveCamera</code></td><td>三维场景与透视相机</td><td>相机斜 45° 俯视图表中心</td></tr>
+                <tr><td><code>WebGLRenderer</code></td><td>渲染器，把场景画到 canvas</td><td>开抗锯齿、随窗口自适应</td></tr>
+                <tr><td><code>BoxGeometry</code></td><td>立方体几何</td><td>每根柱子一个 Mesh，y 高度=销量</td></tr>
+                <tr><td><code>CylinderGeometry</code></td><td>圆柱几何，可设起止角度</td><td>按占比切扇形段拼成饼图</td></tr>
+                <tr><td><code>MeshLambertMaterial</code></td><td>漫反射材质，受光照影响</td><td>AmbientLight + DirectionalLight 打光</td></tr>
+                <tr><td><code>Raycaster</code></td><td>射线拾取，判断鼠标悬停哪个物体</td><td>柱状图高亮提示 / 饼图弹出</td></tr>
+                <tr><td><code>OrbitControls</code></td><td>轨道控制器（拖转/缩放/平移）</td><td>鼠标拖动旋转图表、滚轮缩放</td></tr>
+                <tr><td><code>requestAnimationFrame</code></td><td>渲染循环</td><td>每帧渲染 + 自动旋转 + 弹出动画</td></tr>
+                <tr><td><code>Sprite + CanvasTexture</code></td><td>始终朝向相机的贴图标签</td><td>饼图各扇区名称标签</td></tr>
+            </table>
+            <p style="margin-top:10px">three.min.js（v0.147.0，约 608 KB，该版本仍提供 UMD 构建）与 <code>OrbitControls.js</code> 已下载到本地 <code>cdn/</code> 目录，离线可运行。</p>
+        </div>
+    </div>
+
+    <!-- 本地 cdn 目录中的 Three.js -->
+    <script src="cdn/three.min.js"></script>
+    <script src="cdn/OrbitControls.js"></script>
+    <script>
+        /* ============ 公共：渲染循环管理 ============ */
+        var houYaYueLoop = []; /* 每帧回调 */
+
+        function houYaYueAnimate() {
+            requestAnimationFrame(houYaYueAnimate);
+            for (var i = 0; i < houYaYueLoop.length; i++) houYaYueLoop[i]();
+        }
+        houYaYueAnimate();
+
+        /* 生成 canvas 文字贴图（用于 Sprite 标签） */
+        function houYaYueLabel(text, color) {
+            var cv = document.createElement('canvas');
+            cv.width = 256; cv.height = 96;
+            var ctx = cv.getContext('2d');
+            ctx.font = 'bold 44px "Microsoft YaHei"';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = color;
+            ctx.fillText(text, 128, 62);
+            var tex = new THREE.CanvasTexture(cv);
+            return new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+        }
+
+        /* ============ 图一：3D 柱状图 ============ */
+        (function () {
+            var stage = document.getElementById('hou_ya_yue_bar_stage');
+            var tip = document.getElementById('hou_ya_yue_bar_tip');
+
+            var scene = new THREE.Scene();
+            scene.background = null;
+            var camera = new THREE.PerspectiveCamera(45, stage.clientWidth / stage.clientHeight, 0.1, 200);
+            camera.position.set(16, 15, 20);
+            camera.lookAt(0, 0, 0);
+
+            var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(stage.clientWidth, stage.clientHeight);
+            stage.insertBefore(renderer.domElement, tip);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+            var dir = new THREE.DirectionalLight(0xffffff, 0.9);
+            dir.position.set(12, 20, 10);
+            scene.add(dir);
+
+            /* 数据：12 个月 × 3 条产品线 */
+            var months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            var series = [
+                { name: '手机', color: 0x4f8ef7, data: [42, 38, 55, 60, 52, 66, 70, 74, 88, 95, 120, 132] },
+                { name: '电脑', color: 0x34c38f, data: [30, 26, 35, 40, 44, 38, 42, 50, 58, 64, 78, 90] },
+                { name: '智能配件', color: 0xf7b84f, data: [20, 24, 28, 26, 34, 30, 36, 40, 38, 46, 58, 72] }
+            ];
+
+            var group = new THREE.Group();
+            scene.add(group);
+
+            /* 地面网格 */
+            var grid = new THREE.GridHelper(26, 26, 0x3a3a5c, 0x26263e);
+            grid.position.y = 0.01;
+            group.add(grid);
+
+            var barW = 0.55, gap = 0.75;      /* 柱宽 / 月份间距 */
+            var scale = 0.07;                  /* 销量→高度比例 */
+            var pickables = [];
+
+            for (var m = 0; m < 12; m++) {
+                for (var s = 0; s < 3; s++) {
+                    var v = series[s].data[m];
+                    var h = v * scale;
+                    var geo = new THREE.BoxGeometry(barW, h, barW);
+                    var mat = new THREE.MeshLambertMaterial({ color: series[s].color, transparent: true, opacity: 0.92 });
+                    var bar = new THREE.Mesh(geo, mat);
+                    bar.position.set((m - 5.5) * gap, h / 2, (s - 1) * 1.1);
+                    bar.userData = { label: months[m] + ' · ' + series[s].name, value: v };
+                    group.add(bar);
+                    pickables.push(bar);
+                }
+                /* 月份文字标签 */
+                var lbl = houYaYueLabel(months[m], '#c9c9e8');
+                lbl.scale.set(2.4, 0.9, 1);
+                lbl.position.set((m - 5.5) * gap, 0.5, 4.6);
+                group.add(lbl);
+            }
+
+            var controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.maxPolarAngle = Math.PI / 2.05;
+            controls.target.set(0, 3, 0);
+
+            var autoSpin = true;
+            var raycaster = new THREE.Raycaster();
+            var mouse = new THREE.Vector2(-9, -9);
+
+            stage.addEventListener('mousemove', function (e) {
+                var r = stage.getBoundingClientRect();
+                mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+                mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+                tip.style.left = (e.clientX - r.left + 14) + 'px';
+                tip.style.top = (e.clientY - r.top - 30) + 'px';
+                houYaYueHoverBar();
+            });
+            stage.addEventListener('mouseleave', function () { mouse.set(-9, -9); tip.style.display = 'none'; });
+
+            /* 悬停命中检测：在 mousemove 里同步执行，保证矩阵已更新 */
+            function houYaYueHoverBar() {
+                camera.updateMatrixWorld();
+                group.updateMatrixWorld(true);
+                raycaster.setFromCamera(mouse, camera);
+                var hits = raycaster.intersectObjects(pickables);
+                for (var i = 0; i < pickables.length; i++) {
+                    pickables[i].material.emissive.setHex(0x000000);
+                }
+                if (hits.length) {
+                    var b = hits[0].object;
+                    b.material.emissive.setHex(0x8f6fff);
+                    tip.innerHTML = '<b>' + b.userData.label + '</b>：' + b.userData.value + ' 千台';
+                    tip.style.display = 'block';
+                } else {
+                    tip.style.display = 'none';
+                }
+            }
+
+            houYaYueLoop.push(function () {
+                if (autoSpin) group.rotation.y += 0.004;
+
+                controls.update();
+                renderer.render(scene, camera);
+            });
+
+            document.getElementById('hou_ya_yue_bar_spin').addEventListener('click', function () {
+                autoSpin = !autoSpin;
+                this.textContent = autoSpin ? '⏸ 暂停自动旋转' : '▶ 恢复自动旋转';
+            });
+            document.getElementById('hou_ya_yue_bar_reset').addEventListener('click', function () {
+                camera.position.set(16, 15, 20);
+                controls.target.set(0, 3, 0);
+            });
+
+            window.addEventListener('resize', function () {
+                camera.aspect = stage.clientWidth / stage.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(stage.clientWidth, stage.clientHeight);
+            });
+        })();
+
+        /* ============ 图二：3D 饼图 ============ */
+        (function () {
+            var stage = document.getElementById('hou_ya_yue_pie_stage');
+            var tip = document.getElementById('hou_ya_yue_pie_tip');
+            var status = document.getElementById('hou_ya_yue_pie_status');
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(45, stage.clientWidth / stage.clientHeight, 0.1, 200);
+            camera.position.set(0, 13, 15);
+            camera.lookAt(0, 0, 0);
+
+            var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(stage.clientWidth, stage.clientHeight);
+            stage.insertBefore(renderer.domElement, tip);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            var dir = new THREE.DirectionalLight(0xffffff, 0.95);
+            dir.position.set(8, 18, 12);
+            scene.add(dir);
+
+            /* 数据：年度总销量占比 */
+            var data = [
+                { name: '手机', value: 892, color: 0x4f8ef7 },
+                { name: '电脑', value: 595, color: 0x34c38f },
+                { name: '智能配件', value: 472, color: 0xf7b84f },
+                { name: '智能家居', value: 318, color: 0xef6f8f },
+                { name: '穿戴设备', value: 240, color: 0x9a6ff2 },
+                { name: '其他', value: 96, color: 0x8a93a6 }
+            ];
+            var total = 0;
+            for (var i = 0; i < data.length; i++) total += data[i].value;
+
+            var pieGroup = new THREE.Group();
+            scene.add(pieGroup);
+
+            var R = 6, H = 1.6;
+            var sectors = [];
+            var theta = -Math.PI / 2; /* 从正上方开始顺时针排 */
+            for (var i = 0; i < data.length; i++) {
+                var d = data[i];
+                var len = d.value / total * Math.PI * 2;
+                var geo = new THREE.CylinderGeometry(R, R, H, 64, 1, false, theta, len);
+                var mat = new THREE.MeshLambertMaterial({ color: d.color, transparent: true, opacity: 0.92 });
+                var seg = new THREE.Mesh(geo, mat);
+                seg.userData = {
+                    name: d.name, value: d.value,
+                    pct: (d.value / total * 100).toFixed(1),
+                    dir: new THREE.Vector3( /* 扇区中线方向（弹出方向） */
+                        Math.cos(theta + len / 2), 0, -Math.sin(theta + len / 2))
+                };
+                pieGroup.add(seg);
+                sectors.push(seg);
+
+                /* 扇区标签 */
+                var lbl = houYaYueLabel(d.name, '#' + d.color.toString(16).padStart(6, '0'));
+                lbl.scale.set(2.6, 1, 1);
+                lbl.position.set(Math.cos(theta + len / 2) * (R + 1.3), 1.6, -Math.sin(theta + len / 2) * (R + 1.3));
+                pieGroup.add(lbl);
+
+                theta += len;
+            }
+
+            var controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.maxPolarAngle = Math.PI / 2.1;
+            controls.target.set(0, 0, 0);
+
+            var autoSpin = true;
+            var raycaster = new THREE.Raycaster();
+            var mouse = new THREE.Vector2(-9, -9);
+            var hovered = null;
+
+            stage.addEventListener('mousemove', function (e) {
+                var r = stage.getBoundingClientRect();
+                mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+                mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+                tip.style.left = (e.clientX - r.left + 14) + 'px';
+                tip.style.top = (e.clientY - r.top - 30) + 'px';
+                houYaYueHoverPie();
+            });
+            stage.addEventListener('mouseleave', function () { mouse.set(-9, -9); });
+
+            /* 悬停命中检测：在 mousemove 里同步执行，保证矩阵已更新 */
+            function houYaYueHoverPie() {
+                camera.updateMatrixWorld();
+                pieGroup.updateMatrixWorld(true);
+                raycaster.setFromCamera(mouse, camera);
+                var hits = raycaster.intersectObjects(sectors);
+                var now = hits.length ? hits[0].object : null;
+
+                if (now !== hovered) {
+                    /* 旧扇区复位 */
+                    if (hovered) {
+                        hovered.userData.target = 0;
+                        status.innerHTML = '悬停扇区查看占比';
+                    }
+                    hovered = now;
+                    if (hovered) {
+                        hovered.userData.target = 1; /* 弹出标记 */
+                        status.innerHTML = '当前：<b>' + hovered.userData.name + '</b> ' +
+                            hovered.userData.value + ' 千台 · 占比 ' + hovered.userData.pct + '%';
+                        tip.innerHTML = '<b>' + hovered.userData.name + '</b>：' + hovered.userData.value +
+                            ' 千台（' + hovered.userData.pct + '%）';
+                        tip.style.display = 'block';
+                    } else {
+                        tip.style.display = 'none';
+                    }
+                }
+            }
+
+            houYaYueLoop.push(function () {
+                if (autoSpin) pieGroup.rotation.y += 0.005;
+
+                if (hovered) {
+                    /* 弹出/复位缓动动画 */
+                    var want = hovered.userData.target === 1 ? 0.9 : 0;
+                    hovered.position.x += (hovered.userData.dir.x * want - hovered.position.x) * 0.18;
+                    hovered.position.z += (hovered.userData.dir.z * want - hovered.position.z) * 0.18;
+                }
+
+                controls.update();
+                renderer.render(scene, camera);
+            });
+
+            document.getElementById('hou_ya_yue_pie_spin').addEventListener('click', function () {
+                autoSpin = !autoSpin;
+                this.textContent = autoSpin ? '⏸ 暂停自动旋转' : '▶ 恢复自动旋转';
+            });
+
+            window.addEventListener('resize', function () {
+                camera.aspect = stage.clientWidth / stage.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(stage.clientWidth, stage.clientHeight);
+            });
+        })();
+    </script>
+</body>
+</html>

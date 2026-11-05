@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-4 ECharts 图表：折线图与矩形树图</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-05 16:00:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：ECharts 两个图表——降雨量与流量关系折线图、ECharts 包体积矩形树图（treemap↔sunburst 过渡）
+      说明：echarts.min.js 与示例数据 json 已下载到本地 cdn 目录，无需外网
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #1d5fa6; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #1d5fa6; border-left: 4px solid #1d5fa6;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; color: #c2505a; }
+
+        .hou_ya_yue_chart {
+            width: 100%; height: 460px; border: 1px solid #e3eaf2; border-radius: 8px;
+        }
+
+        .hou_ya_yue_chart2 { height: 520px; }
+
+        .hou_ya_yue_bar {
+            display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+        }
+
+        .hou_ya_yue_btn {
+            padding: 7px 16px; border: 1px solid #722ed1; background: #f5effd; color: #722ed1;
+            border-radius: 6px; cursor: pointer; font-size: 13.5px; font-family: inherit;
+        }
+
+        .hou_ya_yue_btn:hover { background: #722ed1; color: #fff; }
+
+        .hou_ya_yue_status { font-size: 13px; color: #666; }
+
+        .hou_ya_yue_status b { color: #722ed1; }
+
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #e3eaf2; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #eef3fb; color: #1d5fa6; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">18-4 ECharts 可视化：折线图（降雨量-流量）与矩形树图（treemap）</p>
+
+        <!-- ===== 图一：折线图 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>图一：降雨量与流量关系折线图</h2>
+            <p>双 Y 轴折线图（左侧 Flow(m³/s)、右侧 Rainfall(mm) 倒置），带 <code>toolbox</code> 工具箱（区域缩放/还原/保存图片）、<code>dataZoom</code> 滑块 + 滚轮双缩放、十字准星 tooltip 与汛期 <code>markArea</code> 高亮。示例来自 ECharts 官方 <i>area-rainfall</i>。</p>
+            <div id="hou_ya_yue_line" class="hou_ya_yue_chart"></div>
+        </div>
+
+        <!-- ===== 图二：矩形树图 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>图二：ECharts 包体积矩形树图（treemap ↔ sunburst 过渡）</h2>
+            <p>用 <code>$.getJSON</code> 的 fetch 等价写法读取本地 <code>cdn/echarts-package-size.json</code>（ECharts 源码各模块体积），矩形树图与旭日图每 3 秒互相切换（<code>universalTransition</code> 平滑过渡动画）。示例来自官方 <i>treemap-sunburst-transition</i>。</p>
+            <div id="hou_ya_yue_tree" class="hou_ya_yue_chart hou_ya_yue_chart2"></div>
+            <div class="hou_ya_yue_bar">
+                <button class="hou_ya_yue_btn" id="hou_ya_yue_toggle">⏸ 暂停自动切换</button>
+                <button class="hou_ya_yue_btn" id="hou_ya_yue_manual">🔀 手动切一次</button>
+                <span class="hou_ya_yue_status" id="hou_ya_yue_tree_status">加载中…</span>
+            </div>
+        </div>
+
+        <!-- ===== 知识点 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>ECharts 使用五步法与配置项说明</h2>
+            <p>① 引入 <code>echarts.min.js</code> → ② <code>echarts.init(dom)</code> 初始化实例 → ③ 编写 <code>option</code> 配置 → ④ <code>setOption(option)</code> 渲染 → ⑤ 需要时 <code>setOption</code> 更新（本页树图切换就是重复调用 setOption）。</p>
+            <table class="hou_ya_yue_table">
+                <tr><th>配置项</th><th>作用</th><th>本页用法</th></tr>
+                <tr><td><code>title / legend</code></td><td>标题、图例</td><td>折线图标题居中，图例在左上</td></tr>
+                <tr><td><code>xAxis / yAxis</code></td><td>坐标轴</td><td>类目轴日期 + 双 value 轴，降雨量轴 <code>inverse: true</code> 倒置</td></tr>
+                <tr><td><code>series</code></td><td>数据系列</td><td><code>type:'line'</code> 面积折线；<code>type:'treemap'/'sunburst'</code> 层级图</td></tr>
+                <tr><td><code>tooltip</code></td><td>提示框</td><td><code>trigger:'axis'</code> + 十字准星 <code>axisPointer</code></td></tr>
+                <tr><td><code>toolbox</code></td><td>工具箱</td><td>dataZoom 区域缩放、restore 还原、saveAsImage 存图</td></tr>
+                <tr><td><code>dataZoom</code></td><td>数据缩放</td><td>滑块型 + <code>type:'inside'</code> 滚轮缩放，实时联动</td></tr>
+                <tr><td><code>markArea</code></td><td>区域标注</td><td>半透明高亮汛期时间段</td></tr>
+                <tr><td><code>universalTransition</code></td><td>通用过渡</td><td>相同 <code>id</code> 的 treemap ↔ sunburst 切换动画</td></tr>
+            </table>
+            <p style="margin-top:10px">CDN 文件已下载到本地 <code>cdn/</code> 目录：<b>echarts.min.js（约 1 MB，v5.5.1）</b>与 <b>echarts-package-size.json</b>，页面引用 <code>cdn/echarts.min.js</code>，离线也能运行。</p>
+        </div>
+    </div>
+
+    <!-- 本地 cdn 目录中的 ECharts -->
+    <script src="cdn/echarts.min.js"></script>
+    <script>
+        /* ============ 图一：降雨量与流量折线图 ============ */
+        (function () {
+            var chartDom = document.getElementById('hou_ya_yue_line');
+            var myChart = echarts.init(chartDom);
+
+            /* 生成 2009/6/12 2:00 起每小时的时间轴（与官方示例同结构，数据程序化生成） */
+            var times = [];
+            var flow = [];
+            var rain = [];
+            var start = new Date(2009, 5, 12, 2).getTime();
+            var HOUR = 3600 * 1000;
+            var total = 3080; /* 约 128 天，官方示例的规模 */
+
+            function rand(i) { /* 确定性伪随机，每次刷新图形一致 */
+                var x = Math.sin(i * 12.9898) * 43758.5453;
+                return x - Math.floor(x);
+            }
+
+            for (var i = 0; i < total; i++) {
+                var d = new Date(start + i * HOUR);
+                var mm = ('0' + (d.getMonth() + 1)).slice(-2);
+                var dd = ('0' + d.getDate()).slice(-2);
+                var hh = ('0' + d.getHours()).slice(-2);
+                times.push('2009/' + mm + '/' + dd + ' ' + hh + ':00');
+
+                var t = i / total;              /* 全程进度 0~1 */
+                var f = 0.94 + Math.sin(i / 9) * 0.02 + (rand(i) - 0.5) * 0.02;
+
+                /* 峰 1（约 65% 处）：暴涨到 350 的洪峰 */
+                if (t > 0.615 && t < 0.66) {
+                    var k = (t - 0.615) / 0.045;
+                    f = 0.94 + Math.sin(k * Math.PI) * 349;
+                }
+                /* 峰 2（约 75% 处）：第二场洪水冲到 257 */
+                if (t > 0.735 && t < 0.78) {
+                    var k2 = (t - 0.735) / 0.045;
+                    f = Math.max(f, 1.2 + Math.sin(k2 * Math.PI) * 255);
+                }
+
+                /* 降雨量：平时多为 0，偶有小雨，洪峰期间强降雨 */
+                var r = 0;
+                if (rand(i * 3 + 7) > 0.86) r = +(rand(i * 5 + 1) * 2).toFixed(3);
+                if (t > 0.60 && t < 0.665) r = +(rand(i) * 12).toFixed(2);
+                if (t > 0.73 && t < 0.785) r = +(rand(i * 2) * 6).toFixed(2);
+
+                flow.push(+f.toFixed(2));
+                rain.push(r);
+            }
+
+            var lineOption = {
+                title: {
+                    text: '降雨量与流量关系图（2009/6/12 - 2009/10/18，逐小时）',
+                    left: 'center'
+                },
+                grid: { bottom: 80 },
+                toolbox: {
+                    feature: {
+                        dataZoom: { yAxisIndex: 'none' },
+                        restore: {},
+                        saveAsImage: {}
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        animation: false,
+                        label: { backgroundColor: '#505765' }
+                    }
+                },
+                legend: {
+                    data: ['流量', '降雨量'],
+                    left: 10
+                },
+                dataZoom: [
+                    { show: true, realtime: true, start: 60, end: 80 },
+                    { type: 'inside', realtime: true, start: 60, end: 80 }
+                ],
+                xAxis: [{
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLine: { onZero: false },
+                    data: times.map(function (str) { return str.replace(' ', '\n'); })
+                }],
+                yAxis: [
+                    { name: '流量(m³/s)', type: 'value' },
+                    {
+                        name: '降雨量(mm)',
+                        nameLocation: 'start',
+                        alignTicks: true,
+                        type: 'value',
+                        inverse: true
+                    }
+                ],
+                series: [
+                    {
+                        name: '流量',
+                        type: 'line',
+                        areaStyle: {},
+                        lineStyle: { width: 1 },
+                        emphasis: { focus: 'series' },
+                        markArea: {
+                            silent: true,
+                            itemStyle: { opacity: 0.3 },
+                            data: [[{ xAxis: '2009/9/10\n7:00' }, { xAxis: '2009/9/22\n7:00' }]]
+                        },
+                        data: flow
+                    },
+                    {
+                        name: '降雨量',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        areaStyle: {},
+                        lineStyle: { width: 1 },
+                        emphasis: { focus: 'series' },
+                        markArea: {
+                            silent: true,
+                            itemStyle: { opacity: 0.3 },
+                            data: [[{ xAxis: '2009/9/10\n7:00' }, { xAxis: '2009/9/22\n7:00' }]]
+                        },
+                        data: rain
+                    }
+                ]
+            };
+
+            myChart.setOption(lineOption);
+            window.addEventListener('resize', myChart.resize);
+        })();
+
+        /* ============ 图二：矩形树图 ↔ 旭日图 过渡 ============ */
+        (function () {
+            var chartDom = document.getElementById('hou_ya_yue_tree');
+            var myChart = echarts.init(chartDom);
+            var statusEl = document.getElementById('hou_ya_yue_tree_status');
+            var opts = null;          /* 两份 option 缓存 */
+            var showing = 'treemap';  /* 当前显示的图形类型 */
+            var count = 0;            /* 一级模块数 */
+            var timerId = null;
+
+            /* 内置备用数据：网络/路径受限导致 json 读不到时使用（结构与官方数据一致） */
+            var houYaYueFallback = {
+                name: 'echarts',
+                children: [
+                    { name: 'zrender', value: 320, children: [
+                        { name: 'core', value: 120 },
+                        { name: 'graphic', value: 98 },
+                        { name: 'animation', value: 45 },
+                        { name: 'dom', value: 57 }
+                    ]},
+                    { name: 'chart', value: 560, children: [
+                        { name: 'bar', value: 92 },
+                        { name: 'line', value: 88 },
+                        { name: 'pie', value: 76 },
+                        { name: 'scatter', value: 64 },
+                        { name: 'map', value: 120 },
+                        { name: 'treemap', value: 68 },
+                        { name: 'sunburst', value: 52 }
+                    ]},
+                    { name: 'component', value: 420, children: [
+                        { name: 'tooltip', value: 85 },
+                        { name: 'legend', value: 60 },
+                        { name: 'axis', value: 95 },
+                        { name: 'dataZoom', value: 80 },
+                        { name: 'toolbox', value: 55 }
+                    ]},
+                    { name: 'util', value: 130, children: [
+                        { name: 'number', value: 45 },
+                        { name: 'format', value: 42 },
+                        { name: 'color', value: 43 }
+                    ]},
+                    { name: 'coordinate', value: 210, children: [
+                        { name: 'cartesian2d', value: 90 },
+                        { name: 'geo', value: 70 },
+                        { name: 'view', value: 50 }
+                    ]},
+                    { name: 'core', value: 180 }
+                ]
+            };
+
+            function buildOptions(data) {
+                var treemapOption = {
+                    title: { text: 'ECharts 源码包体积 · 矩形树图', left: 'center', top: 8 },
+                    series: [{
+                        type: 'treemap',
+                        id: 'hou_ya_yue_pkg',
+                        animationDurationUpdate: 1000,
+                        roam: false,
+                        nodeClick: undefined,
+                        data: data.children,
+                        universalTransition: true,
+                        label: { show: true },
+                        breadcrumb: { show: false }
+                    }]
+                };
+                var sunburstOption = {
+                    title: { text: 'ECharts 源码包体积 · 旭日图', left: 'center', top: 8 },
+                    series: [{
+                        type: 'sunburst',
+                        id: 'hou_ya_yue_pkg',
+                        radius: ['20%', '90%'],
+                        animationDurationUpdate: 1000,
+                        nodeClick: undefined,
+                        data: data.children,
+                        universalTransition: true,
+                        itemStyle: {
+                            borderWidth: 1,
+                            borderColor: 'rgba(255,255,255,.5)'
+                        },
+                        label: { show: false }
+                    }]
+                };
+                return { treemapOption: treemapOption, sunburstOption: sunburstOption };
+            }
+
+            function start() {
+                if (timerId) clearInterval(timerId);
+                timerId = setInterval(switchOnce, 3000);
+            }
+
+            function switchOnce() {
+                if (!opts) return;
+                showing = showing === 'treemap' ? 'sunburst' : 'treemap';
+                myChart.setOption(showing === 'treemap' ? opts.treemapOption : opts.sunburstOption);
+                statusEl.innerHTML = '当前图形：<b>' + (showing === 'treemap' ? '矩形树图 treemap' : '旭日图 sunburst') +
+                    '</b>（' + count + ' 个一级模块，每 3 秒切换）';
+            }
+
+            function init(data, fromLocal) {
+                opts = buildOptions(data);
+                count = data.children.length;
+                myChart.setOption(opts.treemapOption);
+                statusEl.innerHTML = (fromLocal ? '数据源：<b>cdn/echarts-package-size.json</b>' : '数据源：<b>内置备用数据</b>（本地 json 读取失败）') +
+                    ' · 当前：<b>矩形树图</b> · 每个矩形面积 = 该模块代码体积';
+                start();
+            }
+
+            /* 等价于 $.getJSON(ROOT_PATH + '/data/asset/data/echarts-package-size.json', cb) */
+            fetch('cdn/echarts-package-size.json')
+                .then(function (res) {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(function (data) { init(data, true); })
+                .catch(function () {
+                    init(houYaYueFallback, false);
+                });
+
+            document.getElementById('hou_ya_yue_toggle').addEventListener('click', function () {
+                if (timerId) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    this.textContent = '▶ 恢复自动切换';
+                } else {
+                    start();
+                    this.textContent = '⏸ 暂停自动切换';
+                }
+            });
+
+            document.getElementById('hou_ya_yue_manual').addEventListener('click', function () {
+                if (!opts) return;
+                switchOnce();
+            });
+
+            window.addEventListener('resize', myChart.resize);
+        })();
+    </script>
+</body>
+</html>

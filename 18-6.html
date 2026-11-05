@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-6 Mermaid：智能客服系统流程图与 ER 图</title>
+    <!--
+      作者：侯雅月
+      建立时间：2026-11-05 17:30:00
+      使用的大模型：GLM-5.3-Flash
+      功能名称：基于 Mermaid 的智能客服系统——业务流程图（flowchart）与数据库 ER 图（erDiagram）
+      说明：mermaid.min.js（v10.9.1）已下载到本地 cdn 目录，无需外网
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f0f4f8; color: #333; padding: 24px 16px 48px;
+        }
+
+        .hou_ya_yue_wrap { max-width: 1000px; margin: 0 auto; }
+
+        h1 { text-align: center; font-size: 26px; color: #0e7490; margin-bottom: 6px; }
+
+        .hou_ya_yue_sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 24px; }
+
+        .hou_ya_yue_card {
+            background: #fff; border-radius: 12px; padding: 20px 22px;
+            margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        }
+
+        .hou_ya_yue_card h2 {
+            font-size: 18px; color: #0e7490; border-left: 4px solid #0e7490;
+            padding-left: 10px; margin-bottom: 10px;
+        }
+
+        .hou_ya_yue_card p { font-size: 13px; color: #666; margin-bottom: 12px; line-height: 1.7; }
+
+        code { font-family: Consolas, "Courier New", monospace; color: #c2505a; }
+
+        .hou_ya_yue_diagram {
+            border: 1px solid #dbe7ef; border-radius: 8px; padding: 14px;
+            background: #fcfdff; overflow-x: auto; text-align: center;
+        }
+
+        .hou_ya_yue_diagram svg { max-width: 100%; height: auto; }
+
+        .hou_ya_yue_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        .hou_ya_yue_table th, .hou_ya_yue_table td {
+            border: 1px solid #dbe7ef; padding: 7px 10px; text-align: left; line-height: 1.6;
+        }
+
+        .hou_ya_yue_table th { background: #e9f4f8; color: #0e7490; }
+    </style>
+</head>
+<body>
+    <div class="hou_ya_yue_wrap">
+        <h1>侯雅月的JavaScript</h1>
+        <p class="hou_ya_yue_sub">18-6 Mermaid 图表：智能客服系统流程图（flowchart）与 ER 图（erDiagram）</p>
+
+        <!-- ===== 图一：流程图 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>图一：智能客服系统业务流程图</h2>
+            <p>用 Mermaid 的 <code>flowchart TD</code> 语法绘制：用户提问 → 意图识别 → 知识库检索 → 命中判断分支（命中走机器人应答，未命中转人工工单）→ 用户评价 → 知识库更新闭环。菱形为判断节点、虚线为回流线，样式用 <code>classDef</code> 定义。</p>
+            <pre class="mermaid hou_ya_yue_diagram">
+flowchart TD
+    A([用户发起咨询]) --> B[输入预处理<br/>分词 / 敏感词过滤]
+    B --> C[意图识别<br/>NLP 分类模型]
+    C --> D{意图是否明确？}
+    D -- 否 --> E[反问澄清<br/>引导用户补充]
+    E --> C
+    D -- 是 --> F[知识库检索<br/>向量匹配 Top-N]
+    F --> G{置信度 >= 阈值？}
+    G -- 是 --> H[组装答案模板<br/>生成机器人回复]
+    G -- 否 --> I[创建人工工单<br/>排队转接客服]
+    I --> J[人工坐席处理<br/>录入解决方案]
+    H --> K([回复用户])
+    J --> K
+    K --> L[收集用户评价<br/>满意 / 不满意]
+    L --> M{评价是否满意？}
+    M -- 不满意 --> I
+    M -- 满意 --> N[知识条目归档<br/>更新知识库]
+    N --> O([会话结束])
+
+    classDef startEnd fill:#0e7490,stroke:#0e7490,color:#fff
+    classDef process fill:#e0f2fe,stroke:#0e7490,color:#0c4a6e
+    classDef decision fill:#fef9c3,stroke:#ca8a04,color:#713f12
+    classDef manual fill:#fce7f3,stroke:#be185d,color:#831843
+    class A,K,O startEnd
+    class B,C,F,H,E,L,N process
+    class D,G,M decision
+    class I,J manual
+            </pre>
+        </div>
+
+        <!-- ===== 图二：ER 图 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>图二：智能客服系统数据库 ER 图</h2>
+            <p>用 Mermaid 的 <code>erDiagram</code> 语法绘制核心实体及关系：<code>用户 ||--o{ 会话</code> 一对多、<code>会话 ||--o{ 消息</code>、<code>消息 ||--o| 反馈评价</code>、<code>知识分类 ||--o{ 知识条目</code>、<code>消息 }o--|| 知识条目</code>（命中引用）、<code>会话 ||--o{ 工单</code>（转人工）。每个实体列出主键与主要属性。</p>
+            <pre class="mermaid hou_ya_yue_diagram">
+erDiagram
+    USER ||--o{ SESSION : "发起"
+    USER ||--o{ TICKET : "提交"
+    SESSION ||--o{ MESSAGE : "包含"
+    SESSION ||--o{ TICKET : "升级为"
+    MESSAGE ||--o| FEEDBACK : "获得"
+    MESSAGE }o--|| KB_ENTRY : "命中引用"
+    KB_CATEGORY ||--o{ KB_ENTRY : "归属"
+
+    USER {
+        bigint user_id PK "用户ID"
+        varchar nickname "昵称"
+        varchar phone "手机号"
+        datetime register_time "注册时间"
+    }
+    SESSION {
+        bigint session_id PK "会话ID"
+        bigint user_id FK "所属用户"
+        varchar channel "渠道(App/网页)"
+        datetime start_time "开始时间"
+        varchar status "进行中/已结束"
+    }
+    MESSAGE {
+        bigint message_id PK "消息ID"
+        bigint session_id FK "所属会话"
+        tinyint sender_type "0用户/1机器人/2人工"
+        text content "消息内容"
+        bigint kb_entry_id FK "命中的知识条目"
+        datetime send_time "发送时间"
+    }
+    KB_CATEGORY {
+        int category_id PK "分类ID"
+        varchar category_name "分类名称"
+        int parent_id FK "父分类"
+    }
+    KB_ENTRY {
+        bigint entry_id PK "知识条目ID"
+        int category_id FK "所属分类"
+        varchar question "标准问题"
+        text answer "标准答案"
+        varchar vector_id "向量库索引"
+        int hit_count "命中次数"
+    }
+    TICKET {
+        bigint ticket_id PK "工单ID"
+        bigint session_id FK "来源会话"
+        bigint user_id FK "所属用户"
+        varchar issue_type "问题类型"
+        varchar handler "处理坐席"
+        varchar status "待处理/已完成"
+    }
+    FEEDBACK {
+        bigint feedback_id PK "评价ID"
+        bigint message_id FK "被评消息"
+        tinyint score "1~5分"
+        varchar comment "评价内容"
+    }
+            </pre>
+        </div>
+
+        <!-- ===== 知识点 ===== -->
+        <div class="hou_ya_yue_card">
+            <h2>Mermaid 使用要点</h2>
+            <p>引入本地 <code>cdn/mermaid.min.js</code> → <code>mermaid.initialize({ startOnLoad: true })</code> → 页面里写 <code>&lt;pre class="mermaid"&gt;</code> 或 <code>&lt;div class="mermaid"&gt;</code> 放入文本语法，加载后自动渲染成 SVG。</p>
+            <table class="hou_ya_yue_table">
+                <tr><th>语法要素</th><th>说明</th><th>本页用法</th></tr>
+                <tr><td><code>flowchart TD</code></td><td>流程图，TD 为从上到下（LR 为从左到右）</td><td>智能客服问答主流程</td></tr>
+                <tr><td><code>[] / () / ([]) / {}</code></td><td>矩形=过程、圆角=起止、 Stadium=端点、菱形=判断</td><td>意图判断、置信度判断用 <code>{}</code></td></tr>
+                <tr><td><code>--&gt; / --文字--&gt; / -.-&gt;</code></td><td>实线箭头 / 带标签箭头 / 虚线箭头</td><td>分支标签「是 / 否」</td></tr>
+                <tr><td><code>classDef + class</code></td><td>自定义节点配色</td><td>起止深青、判断黄、人工粉、过程蓝</td></tr>
+                <tr><td><code>&lt;br/&gt;</code></td><td>节点内换行</td><td>节点名 + 补充说明两行显示</td></tr>
+                <tr><td><code>erDiagram</code></td><td>实体关系图</td><td>7 个实体、7 条关系</td></tr>
+                <tr><td><code>||--o{</code></td><td>基数符号：||恰好一、o|零或一、}o零或多</td><td>用户1—多会话、消息0—1评价</td></tr>
+                <tr><td><code>PK / FK</code></td><td>实体属性标注主键、外键</td><td>各表主外键与字段类型</td></tr>
+            </table>
+            <p style="margin-top:10px">mermaid.min.js（v10.9.1，约 3.3 MB）已下载到本地 <code>cdn/</code> 目录，离线可运行。</p>
+        </div>
+    </div>
+
+    <!-- 本地 cdn 目录中的 Mermaid -->
+    <script src="cdn/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                fontFamily: '"Microsoft YaHei", sans-serif',
+                fontSize: '14px',
+                primaryColor: '#e0f2fe',
+                primaryBorderColor: '#0e7490',
+                lineColor: '#64748b'
+            },
+            flowchart: { curve: 'basis' }
+        });
+    </script>
+</body>
+</html>

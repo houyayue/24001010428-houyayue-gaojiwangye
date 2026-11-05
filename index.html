@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+﻿﻿ <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -246,7 +246,7 @@
 
                 <div class="summary">
                     <div class="summary-item">
-                        <strong>40</strong>
+                        <strong>48</strong>
                         <span>实践页面</span>
                     </div>
                     <div class="summary-item">
@@ -631,6 +631,69 @@
                     </div>
                     <h3>17-6.html</h3>
                     <p>包饺子异步流程演示：把 setTimeout 包装成 Promise，买原料 6s → 取原料 2s → Promise.all 并行和面 5s 与和馅 4s → 包饺子 4s → 吃饺子 3s，节点卡片带进度条与剩余秒数，提供 async/await 与 then 链式两种写法，附执行时间线日志。</p>
+                </a>
+
+                <a class="card" href="18-1.html">
+                    <div class="card-header">
+                        <span class="card-index">18-1</span>
+                        <span class="card-badge">Canvas 动画</span>
+                    </div>
+                    <h3>18-1.html</h3>
+                    <p>Canvas 动画：深空星野粒子闪烁并自动连线成星座、随机流星拖尾、两圈椭圆轨道环绕光点，中央渐变发光 + sin 浮动的文字「侯雅月」，requestAnimationFrame 驱动并实时显示帧率，支持暂停/重铺星空/手动流星。</p>
+                </a>
+
+                <a class="card" href="18-2.html">
+                    <div class="card-header">
+                        <span class="card-index">18-2</span>
+                        <span class="card-badge">架构图</span>
+                    </div>
+                    <h3>18-2.html</h3>
+                    <p>基于 Canvas 的汽车之家网站系统架构图：用户层/接入层/Web 服务层/应用服务层/数据层 5 层 17 个组件节点，圆角矩形 + 箭头 + 数据总线全代码绘制，蓝色请求/绿色返回光点沿线流动，悬停节点显示组件说明。</p>
+                </a>
+
+                <a class="card" href="18-3.html">
+                    <div class="card-header">
+                        <span class="card-index">18-3</span>
+                        <span class="card-badge">SVG 架构图</span>
+                    </div>
+                    <h3>18-3.html</h3>
+                    <p>基于知识库的智能客服系统架构图（SVG 矢量绘制，科研方向）：用户接入/会话理解/知识引擎(RAG)/应答生成/数据知识 5 层 21 个节点 + 科研方向虚线层（RAG 优化、评测体系、知识自动更新闭环），marker 箭头、path 回流线、悬停节点显示职责说明。</p>
+                </a>
+
+                <a class="card" href="18-4.html">
+                    <div class="card-header">
+                        <span class="card-index">18-4</span>
+                        <span class="card-badge">ECharts 图表</span>
+                    </div>
+                    <h3>18-4.html</h3>
+                    <p>ECharts 两个图表：降雨量-流量双 Y 轴面积折线图（toolbox 工具箱、dataZoom 滑块+滚轮缩放、十字准星 tooltip、markArea 汛期高亮）与 ECharts 包体积矩形树图（treemap ↔ sunburst 每 3 秒 universalTransition 平滑过渡，可暂停/手动切换）；echarts.min.js 与示例数据 json 已下载到本地 cdn 目录，离线可运行。</p>
+                </a>
+
+                <a class="card" href="18-6.html">
+                    <div class="card-header">
+                        <span class="card-index">18-6</span>
+                        <span class="card-badge">Mermaid 图表</span>
+                    </div>
+                    <h3>18-6.html</h3>
+                    <p>基于 Mermaid 的智能客服系统图表：flowchart 业务流程图（意图识别→知识库检索→置信度判断分支→机器人应答/转人工工单→评价→知识库更新闭环，classDef 四色节点）与 erDiagram 数据库 ER 图（用户/会话/消息/知识分类/知识条目/工单/反馈评价 7 实体含主外键与基数关系）；mermaid.min.js 已下载到本地 cdn 目录，离线可运行。</p>
+                </a>
+
+                <a class="card" href="18-7.html">
+                    <div class="card-header">
+                        <span class="card-index">18-7</span>
+                        <span class="card-badge">Three.js 3D</span>
+                    </div>
+                    <h3>18-7.html</h3>
+                    <p>基于 Three.js 的两个 3D 图表：月份×产品线销量 3D 柱状图（BoxGeometry 逐根生成、按产品线配色、Raycaster 悬停高亮+跟随提示、自动旋转/复位视角）与年度销量占比 3D 饼图（CylinderGeometry 扇形段拼合、Sprite 文字标签、悬停向外弹出+占比状态）；OrbitControls 拖转/缩放，three.min.js 与 OrbitControls.js 已下载到本地 cdn 目录，离线可运行。</p>
+                </a>
+
+                <a class="card" href="18-8.html">
+                    <div class="card-header">
+                        <span class="card-index">18-8</span>
+                        <span class="card-badge">数据大屏</span>
+                    </div>
+                    <h3>18-8.html</h3>
+                    <p>汽车之家全国运营数据大屏（ECharts）：三列布局——左列 KPI 数字滚动 + 省份 TOP8 柱状图 + 车型环形占比，中间上方为中国地图（geo 行政区着色 + visualMap + 热门城市涟漪散点 + 订单飞线）、下方 24 小时 PV/UV 趋势，右列服务雷达 + 转化漏斗 + 实时成交播报；echarts.min.js 与中国地图 GeoJSON（china.json/china.js）已下载到本地 cdn 目录，离线可运行。</p>
                 </a>
             </div>
         </main>
